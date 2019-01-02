@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Foil Notes
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-foilnotes
+Exec=harbour-foilnotes

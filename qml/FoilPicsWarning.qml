@@ -37,7 +37,7 @@ Item {
         horizontalAlignment: Text.AlignLeft
         color: Theme.highlightColor
         //: Warning text, small size label below the password prompt
-        //% "Note that Foil Notes and Foil Pics share encryption key and password."
+        //% "Note that Foil Notes and Foil Pics share the encryption key and the password."
         text: qsTrId("foilnotes-foil_pics_warning")
     }
 }

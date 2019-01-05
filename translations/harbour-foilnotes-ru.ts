@@ -291,7 +291,7 @@
         <translation>Расшифровать выбранные записи</translation>
     </message>
     <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share encryption key and password.</source>
+        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
         <translation>Имейте в виду, что Foil Pics использует тот же ключ с тем же паролем, что и Foil Notes.</translation>
     </message>

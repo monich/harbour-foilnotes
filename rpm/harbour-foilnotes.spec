@@ -14,7 +14,6 @@ BuildRequires:  pkgconfig(libcrypto)
 BuildRequires:  pkgconfig(sailfishapp)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Core)
-BuildRequires:  pkgconfig(Qt5Svg)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(mlite5)
 BuildRequires:  qt5-qttools-linguist
@@ -30,13 +29,12 @@ Notes encryption application.
 %setup -q -n %{name}-%{version}
 
 %build
-find  -type f  -exec touch {} + # Workaround for Mer OBS being slightly broken
 %qtc_qmake5 %{name}.pro
 %qtc_make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
-%qmake5_install -f Makefile.app
+%qmake5_install
 
 desktop-file-install --delete-original \
   --dir %{buildroot}%{_datadir}/applications \

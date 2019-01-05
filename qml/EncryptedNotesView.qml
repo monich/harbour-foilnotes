@@ -122,6 +122,7 @@ SilicaFlickable {
             filterModel.setFilterFixedString("")
             filterModel.sourceModel = foilModel
             grid.model = filterModel
+            grid.removeAnimationDuration = 0
             grid.animateDisplacement = false
         } else {
             grid.model = foilModel

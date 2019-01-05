@@ -20,6 +20,7 @@ Page {
 
     function encryptNoteAt(row) {
         if (row >= 0 && foilModel.keyAvailable) {
+            grid.removeAnimationDuration = 500
             var reqid = plaintextModel.startEncryptingAt(row)
             var note = plaintextModel.get(row)
             if (!foilModel.encryptNote(note.body, note.color, note.pagenr, reqid)) {
@@ -30,6 +31,7 @@ Page {
 
     function encryptNotes(rows) {
         pageStack.pop()
+        grid.removeAnimationDuration = 500
         for (var i = rows.length - 1; i >= 0 ; i--) {
             encryptNoteAt(rows[i])
         }
@@ -119,8 +121,11 @@ Page {
             filterModel.setFilterFixedString("")
             filterModel.sourceModel = plaintextModel
             grid.model = filterModel
+            grid.removeAnimationDuration = 0
+            grid.animateDisplacement = false
         } else {
             grid.model = plaintextModel
+            grid.animateDisplacement = true
             filterModel.sourceModel = null
             page.filter = ""
         }

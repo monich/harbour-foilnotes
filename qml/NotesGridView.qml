@@ -21,6 +21,7 @@ SilicaGridView {
     property bool showSelection
     property bool secret
     property bool animateDisplacement: true
+    property int removeAnimationDuration: 0
     property Component contextMenuComponent
     property Item contextMenu
     property Item contextMenuItem: contextMenu ? contextMenu.parent : null
@@ -117,9 +118,9 @@ SilicaGridView {
                 //: Remorse item text, will delete note when timer expires
                 //% "Deleting"
                 remorseAction(qsTrId("foilnotes-remorse-deleting"), function(index) {
+                    grid.removeAnimationDuration = 0
                     grid.model.deleteNoteAt(index)
                 })
-                pageStack.pop()
             }
 
             function remorseAction(text, callback) {
@@ -174,7 +175,10 @@ SilicaGridView {
                     })
                     notePage.colorChanged.connect(function() { model.color = notePage.color })
                     notePage.saveBody.connect(function(body) { model.body = body })
-                    notePage.deleteNote.connect(function() { noteDelegate.deleteNote() })
+                    notePage.deleteNote.connect(function() {
+                        noteDelegate.deleteNote()
+                        pageStack.pop()
+                    })
                     notePage.performAction.connect(function() { grid.performNoteAction(noteDelegate) })
                 }
             }
@@ -191,12 +195,22 @@ SilicaGridView {
             }
 
             GridView.onRemove: SequentialAnimation {
+                PropertyAction {
+                    target: noteDelegate
+                    property: "GridView.delayRemove"
+                    value: true
+                }
                 NumberAnimation {
                     target: noteDelegate
                     properties: "opacity,scale"
                     to: 0
-                    duration: 150
+                    duration: grid.removeAnimationDuration
                     easing.type: Easing.InOutQuad
+                }
+                PropertyAction {
+                    target: noteDelegate
+                    property: "GridView.delayRemove"
+                    value: false
                 }
             }
         }

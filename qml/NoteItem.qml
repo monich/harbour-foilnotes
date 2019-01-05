@@ -55,7 +55,7 @@ Item {
                 right: parent.right
             }
             height: parent.height
-            text: body ? Theme.highlightText(body.substr(0, Math.min(body.length, 300)), noteItem.filter, Theme.highlightColor) : ""
+            text: body ? Theme.highlightText(body.substr(0, Math.min(body.length, 300)), noteItem.filter, Theme.highlightColor).replace(/\n/g, '<br/>') : ""
             textFormat: Text.StyledText
             font {
                 family: Theme.fontFamily

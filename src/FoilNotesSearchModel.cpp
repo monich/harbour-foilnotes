@@ -32,6 +32,7 @@
  */
 
 #include "FoilNotesSearchModel.h"
+#include "FoilNotesBaseModel.h"
 
 #include "HarbourDebug.h"
 
@@ -195,6 +196,18 @@ void FoilNotesSearchModel::setTextIndex(int aIndex)
         QModelIndex sourceIndex = mapToSource(index(aIndex, 0));
         if (sourceIndex.isValid()) {
             source->setProperty(Private::PROP_TEXT_INDEX, sourceIndex.row());
+        }
+    }
+}
+
+void FoilNotesSearchModel::deleteNoteAt(int aRow)
+{
+    HDEBUG(aRow);
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
+        if (sourceIndex.isValid()) {
+            source->deleteNoteAt(sourceIndex.row());
         }
     }
 }

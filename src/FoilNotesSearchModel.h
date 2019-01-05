@@ -56,6 +56,8 @@ public:
     int textIndex() const;
     void setTextIndex(int aIndex);
 
+    Q_INVOKABLE void deleteNoteAt(int aRow);
+
 Q_SIGNALS:
     void filterRoleNameChanged();
     void sourceModelChanged();

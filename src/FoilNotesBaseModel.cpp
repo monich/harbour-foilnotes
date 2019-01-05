@@ -149,10 +149,15 @@ QList<int> FoilNotesBaseModel::selectedRows() const
     return rows;
 }
 
-QVariantMap FoilNotesBaseModel::get(int aIndex) const
+QVariantMap FoilNotesBaseModel::get(int aRow) const
 {
-    const Note* note = noteAt(aIndex);
+    const Note* note = noteAt(aRow);
     return note ? note->toVariant() : QVariantMap();
+}
+
+int FoilNotesBaseModel::sourceRow(int aRow) const
+{
+    return aRow;
 }
 
 void FoilNotesBaseModel::emitSelectedChanged()

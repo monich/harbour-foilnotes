@@ -19,10 +19,12 @@ Page {
         pageStack.find(function (pageOnStack) { return (page === pageOnStack) })
 
     function encryptNoteAt(row) {
-        var reqid = plaintextModel.startEncryptingAt(row)
-        var note = plaintextModel.get(row)
-        if (!foilModel.encryptNote(note.body, note.color, note.pagenr, reqid)) {
-            plaintextModel.onEncryptionDone(reqid, false)
+        if (row >= 0 && foilModel.keyAvailable) {
+            var reqid = plaintextModel.startEncryptingAt(row)
+            var note = plaintextModel.get(row)
+            if (!foilModel.encryptNote(note.body, note.color, note.pagenr, reqid)) {
+                plaintextModel.onEncryptionDone(reqid, false)
+            }
         }
     }
 
@@ -288,6 +290,15 @@ Page {
             model: plaintextModel
             showSelection: bulkActionRemorse.visible
 
+            //: Generic menu item
+            //% "Encrypt"
+            noteActionMenuText: foilModel.keyAvailable ? qsTrId("foilnotes-menu-encrypt") : ""
+            onPerformNoteAction: {
+                encryptNoteAt(grid.model.sourceRow(item.modelIndex))
+                rightSwipeToEncryptedHintLoader.armed = true
+                pageStack.pop()
+            }
+
             contextMenuComponent: Component {
                 ContextMenu {
                     id: contextMenu
@@ -308,7 +319,7 @@ Page {
                         text: qsTrId("foilnotes-menu-encrypt")
                         visible: foilModel.keyAvailable
                         onClicked: {
-                            encryptNoteAt(contextMenu.parent.modelIndex)
+                            encryptNoteAt(grid.model.sourceRow(contextMenu.parent.modelIndex))
                             rightSwipeToEncryptedHintLoader.armed = true
                         }
                     }

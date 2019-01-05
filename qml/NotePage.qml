@@ -9,9 +9,11 @@ Page {
     property color color: FoilNotesSettings.availableColors[0]
     property alias body: textArea.text
     property alias dirty: shortSaveTimer.running
+    property alias actionMenuText: actionMenuItem.text
 
     signal saveBody(var body)
     signal deleteNote()
+    signal performAction()
 
     onStatusChanged: {
         if (status === PageStatus.Inactive) {
@@ -47,6 +49,13 @@ Page {
         contentHeight: column.y + column.height
 
         PullDownMenu {
+            MenuItem {
+                id: actionMenuItem
+
+                enabled: text.length > 0
+                visible: enabled
+                onClicked: page.performAction()
+            }
             MenuItem {
                 //: Select note color
                 //% "Select color"

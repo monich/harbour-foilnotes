@@ -83,7 +83,8 @@ public:
     Q_INVOKABLE void selectAll();
     Q_INVOKABLE void clearSelection();
     Q_INVOKABLE QList<int> selectedRows() const;
-    Q_INVOKABLE QVariantMap get(int aIndex) const;
+    Q_INVOKABLE QVariantMap get(int aRow) const;
+    Q_INVOKABLE int sourceRow(int aRow) const;
 
     // QAbstractListModel
     Qt::ItemFlags flags(const QModelIndex& aIndex) const Q_DECL_OVERRIDE;

@@ -225,4 +225,17 @@ QVariantMap FoilNotesSearchModel::get(int aRow) const
     return QVariantMap();
 }
 
+int FoilNotesSearchModel::sourceRow(int aRow) const
+{
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
+        if (sourceIndex.isValid()) {
+            HDEBUG(aRow << "->" << sourceIndex.row());
+            return sourceIndex.row();
+        }
+    }
+    return -1;
+}
+
 #include "FoilNotesSearchModel.moc"

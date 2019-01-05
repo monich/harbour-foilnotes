@@ -11,6 +11,10 @@ SilicaGridView {
     cellWidth: cellSize
     clip: true
 
+    // Custom note action
+    property string noteActionMenuText
+    signal performNoteAction(var item)
+
     property int cellSize
     property int columnCount
     property string filter
@@ -109,15 +113,22 @@ SilicaGridView {
             readonly property bool menuOpen: grid.contextMenuItem === noteDelegate
 
             function deleteNote() {
+                grid.positionViewAtIndex(noteDelegate.modelIndex, GridView.Visible)
+                //: Remorse item text, will delete note when timer expires
+                //% "Deleting"
+                remorseAction(qsTrId("foilnotes-remorse-deleting"), function(index) {
+                    grid.model.deleteNoteAt(index)
+                })
+                pageStack.pop()
+            }
+
+            function remorseAction(text, callback) {
                 var item = noteDelegate
-                remorseComponent.createObject(item).execute(item,
-                    //: Remorse item text, will delete note when timer expires
-                    //% "Deleting"
-                    qsTrId("foilnotes-remorse-deleting"), function() {
-                        // Always animate deletion
+                remorseComponent.createObject(item).execute(item, text,
+                    function() {
                         var prevAnimateDisplacement  = grid.animateDisplacement
                         grid.animateDisplacement = true
-                        grid.model.deleteNoteAt(item.modelIndex)
+                        callback(item.modelIndex)
                         grid.animateDisplacement = prevAnimateDisplacement
                     })
             }
@@ -158,15 +169,13 @@ SilicaGridView {
                         pagenr: model.pagenr,
                         color: model.color,
                         body: modelText,
-                        allowedOrientations: page.allowedOrientations
+                        allowedOrientations: page.allowedOrientations,
+                        actionMenuText: noteActionMenuText
                     })
                     notePage.colorChanged.connect(function() { model.color = notePage.color })
                     notePage.saveBody.connect(function(body) { model.body = body })
-                    notePage.deleteNote.connect(function() {
-                        grid.positionViewAtIndex(noteDelegate.modelIndex, GridView.Visible)
-                        noteDelegate.deleteNote()
-                        pageStack.pop()
-                    })
+                    notePage.deleteNote.connect(function() { noteDelegate.deleteNote() })
+                    notePage.performAction.connect(function() { grid.performNoteAction(noteDelegate) })
                 }
             }
 

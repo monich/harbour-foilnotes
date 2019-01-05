@@ -89,7 +89,11 @@ SilicaGridView {
     Component {
         id: remorseComponent
 
-        RemorseItem { wrapMode: Text.Wrap }
+        RemorseItem {
+            leftMargin: Theme.paddingLarge
+            rightMargin: Theme.paddingLarge
+            wrapMode: Text.Wrap
+        }
     }
 
     delegate: Component {

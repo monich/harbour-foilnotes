@@ -140,8 +140,8 @@ Page {
                     onDecryptNote: page.decryptNote(note)
                     Connections {
                         target: page
-                        onStatusChanged: {
-                            if (page.status === PageStatus.Inactive) {
+                        onIsCurrentPageChanged: {
+                            if (page.isCurrentPage) {
                                 encryptedNotesView.searchMode = false
                             }
                         }

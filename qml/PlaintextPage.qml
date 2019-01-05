@@ -15,6 +15,8 @@ Page {
 
     readonly property int columnCount: isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
     readonly property int cellSize: isPortrait ? appPortraitCellSize : appLandscapeCellSize
+    readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
+        pageStack.find(function (pageOnStack) { return (page === pageOnStack) })
 
     function encryptNoteAt(row) {
         var reqid = plaintextModel.startEncryptingAt(row)
@@ -97,11 +99,15 @@ Page {
         filterRoleName: "body"
     }
 
+    onIsCurrentPageChanged: {
+        if (!isCurrentPage) {
+            searchMode = false
+        }
+    }
+
     onStatusChanged: {
         if (status === PageStatus.Active) {
             plaintextModel.textIndex = -1
-        } else if (status === PageStatus.Inactive) {
-            searchMode = false
         }
     }
 

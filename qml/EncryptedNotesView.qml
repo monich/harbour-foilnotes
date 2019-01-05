@@ -276,6 +276,30 @@ SilicaFlickable {
             showSelection: bulkActionRemorse.visible
             secret: true
 
+            //: Generic menu item
+            //% "Decrypt"
+            noteActionMenuText: qsTrId("foilnotes-menu-decrypt")
+            onPerformNoteAction: {
+                grid.positionViewAtIndex(item.modelIndex, GridView.Visible)
+                //: Decrypting note in 5 seconds
+                //% "Decrypting"
+                item.remorseAction(qsTrId("foilnotes-remorse-decrypting"),
+                    function(index) { decryptNoteAt(index) })
+                pageStack.pop()
+            }
+
+            function decryptNoteAt(index) {
+                var note = model.get(index)
+                if ('body' in note) {
+                    view.decryptNote(note)
+                    // Always animate deletion of decrypted items
+                    animateDisplacement = false
+                    model.deleteNoteAt(index)
+                    animateDisplacement = !searchMode
+                    leftSwipeToDecryptedHintLoader.armed = true
+                }
+            }
+
             contextMenuComponent: Component {
                 ContextMenu {
                     id: contextMenu
@@ -295,21 +319,10 @@ SilicaFlickable {
                         //% "Decrypt"
                         text: qsTrId("foilnotes-menu-decrypt")
                         onClicked: {
-                            var item = contextMenu.parent
-                            remorseComponent.createObject(item).execute(item,
-                                //: Decrypting note in 5 seconds
-                                //% "Decrypting"
-                                qsTrId("foilnotes-remorse-decrypting"), function() {
-                                    var note = grid.model.get(item.modelIndex)
-                                    if ('body' in note) {
-                                        view.decryptNote(note)
-                                        // Always animate deletion of decrypted items
-                                        grid.animateDisplacement = false
-                                        grid.model.deleteNoteAt(item.modelIndex)
-                                        grid.animateDisplacement = !searchMode
-                                        leftSwipeToDecryptedHintLoader.armed = true
-                                    }
-                                })
+                            //: Decrypting note in 5 seconds
+                            //% "Decrypting"
+                            contextMenu.parent.remorseAction(qsTrId("foilnotes-remorse-decrypting"),
+                                function(index) { grid.decryptNoteAt(index) })
                         }
                     }
                     MenuItem {

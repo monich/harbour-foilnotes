@@ -57,6 +57,11 @@ Page {
         id: notification
 
         expireTimeout: 2000
+        Component.onCompleted: {
+            if ('icon' in notification) {
+                notification.icon = "icon-s-certificates"
+            }
+        }
     }
 
     Timer {

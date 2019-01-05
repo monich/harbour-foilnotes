@@ -48,6 +48,12 @@ Page {
 
         PullDownMenu {
             MenuItem {
+                //: Select note color
+                //% "Select color"
+                text: qsTrId("foilnotes-menu-select_color")
+                onClicked: page.pickColor()
+            }
+            MenuItem {
                 //: Delete this note from note page
                 //% "Delete note"
                 text: qsTrId("foilnotes-menu-delete_note")

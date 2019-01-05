@@ -38,6 +38,11 @@
         <extracomment>Create a new secret note ready for editing</extracomment>
         <translation>New secret note</translation>
     </message>
+    <message id="foilnotes-menu-select_color">
+        <source>Select color</source>
+        <extracomment>Select note color</extracomment>
+        <translation>Select color</translation>
+    </message>
     <message id="foilnotes-menu-delete_note">
         <source>Delete note</source>
         <extracomment>Delete this note from note page</extracomment>

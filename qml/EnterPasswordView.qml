@@ -7,6 +7,7 @@ SilicaFlickable {
     id: view
     property var foilModel
     property bool wrongPassword
+    readonly property bool landscapeLayout: appLandscapeMode && Screen.sizeCategory < Screen.Large
     readonly property bool unlocking: foilModel.foilState !== FoilNotesModel.FoilLocked &&
                                     foilModel.foilState !== FoilNotesModel.FoilLockedTimedOut
 
@@ -110,7 +111,7 @@ SilicaFlickable {
     states: [
         State {
             name: "portrait"
-            when: !appLandscapeMode
+            when: !landscapeLayout
             changes: [
                 AnchorChanges {
                     target: passphraseField
@@ -138,7 +139,7 @@ SilicaFlickable {
         },
         State {
             name: "landscape"
-            when: appLandscapeMode
+            when: landscapeLayout
             changes: [
                 AnchorChanges {
                     target: passphraseField

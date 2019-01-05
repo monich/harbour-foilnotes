@@ -152,26 +152,27 @@ Page {
 
         anchors.fill: parent
 
-        onMovementEnded: {
-            if (pullDownMenu.fullyExpanded) {
-                // Pulley menu snapped
-                pullDownMenu.searchModeBeforeSnap = searchMode
-                pullDownMenu.snapped = true
-                if (searchMode) searchField.focus = false
-            }
-        }
+        // atYBeginning property seems to be unreliable, sometimes topMargin
+        // equals -contentY but for whatever reason atYBeginning stays false
+        readonly property bool fullyExpanded: topMargin > 0 && topMargin == -contentY
+        property bool moving
+
+        onMovementStarted: moving = true
+        onMovementEnded: moving = false
 
         PullDownMenu {
             id: pullDownMenu
 
-            property bool snapped
             property bool searchModeBeforeSnap
             property bool menuItemClicked
-            readonly property bool fullyExpanded: active && flickable.atYBeginning && (flickable.topMargin > 0)
+            readonly property bool snapped: active && flickable.fullyExpanded && !flickable.moving
 
-            onFullyExpandedChanged: {
-                if (!fullyExpanded && snapped && !menuItemClicked) {
-                    // Released from snap
+            onSnappedChanged: {
+                if (snapped) {
+                    searchModeBeforeSnap = searchMode
+                    if (searchMode) searchField.focus = false
+                } else {
+                    // Release from snap
                     if (searchModeBeforeSnap) {
                         searchMode = false
                         searchField.text = ""
@@ -184,7 +185,6 @@ Page {
 
             onActiveChanged: {
                 if (active) {
-                    snapped = false
                     menuItemClicked = false
                 } else {
                     updateMenuItems()

@@ -57,6 +57,7 @@ public:
     void setTextIndex(int aIndex);
 
     Q_INVOKABLE void deleteNoteAt(int aRow);
+    Q_INVOKABLE QVariantMap get(int aIndex) const;
 
 Q_SIGNALS:
     void filterRoleNameChanged();

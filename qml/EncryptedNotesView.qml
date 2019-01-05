@@ -296,12 +296,15 @@ SilicaFlickable {
                                 //: Decrypting note in 5 seconds
                                 //% "Decrypting"
                                 qsTrId("foilnotes-remorse-decrypting"), function() {
-                                    view.decryptNote(foilModel.get(item.modelIndex))
-                                    // Always animate deletion of decrypted items
-                                    grid.animateDisplacement = false
-                                    foilModel.deleteNoteAt(item.modelIndex)
-                                    grid.animateDisplacement = !searchMode
-                                    leftSwipeToDecryptedHintLoader.armed = true
+                                    var note = grid.model.get(item.modelIndex)
+                                    if ('body' in note) {
+                                        view.decryptNote(note)
+                                        // Always animate deletion of decrypted items
+                                        grid.animateDisplacement = false
+                                        grid.model.deleteNoteAt(item.modelIndex)
+                                        grid.animateDisplacement = !searchMode
+                                        leftSwipeToDecryptedHintLoader.armed = true
+                                    }
                                 })
                         }
                     }

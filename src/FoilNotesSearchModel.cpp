@@ -212,4 +212,17 @@ void FoilNotesSearchModel::deleteNoteAt(int aRow)
     }
 }
 
+QVariantMap FoilNotesSearchModel::get(int aRow) const
+{
+    HDEBUG(aRow);
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
+        if (sourceIndex.isValid()) {
+            return source->get(sourceIndex.row());
+        }
+    }
+    return QVariantMap();
+}
+
 #include "FoilNotesSearchModel.moc"

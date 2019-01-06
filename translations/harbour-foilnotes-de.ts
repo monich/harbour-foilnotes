@@ -113,7 +113,7 @@
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
             <numerusform>Löschen %0 der Notiz</numerusform>
-            <numerusform>Löschen %0 der Notiz</numerusform>
+            <numerusform>Löschen %0 Notizen</numerusform>
         </translation>
     </message>
     <message id="foilnotes-organize_page-plaintext_header">
@@ -189,7 +189,10 @@
     <message id="foilnotes-generate_key_view-label-minimum_length" numerus="yes">
         <source>Type at least %0 character(s)</source>
         <extracomment>Password field label</extracomment>
-        <translation>Nutze mindestens %0 Zeichen</translation>
+        <translation>
+            <numerusform>Nutze mindestens %0 Zeichen</numerusform>
+            <numerusform>Nutze mindestens %0 Zeichen</numerusform>
+        </translation>
     </message>
     <message id="foilnotes-generate_key_view-button-generate_key">
         <source>Generate key</source>
@@ -224,7 +227,7 @@
     <message id="foilnotes-change_password_page-text_field_label-current_password">
         <source>Current password</source>
         <extracomment>Placeholder and label for the current password prompt</extracomment>
-        <translation>Aktualne hasło</translation>
+        <translation>Derzeitiges Passwort</translation>
     </message>
     <message id="foilnotes-change_password_page-text_field_label-new_password">
         <source>New password</source>
@@ -269,7 +272,10 @@
     <message id="foilnotes-remorse-decrypting_selected" numerus="yes">
         <source>Decrypting %0 selected notes</source>
         <extracomment>Generic remorse popup text</extracomment>
-        <translation>Entschlüssel %0 ausgewählte Notizen</translation>
+        <translation>
+            <numerusform>Entschlüssel %0 ausgewählte Notiz</numerusform>
+            <numerusform>Entschlüssel %0 ausgewählte Notizen</numerusform>
+        </translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

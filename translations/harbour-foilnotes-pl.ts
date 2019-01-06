@@ -112,6 +112,7 @@
         <source>Deleting %0 selected notes</source>
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
+            <numerusform>Usuwanie %0 wybraną notatkę</numerusform>
             <numerusform>Usuwanie %0 wybranej notatki</numerusform>
             <numerusform>Usuwanie %0 wybranych notatek</numerusform>
         </translation>
@@ -274,6 +275,7 @@
         <source>Decrypting %0 selected notes</source>
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
+            <numerusform>Odszyfrowywanie %0 wybraną notatkę</numerusform>
             <numerusform>Odszyfrowywanie %0 wybranej notatki</numerusform>
             <numerusform>Odszyfrowywanie %0 wybranych notatek</numerusform>
         </translation>

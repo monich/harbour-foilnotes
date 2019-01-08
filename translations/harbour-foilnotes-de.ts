@@ -51,12 +51,12 @@
     <message id="foilnotes-menu-encrypt">
         <source>Encrypt</source>
         <extracomment>Generic menu item</extracomment>
-        <translation>Entschlüsselt</translation>
+        <translation>Verschlüsselt</translation>
     </message>
     <message id="foilnotes-menu-decrypt">
         <source>Decrypt</source>
         <extracomment>Generic menu item</extracomment>
-        <translation>Verschlüsselt</translation>
+        <translation>Entschlüsseln</translation>
     </message>
     <message id="foilnotes-menu-delete">
         <source>Delete</source>
@@ -247,7 +247,7 @@
     <message id="foilnotes-confirm_password_page-description">
         <source>Make sure you don&apos;t forget your password. It&apos;s impossible to either recover it or to access the encrypted notes without knowing it. Better take it seriously.</source>
         <extracomment>Password confirmation description</extracomment>
-        <translation>Beachte, wen du dein Password vergisst hast du kein Zugriff mehr auf deine veschlüsselten Notizen.</translation>
+        <translation>Beachte, wen du dein Password vergisst hast du kein Zugriff mehr auf deine verschlüsselten Notizen.</translation>
     </message>
     <message id="foilnotes-confirm_password_page-text_field_placeholder-new_password">
         <source>New password again</source>

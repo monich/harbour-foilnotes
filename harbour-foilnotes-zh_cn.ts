@@ -81,7 +81,7 @@
     <message id="foilnotes-default_file_name">
         <source>note</source>
         <extracomment>Placeholder name for note filename</extracomment>
-        <translation>note</translation>
+        <translation>笔记</translation>
     </message>
     <message id="foilnotes-placeholder-empty_note">
         <source>Write a note...</source>
@@ -140,7 +140,7 @@
     <message id="foilnotes-notification-password_changed">
         <source>Password changed</source>
         <extracomment>Pop-up notification</extracomment>
-        <translation>Пароль сменён</translation>
+        <translation>密码已更改</translation>
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
@@ -224,7 +224,7 @@
     <message id="foilnotes-change_password_page-label-enter_passwords">
         <source>Please enter the current and the new password</source>
         <extracomment>Password change prompt</extracomment>
-        <translation>Введите текущий и новый пароль</translation>
+        <translation>请输入当前密码和新密码</translation>
     </message>
     <message id="foilnotes-change_password_page-text_field_label-current_password">
         <source>Current password</source>

@@ -303,7 +303,7 @@
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
         <extracomment>Left swipe hint text</extracomment>
-        <translation>Там справа незашифрованные записи</translation>
+        <translation>左滑以访问明文笔记</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
         <source>Encrypted pictures are moved there to the left</source>

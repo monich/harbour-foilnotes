@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_cn">
+<TS version="2.1" language="zh_CN">
 <context>
     <name></name>
     <message id="foilnotes-app_name">
@@ -113,8 +113,6 @@
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
             <numerusform>删除选择的%0笔记</numerusform>
-            <numerusform>删除选择的%0笔记</numerusform>
-            <numerusform>删除选择的%0笔记</numerusform>
         </translation>
     </message>
     <message id="foilnotes-organize_page-plaintext_header">
@@ -191,8 +189,6 @@
         <source>Type at least %0 character(s)</source>
         <extracomment>Password field label</extracomment>
         <translation>
-            <numerusform>输入至少 %0 字符</numerusform>
-            <numerusform>输入至少 %0 字符</numerusform>
             <numerusform>输入至少 %0 字符</numerusform>
         </translation>
     </message>
@@ -276,8 +272,6 @@
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
             <numerusform>解密选择的 %0 笔记</numerusform>
-            <numerusform>解密选择的 %0 笔记</numerusform>
-            <numerusform>解密选择的 %0 笔记</numerusform>
         </translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
@@ -298,7 +292,7 @@
     <message id="foilnotes-foil_pics_warning">
         <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>请注意, "Foil Notes " 和 "Foil Pics" 共享加密密钥和密码。</translation>
+        <translation>请注意, &quot;Foil Notes&quot; 和 &quot;Foil Pics&quot; 共享加密密钥和密码。</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>

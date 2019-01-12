@@ -29,7 +29,7 @@ ApplicationWindow {
     readonly property int appColumnCount: appLandscapeMode ? appLandscapeColumnCount : appPortraitColumnCount
     readonly property int appCellSize: appLandscapeMode ? appLandscapeCellSize : appPortraitCellSize
 
-    signal newPageFromCover()
+    signal newNoteFromCover()
 
     FoilNotesPlaintextModel {
         id: appPlaintextModel
@@ -80,10 +80,10 @@ ApplicationWindow {
 
             Connections {
                 target: appWindow
-                onNewPageFromCover: {
+                onNewNoteFromCover: {
                     pageStack.pop(null, PageStackAction.Immediate)
                     pageStack.navigateForward(PageStackAction.Immediate)
-                    plaintextPage.newNote(PageStackAction.Immediate)
+                    plaintextPage.newNoteFromCover()
                     activate()
                 }
             }
@@ -94,7 +94,7 @@ ApplicationWindow {
 
     cover: Component {
         CoverPage {
-            onNewNote: appWindow.newPageFromCover()
+            onNewNote: appWindow.newNoteFromCover()
         }
     }
 }

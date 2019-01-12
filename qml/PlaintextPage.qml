@@ -29,6 +29,10 @@ Page {
         }
     }
 
+    function newNoteFromCover() {
+        grid.newNote(plaintextModel, PageStackAction.Immediate)
+    }
+
     function encryptNotes(rows) {
         pageStack.pop()
         grid.removeAnimationDuration = 500
@@ -134,32 +138,6 @@ Page {
 
     onFilterChanged: filterModel.setFilterFixedString(filter)
 
-    function newNote(transition) {
-        var noteCreated = false
-        var notePage = pageStack.push(notePageComponent, {
-            color: FoilNotesSettings.pickColor(),
-            allowedOrientations: page.allowedOrientations
-        }, transition)
-        notePage.colorChanged.connect(function() {
-            if (noteCreated) {
-                plaintextModel.setColorAt(0, notePage.color)
-            }
-        })
-        notePage.saveBody.connect(function(body) {
-            if (noteCreated) {
-                if (body.length > 0) {
-                    plaintextModel.setBodyAt(0, body)
-                } else {
-                    plaintextModel.deleteNoteAt(0)
-                    noteCreated = false
-                }
-            } else if (body.length > 0) {
-                plaintextModel.addNote(notePage.color, body)
-                noteCreated = true
-            }
-        })
-    }
-
     SilicaFlickable {
         id: flickable
 
@@ -250,7 +228,7 @@ Page {
                 text: qsTrId("foilnotes-menu-new_note")
                 onClicked: {
                     pullDownMenu.menuItemClicked = true
-                    page.newNote(PageStackAction.Animated)
+                    grid.newNote(plaintextModel, PageStackAction.Animated)
                 }
             }
         }

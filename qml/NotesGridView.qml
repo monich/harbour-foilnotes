@@ -30,15 +30,15 @@ SilicaGridView {
         contextMenuItem.modelIndex - (contextMenuItem.modelIndex % columnCount) + columnCount : 0
     readonly property int yOffset: contextMenu ? contextMenu.height : 0
 
-    function newNote() {
+    function newNote(model,transition) {
         var noteCreated = false
         var notePage = pageStack.push(notePageComponent, {
             color: FoilNotesSettings.pickColor(),
             allowedOrientations: appAllowedOrientations
-        })
+        }, transition)
         notePage.colorChanged.connect(function() {
             if (noteCreated) {
-                grid.model.setColorAt(0, notePage.color)
+                model.setColorAt(0, notePage.color)
             }
         })
         notePage.saveBody.connect(function(body) {
@@ -46,15 +46,33 @@ SilicaGridView {
                 if (body.length > 0) {
                     model.setBodyAt(0, body)
                 } else {
-                    grid.model.textIndex = -1
-                    grid.model.deleteNoteAt(0)
+                    model.textIndex = -1
+                    model.deleteNoteAt(0)
                     noteCreated = false
                 }
             } else if (body.length > 0) {
                 model.addNote(notePage.color, body)
-                grid.model.textIndex = 0
+                model.textIndex = 0
                 noteCreated = true
             }
+        })
+        notePage.deleteNote.connect(function() {
+            if (noteCreated) {
+                if (notePage.body.length > 0) {
+                    model.setBodyAt(0, notePage.body)
+                    grid.positionViewAtBeginning()
+                    grid.currentIndex = 0
+                    grid.currentItem.deleteNote()
+                } else {
+                    model.deleteNoteAt(0)
+                }
+            } else if (notePage.body.length > 0) {
+                model.addNote(notePage.color, body)
+                grid.positionViewAtBeginning()
+                grid.currentIndex = 0
+                grid.currentItem.deleteNote()
+            }
+            pageStack.pop()
         })
     }
 

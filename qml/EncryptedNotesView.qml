@@ -231,7 +231,7 @@ SilicaFlickable {
                 text: qsTrId("foilnotes-menu-new_secret_note")
                 onClicked: {
                     pullDownMenu.menuItemClicked = true
-                    grid.newNote()
+                    grid.newNote(foilModel, PageStackAction.Animated)
                 }
             }
         }

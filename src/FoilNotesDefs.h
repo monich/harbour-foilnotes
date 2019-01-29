@@ -51,11 +51,4 @@
 #define FOILNOTES_ROLE_BODY         "body"
 #define FOILNOTES_ROLE_NOTEID       "noteId"
 
-enum FoilNotesRole {
-    FoilNotesRolePageNr = Qt::UserRole,
-    FoilNotesRoleColor,
-    FoilNotesRoleBody,
-    FoilNotesRoleNoteId
-};
-
 #endif // FOILNOTES_DEFS_H

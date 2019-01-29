@@ -1242,7 +1242,7 @@ void FoilNotesModel::Private::onDecryptNotesProgress(DecryptNotesTask::Progress:
 
 void FoilNotesModel::Private::onDecryptNotesTaskDone()
 {
-    HDEBUG(iData.count() << "picture(s) decrypted");
+    HDEBUG(iData.count() << "note(s) decrypted");
     if (sender() == iDecryptNotesTask) {
         bool infoUpdated = iDecryptNotesTask->iSaveInfo;
         iDecryptNotesTask->release();
@@ -1656,7 +1656,7 @@ bool FoilNotesModel::Private::unlock(QString aPassword)
             if (key) {
                 HDEBUG("Password accepted, thank you!");
                 setKeys(key);
-                // Now that we know the key, decrypt the pictures
+                // Now that we know the key, decrypt the notes
                 if (iDecryptNotesTask) iDecryptNotesTask->release();
                 iDecryptNotesTask = new DecryptNotesTask(iThreadPool,
                     iFoilNotesDir, iPrivateKey, iPublicKey, &iNextId);
@@ -1711,7 +1711,8 @@ bool FoilNotesModel::Private::busy() const
     if (iCheckNotesTask ||
         iSaveInfoTask ||
         iGenerateKeyTask ||
-        iDecryptNotesTask) {
+        iDecryptNotesTask ||
+        !iEncryptTasks.isEmpty()) {
         return true;
     } else {
         return false;

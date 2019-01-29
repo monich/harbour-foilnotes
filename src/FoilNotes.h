@@ -62,4 +62,4 @@ private:
     Private* iPrivate;
 };
 
-#endif // FOILNOTES_UTIL_H
+#endif // FOILNOTES_H

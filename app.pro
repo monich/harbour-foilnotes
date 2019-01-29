@@ -181,7 +181,7 @@ defineTest(addTrFile) {
     export(qm.files)
 }
 
-LANGUAGES = de pl ru sv zh_CN
+LANGUAGES = de fr pl ru sv zh_CN
 
 addTrFile($${NAME})
 for(l, LANGUAGES) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en">
+<TS version="2.1" language="fr">
 <context>
     <name></name>
     <message id="foilnotes-app_name">
@@ -16,12 +16,12 @@
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Vous n'avez aucune note.</translation>
+        <translation>Vous n&apos;avez aucune note.</translation>
     </message>
     <message id="foilnotes-encrypted_view-placeholder">
         <source>You do not have any encrypted notes</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Vous n'avez aucune note chiffrée</translation>
+        <translation>Vous n&apos;avez aucune note chiffrée</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder_hint">
         <source>Open pulley menu to add one.</source>
@@ -222,7 +222,7 @@
     <message id="foilnotes-change_password_page-label-enter_passwords">
         <source>Please enter the current and the new password</source>
         <extracomment>Password change prompt</extracomment>
-        <translation>Merci d'entrer le mot de passe actuel ainsi que le nouveau</translation>
+        <translation>Merci d&apos;entrer le mot de passe actuel ainsi que le nouveau</translation>
     </message>
     <message id="foilnotes-change_password_page-text_field_label-current_password">
         <source>Current password</source>
@@ -242,7 +242,7 @@
     <message id="foilnotes-confirm_password_page-info_label">
         <source>Please type in your new password one more time</source>
         <extracomment>Password confirmation label</extracomment>
-        <translation>Merci d'entrer votre nouveau mot de passe de nouveau</translation>
+        <translation>Merci d&apos;entrer votre nouveau mot de passe de nouveau</translation>
     </message>
     <message id="foilnotes-confirm_password_page-description">
         <source>Make sure you don&apos;t forget your password. It&apos;s impossible to either recover it or to access the encrypted notes without knowing it. Better take it seriously.</source>

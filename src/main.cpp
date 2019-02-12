@@ -35,13 +35,13 @@
 #include "FoilNotesHints.h"
 #include "FoilNotesModel.h"
 #include "FoilNotesPlaintextModel.h"
-#include "FoilNotesOrganizeModel.h"
 #include "FoilNotesSearchModel.h"
 #include "FoilNotesSettings.h"
 #include "FoilNotes.h"
 
 #include "HarbourDebug.h"
 #include "HarbourImageProvider.h"
+#include "HarbourOrganizeListModel.h"
 #include "HarbourSystemState.h"
 #include "HarbourTheme.h"
 
@@ -58,7 +58,7 @@ static void register_types(const char* uri, int v1 = 1, int v2 = 0)
     qmlRegisterSingletonType<FoilNotesHints>(uri, v1, v2, "FoilNotesHints", FoilNotesHints::createSingleton);
     qmlRegisterSingletonType<FoilNotesSettings>(uri, v1, v2, "FoilNotesSettings", FoilNotesSettings::createSingleton);
     qmlRegisterType<FoilNotesSearchModel>(uri, v1, v2, "FoilNotesSearchModel");
-    qmlRegisterType<FoilNotesOrganizeModel>(uri, v1, v2, "FoilNotesOrganizeModel");
+    qmlRegisterType<HarbourOrganizeListModel>(uri, v1, v2, "HarbourOrganizeListModel");
     qmlRegisterType<FoilNotesPlaintextModel>(uri, v1, v2, "FoilNotesPlaintextModel");
     qmlRegisterSingletonType<FoilNotes>(uri, v1, v2, "FoilNotes", FoilNotes::createSingleton);
     qmlRegisterSingletonType<FoilNotesModel>(uri, v1, v2, "FoilNotesModel", FoilNotesModel::createSingleton);

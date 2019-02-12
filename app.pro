@@ -68,7 +68,6 @@ HEADERS += \
     src/FoilNotesDefs.h \
     src/FoilNotesHints.h \
     src/FoilNotesModel.h \
-    src/FoilNotesOrganizeModel.h \
     src/FoilNotesPlaintextModel.h \
     src/FoilNotesSearchModel.h \
     src/FoilNotesSettings.h
@@ -78,7 +77,6 @@ SOURCES += \
     src/FoilNotesBaseModel.cpp \
     src/FoilNotesHints.cpp \
     src/FoilNotesModel.cpp \
-    src/FoilNotesOrganizeModel.cpp \
     src/FoilNotesPlaintextModel.cpp \
     src/FoilNotesSearchModel.cpp \
     src/FoilNotesSettings.cpp \
@@ -103,6 +101,7 @@ INCLUDEPATH += \
 HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourDebug.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourImageProvider.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystemState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourTask.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourTheme.h \
@@ -111,6 +110,7 @@ HEADERS += \
 SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourImageProvider.cpp \
     $${HARBOUR_LIB_SRC}/HarbourMce.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourOrganizeListModel.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystemState.cpp \
     $${HARBOUR_LIB_SRC}/HarbourTask.cpp \
     $${HARBOUR_LIB_SRC}/HarbourTheme.cpp

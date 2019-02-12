@@ -25,7 +25,7 @@ Page {
             anchors.fill: parent
             interactive: !dragItem
             clip: true
-            model: FoilNotesOrganizeModel {
+            model: HarbourOrganizeListModel {
                 id: organizeModel
             }
 

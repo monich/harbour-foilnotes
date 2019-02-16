@@ -274,6 +274,11 @@
             <numerusform>解密选择的 %0 笔记</numerusform>
         </translation>
     </message>
+    <message id="foilnotes-foil_pics_warning">
+        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+        <extracomment>Warning text, small size label below the password prompt</extracomment>
+        <translation>请注意, &quot;Foil Notes&quot; 和 &quot;Foil Pics&quot; 共享加密密钥和密码。</translation>
+    </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>
         <extracomment>Hint text</extracomment>
@@ -289,11 +294,6 @@
         <extracomment>Hint text</extracomment>
         <translation>解密选择的笔记</translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
-        <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>请注意, &quot;Foil Notes&quot; 和 &quot;Foil Pics&quot; 共享加密密钥和密码。</translation>
-    </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
         <extracomment>Left swipe hint text</extracomment>
@@ -308,6 +308,16 @@
         <source>Decrypted notes are moved back to the right</source>
         <extracomment>Left swipe hint text</extracomment>
         <translation>解密笔记会移回右侧</translation>
+    </message>
+    <message id="foilnotes-hint-undo">
+        <source>Undo</source>
+        <extracomment>Hint text</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="foilnotes-hint-redo">
+        <source>Redo</source>
+        <extracomment>Hint text</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

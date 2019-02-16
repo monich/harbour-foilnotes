@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.2
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
@@ -10,6 +10,11 @@ Page {
     property alias body: textArea.text
     property alias dirty: shortSaveTimer.running
     property alias actionMenuText: actionMenuItem.text
+
+    readonly property string imageProvider: HarbourTheme.darkOnLight ? ImageProviderDarkOnLight : ImageProviderDefault
+    readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
+    readonly property bool canUndo: "_editor" in textArea && textArea._editor.canUndo
+    readonly property bool canRedo: "_editor" in textArea && textArea._editor.canRedo
 
     signal saveBody(var body)
     signal deleteNote()
@@ -131,5 +136,93 @@ Page {
         }
 
         VerticalScrollDecorator {}
+    }
+
+    InteractionHintLabel {
+        id: selectionHint
+
+        anchors.fill: page
+        visible: opacity > 0
+        opacity: item ? 1.0 : 0.0
+        property Item item: null
+        Behavior on opacity { FadeAnimation { duration: 1000 } }
+    }
+
+    Loader {
+        opacity: page.canUndo ? 1 : 0
+        active: opacity > 0
+        anchors {
+            top: parent.top
+            topMargin: page.screenHeight - height - Theme.paddingLarge
+            left: parent.left
+            leftMargin: Theme.horizontalPageMargin
+        }
+        sourceComponent: Component {
+            IconButton {
+                id: undoButton
+
+                icon {
+                    source: "image://" + imageProvider + "/" + Qt.resolvedUrl("images/undo.svg")
+                    sourceSize: Qt.size(Theme.itemSizeSmall, Theme.itemSizeSmall)
+                }
+                onClicked: {
+                    cancelHint()
+                    textArea._editor.undo()
+                }
+                onReleased: cancelHint()
+                onCanceled: cancelHint()
+                onPressAndHold: {
+                    //: Hint text
+                    //% "Undo"
+                    selectionHint.text = qsTrId("foilnotes-hint-undo")
+                    selectionHint.item = undoButton
+                }
+                function cancelHint() {
+                    if (selectionHint.item === undoButton) {
+                        selectionHint.item = null
+                    }
+                }
+            }
+        }
+        Behavior on opacity { FadeAnimator {} }
+    }
+
+    Loader {
+        opacity: page.canRedo ? 1 : 0
+        active: opacity > 0
+        anchors {
+            top: parent.top
+            topMargin: page.screenHeight - height - Theme.paddingLarge
+            right: parent.right
+            rightMargin: Theme.horizontalPageMargin
+        }
+        sourceComponent: Component {
+            IconButton {
+                id: redoButton
+
+                icon {
+                    source: "image://" + imageProvider + "/" + Qt.resolvedUrl("images/redo.svg")
+                    sourceSize: Qt.size(Theme.itemSizeSmall, Theme.itemSizeSmall)
+                }
+                onClicked: {
+                    cancelHint()
+                    textArea._editor.redo()
+                }
+                onReleased: cancelHint()
+                onCanceled: cancelHint()
+                onPressAndHold: {
+                    //: Hint text
+                    //% "Redo"
+                    selectionHint.text = qsTrId("foilnotes-hint-redo")
+                    selectionHint.item = redoButton
+                }
+                function cancelHint() {
+                    if (selectionHint.item === redoButton) {
+                        selectionHint.item = null
+                    }
+                }
+            }
+        }
+        Behavior on opacity { FadeAnimator {} }
     }
 }

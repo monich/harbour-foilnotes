@@ -123,7 +123,7 @@ Item {
         sourceComponent: Component {
             Item {
                 Image {
-                    source: "image://" + HarbourImageProvider + "/" + Qt.resolvedUrl(HarbourTheme.darkOnLight ? "images/cover-lock-dark.svg" : "images/cover-lock.svg") + "?" + noteItem.color
+                    source: "image://" + ImageProviderDefault + "/" + Qt.resolvedUrl(HarbourTheme.darkOnLight ? "images/cover-lock-dark.svg" : "images/cover-lock.svg") + "?" + noteItem.color
                     x: Theme.paddingLarge
                     y: pagenumber.y + Math.floor((pagenumber.height - height)/2)
                     height: size

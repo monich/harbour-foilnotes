@@ -114,12 +114,17 @@ int main(int argc, char *argv[])
     QQmlContext* context = view->rootContext();
     QQmlEngine* engine = context->engine();
 
-    QString imageProvider("harbour");
-    engine->addImageProvider(imageProvider, new HarbourImageProvider);
+    // Register our image provider (two sets - one for light-on-dark and
+    // one for dark-on-light, doesn't really matter which one)
+    QString providerDefault("harbour");
+    QString providerDarkOnLight("harbour-dark");
+    engine->addImageProvider(providerDefault, new HarbourImageProvider);
+    engine->addImageProvider(providerDarkOnLight, new HarbourImageProvider);
 
     // Initialize global properties
     context->setContextProperty("MaximumHintCount", 1);
-    context->setContextProperty("HarbourImageProvider", imageProvider);
+    context->setContextProperty("ImageProviderDefault", providerDefault);
+    context->setContextProperty("ImageProviderDarkOnLight", providerDarkOnLight);
     context->setContextProperty("FoilNotesAppName", FOILNOTES_APP_NAME);
 
     // Initialize the view and show it

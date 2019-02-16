@@ -277,6 +277,11 @@
             <numerusform>Avkrypterar %0 markerade anteckningar</numerusform>
         </translation>
     </message>
+    <message id="foilnotes-foil_pics_warning">
+        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+        <extracomment>Warning text, small size label below the password prompt</extracomment>
+        <translation>Notera att Foil Notes och Foil Pics delar krypteringsnyckel och lösenord.</translation>
+    </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>
         <extracomment>Hint text</extracomment>
@@ -292,11 +297,6 @@
         <extracomment>Hint text</extracomment>
         <translation>Avkryptera valda anteckningar</translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
-        <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Notera att Foil Notes och Foil Pics delar krypteringsnyckel och lösenord.</translation>
-    </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
         <extracomment>Left swipe hint text</extracomment>
@@ -311,6 +311,16 @@
         <source>Decrypted notes are moved back to the right</source>
         <extracomment>Left swipe hint text</extracomment>
         <translation>Avkrypterade anteckningar flyttas tillbaka åt höger</translation>
+    </message>
+    <message id="foilnotes-hint-undo">
+        <source>Undo</source>
+        <extracomment>Hint text</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="foilnotes-hint-redo">
+        <source>Redo</source>
+        <extracomment>Hint text</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

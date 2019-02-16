@@ -280,6 +280,11 @@
             <numerusform>Расшифровка %0 записей</numerusform>
         </translation>
     </message>
+    <message id="foilnotes-foil_pics_warning">
+        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+        <extracomment>Warning text, small size label below the password prompt</extracomment>
+        <translation>Имейте в виду, что Foil Pics использует тот же ключ с тем же паролем, что и Foil Notes.</translation>
+    </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>
         <extracomment>Hint text</extracomment>
@@ -295,11 +300,6 @@
         <extracomment>Hint text</extracomment>
         <translation>Расшифровать выбранные записи</translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
-        <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Имейте в виду, что Foil Pics использует тот же ключ с тем же паролем, что и Foil Notes.</translation>
-    </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
         <extracomment>Left swipe hint text</extracomment>
@@ -314,6 +314,16 @@
         <source>Decrypted notes are moved back to the right</source>
         <extracomment>Left swipe hint text</extracomment>
         <translation>Расшифрованные записи попадают обратно направо</translation>
+    </message>
+    <message id="foilnotes-hint-undo">
+        <source>Undo</source>
+        <extracomment>Hint text</extracomment>
+        <translation>Отменить</translation>
+    </message>
+    <message id="foilnotes-hint-redo">
+        <source>Redo</source>
+        <extracomment>Hint text</extracomment>
+        <translation>Вернуть</translation>
     </message>
 </context>
 </TS>

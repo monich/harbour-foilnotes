@@ -277,6 +277,11 @@
             <numerusform>Entschlüssel %0 ausgewählte Notizen</numerusform>
         </translation>
     </message>
+    <message id="foilnotes-foil_pics_warning">
+        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+        <extracomment>Warning text, small size label below the password prompt</extracomment>
+        <translation>Achtung, Foil Notes und Foil Pics nutzen beide den gleichen Schlüssel und das gleiche Passwort</translation>
+    </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>
         <extracomment>Hint text</extracomment>
@@ -292,11 +297,6 @@
         <extracomment>Hint text</extracomment>
         <translation>Entschlüssel ausgewählte Notizen</translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
-        <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Achtung, Foil Notes und Foil Pics nutzen beide den gleichen Schlüssel und das gleiche Passwort</translation>
-    </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
         <extracomment>Left swipe hint text</extracomment>
@@ -311,6 +311,16 @@
         <source>Decrypted notes are moved back to the right</source>
         <extracomment>Left swipe hint text</extracomment>
         <translation>Entschlüsselte Notizen werden nach rechts bewegt</translation>
+    </message>
+    <message id="foilnotes-hint-undo">
+        <source>Undo</source>
+        <extracomment>Hint text</extracomment>
+        <translation type="unfinished">Rückgängig</translation>
+    </message>
+    <message id="foilnotes-hint-redo">
+        <source>Redo</source>
+        <extracomment>Hint text</extracomment>
+        <translation type="unfinished">Wiederholen</translation>
     </message>
 </context>
 </TS>

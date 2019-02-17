@@ -200,7 +200,7 @@
     <message id="foilnotes-generate_key_view-button-generating_key">
         <source>Generating...</source>
         <extracomment>Button label</extracomment>
-        <translation>生成...</translation>
+        <translation>生成中...</translation>
     </message>
     <message id="foilnotes-generate_key_warning-title">
         <source>Warning</source>
@@ -215,7 +215,7 @@
     <message id="foilnotes-generating_key_view-generating_new_key">
         <source>Generating new key...</source>
         <extracomment>Progress view label</extracomment>
-        <translation>生成新秘钥...</translation>
+        <translation>生成新秘钥中...</translation>
     </message>
     <message id="foilnotes-change_password_page-label-enter_passwords">
         <source>Please enter the current and the new password</source>
@@ -265,7 +265,7 @@
     <message id="foilnotes-remorse-decrypting">
         <source>Decrypting</source>
         <extracomment>Decrypting note in 5 seconds</extracomment>
-        <translation>解密</translation>
+        <translation>解密中</translation>
     </message>
     <message id="foilnotes-remorse-decrypting_selected" numerus="yes">
         <source>Decrypting %0 selected notes</source>
@@ -302,7 +302,7 @@
     <message id="foilnotes-hint-swipe_right_to_encrypted">
         <source>Encrypted pictures are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
-        <translation>加密照片从这里移到左侧</translation>
+        <translation>加密照片会从这里移到左侧</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_decrypted">
         <source>Decrypted notes are moved back to the right</source>
@@ -312,12 +312,12 @@
     <message id="foilnotes-hint-undo">
         <source>Undo</source>
         <extracomment>Hint text</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>取消</translation>
     </message>
     <message id="foilnotes-hint-redo">
         <source>Redo</source>
         <extracomment>Hint text</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>重做</translation>
     </message>
 </context>
 </TS>

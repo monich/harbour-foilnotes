@@ -315,12 +315,12 @@
     <message id="foilnotes-hint-undo">
         <source>Undo</source>
         <extracomment>Hint text</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Ångra</translation>
     </message>
     <message id="foilnotes-hint-redo">
         <source>Redo</source>
         <extracomment>Hint text</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Gör om</translation>
     </message>
 </context>
 </TS>

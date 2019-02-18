@@ -267,7 +267,7 @@
     <message id="foilnotes-remorse-decrypting">
         <source>Decrypting</source>
         <extracomment>Decrypting note in 5 seconds</extracomment>
-        <translation>Déchiffrement dans 5 secondes</translation>
+        <translation>Déchiffrement</translation>
     </message>
     <message id="foilnotes-remorse-decrypting_selected" numerus="yes">
         <source>Decrypting %0 selected notes</source>

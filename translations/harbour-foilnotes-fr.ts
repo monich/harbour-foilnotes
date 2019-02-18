@@ -41,7 +41,7 @@
     <message id="foilnotes-menu-select_color">
         <source>Select color</source>
         <extracomment>Select note color</extracomment>
-        <translation>Sélectionnez une couleur</translation>
+        <translation>Sélectionner une couleur</translation>
     </message>
     <message id="foilnotes-menu-delete_note">
         <source>Delete note</source>
@@ -315,12 +315,12 @@
     <message id="foilnotes-hint-undo">
         <source>Undo</source>
         <extracomment>Hint text</extracomment>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message id="foilnotes-hint-redo">
         <source>Redo</source>
         <extracomment>Hint text</extracomment>
-        <translation type="unfinished">Répéter</translation>
+        <translation>Refaire</translation>
     </message>
 </context>
 </TS>

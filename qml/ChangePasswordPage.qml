@@ -1,13 +1,15 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
+
 import "harbour"
 
-Dialog {
-    id: dialog
+Page {
+    id: page
 
-    forwardNavigation: false
     allowedOrientations: window.allowedOrientations
+
+    property Page mainPage
     property var foilModel
     property bool wrongPassword
     property alias currentPassword: currentPasswordInput.text
@@ -26,11 +28,11 @@ Dialog {
     function changePassword() {
         if (canChangePassword()) {
             if (foilModel.checkPassword(currentPassword)) {
-                pageStack.push(Qt.resolvedUrl("ConfirmPasswordDialog.qml"), {
+                pageStack.push(Qt.resolvedUrl("ConfirmPasswordPage.qml"), {
                     password: newPassword
                 }).passwordConfirmed.connect(function() {
                     if (foilModel.changePassword(currentPassword, newPassword)) {
-                        pageStack.pop(pageStack.previousPage(dialog))
+                        pageStack.pop(mainPage)
                     } else {
                         invalidPassword()
                     }
@@ -42,7 +44,7 @@ Dialog {
     }
 
     onStatusChanged: {
-        if (status === DialogStatus.Opening) {
+        if (status === PageStatus.Activating) {
             currentPasswordInput.requestFocus()
         }
     }
@@ -67,7 +69,7 @@ Dialog {
             label: qsTrId("foilnotes-change_password_page-text_field_label-current_password")
             placeholderText: label
             EnterKey.onClicked: newPasswordInput.focus = true
-            onTextChanged: dialog.wrongPassword = false
+            onTextChanged: page.wrongPassword = false
         }
         HarbourPasswordInputField {
             id: newPasswordInput
@@ -76,7 +78,7 @@ Dialog {
             //% "New password"
             placeholderText: qsTrId("foilnotes-change_password_page-text_field_label-new_password")
             label: placeholderText
-            EnterKey.onClicked: dialog.changePassword()
+            EnterKey.onClicked: page.changePassword()
         }
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -84,7 +86,7 @@ Dialog {
             //% "Change password"
             text: qsTrId("foilnotes-change_password_page-button-change_password")
             enabled: canChangePassword()
-            onClicked: dialog.changePassword()
+            onClicked: page.changePassword()
         }
     }
 

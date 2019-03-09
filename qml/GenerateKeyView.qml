@@ -1,25 +1,26 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
+
 import "harbour"
 
 Item {
     id: view
 
+    property Page mainPage
     property var foilModel
     property alias title: title.text
     readonly property int minPassphraseLen: 8
     readonly property bool generating: foilModel.foilState === FoilNotesModel.FoilGeneratingKey
 
     function generateKey() {
-        var dialog = pageStack.push(Qt.resolvedUrl("ConfirmPasswordDialog.qml"), {
+        var dialog = pageStack.push(Qt.resolvedUrl("ConfirmPasswordPage.qml"), {
             password: passphrase.text
         })
         dialog.passwordConfirmed.connect(function() {
             dialog.backNavigation = false
             foilModel.generateKey(keySize.value, passphrase.text)
-            dialog.forwardNavigation = true
-            dialog.accept()
+            pageStack.pop(mainPage)
         })
     }
 

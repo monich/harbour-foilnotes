@@ -1,9 +1,10 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+
 import "harbour"
 
-Dialog {
-    id: dialog
+Page {
+    id: page
 
     allowedOrientations: window.allowedOrientations
     forwardNavigation: false
@@ -14,7 +15,7 @@ Dialog {
 
     function checkPassword() {
         if (passwordInput.text === password) {
-            dialog.passwordConfirmed()
+            page.passwordConfirmed()
         } else {
             wrongPassword = true
             wrongPasswordAnimation.start()
@@ -24,6 +25,12 @@ Dialog {
 
     function canCheckPassword() {
         return passwordInput.text.length > 0 && passwordInput.text.length > 0 && !wrongPassword
+    }
+
+    onStatusChanged: {
+        if (status === PageStatus.Activating) {
+            passwordInput.requestFocus()
+        }
     }
 
     Column {
@@ -57,16 +64,16 @@ Dialog {
             //: Label for the password confirmation prompt
             //% "New password"
             label: qsTrId("foilnotes-confirm_password_page-text_field_label-new_password")
-            onTextChanged: dialog.wrongPassword = false
-            EnterKey.onClicked: dialog.checkPassword()
+            onTextChanged: page.wrongPassword = false
+            EnterKey.onClicked: page.checkPassword()
         }
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             //: Button label (confirm password)
             //% "Confirm"
             text: qsTrId("foilnotes-confirm_password_page-button-confirm")
-            enabled: dialog.canCheckPassword()
-            onClicked: dialog.checkPassword()
+            enabled: page.canCheckPassword()
+            onClicked: page.checkPassword()
         }
     }
 

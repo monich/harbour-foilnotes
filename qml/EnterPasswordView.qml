@@ -5,6 +5,8 @@ import "harbour"
 
 SilicaFlickable {
     id: view
+
+    property Page mainPage
     property var foilModel
     property bool wrongPassword
     readonly property bool landscapeLayout: appLandscapeMode && Screen.sizeCategory < Screen.Large
@@ -21,6 +23,7 @@ SilicaFlickable {
 
     PullDownMenu {
         id: pullDownMenu
+
         MenuItem {
             //: Pulley menu item
             //% "Generate a new key"
@@ -42,11 +45,13 @@ SilicaFlickable {
                         //
                         warning.canNavigateForward = false
                         pageStack.replace(Qt.resolvedUrl("GenerateKeyPage.qml"), {
+                            mainPage: view.mainPage,
                             foilModel: foilModel
                         })
                     })
                 } else {
                     pageStack.push(Qt.resolvedUrl("GenerateKeyPage.qml"), {
+                        mainPage: view.mainPage,
                         foilModel: foilModel
                     })
                 }

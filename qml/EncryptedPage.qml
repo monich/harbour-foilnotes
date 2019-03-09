@@ -87,7 +87,12 @@ Page {
             anchors.fill: parent
             active: opacity > 0
             opacity: (foilModel.foilState === FoilNotesModel.FoilKeyMissing) ? 1 : 0
-            sourceComponent: Component { GenerateKeyView { foilModel: page.foilModel } }
+            sourceComponent: Component {
+                GenerateKeyView {
+                    mainPage: page
+                    foilModel: page.foilModel
+                }
+            }
             Behavior on opacity { FadeAnimator {} }
         }
 
@@ -109,6 +114,7 @@ Page {
                         foilModel.foilState === FoilNotesModel.FoilLockedTimedOut) ? 1 : 0
             sourceComponent: Component {
                 EnterPasswordView {
+                    mainPage: page
                     foilModel: page.foilModel
                 }
             }
@@ -139,6 +145,7 @@ Page {
                 EncryptedNotesView {
                     id: encryptedNotesView
 
+                    mainPage: page
                     hints: page.hints
                     foilModel: page.foilModel
                     pulleyFlickable: flickable

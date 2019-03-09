@@ -23,6 +23,7 @@ Dialog {
             //: Title for the new key warning
             //% "Warning"
             text: qsTrId("foilnotes-generate_key_warning-title")
+            font.bold: true
         }
 
         Label {

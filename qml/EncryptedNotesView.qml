@@ -1,11 +1,13 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
+
 import "harbour"
 
 SilicaFlickable {
     id: view
 
+    property Page mainPage
     property var hints
     property var foilModel
     property var pulleyFlickable
@@ -192,7 +194,8 @@ SilicaFlickable {
                 text: qsTrId("foilnotes-menu-change_password")
                 onClicked: {
                     pullDownMenu.menuItemClicked = true
-                    pageStack.push(Qt.resolvedUrl("ChangePasswordDialog.qml"), {
+                    pageStack.push(Qt.resolvedUrl("ChangePasswordPage.qml"), {
+                        mainPage: view.mainPage,
                         foilModel: foilModel
                     })
                 }

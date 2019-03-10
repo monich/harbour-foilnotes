@@ -1,6 +1,6 @@
 Name:           harbour-foilnotes
 Summary:        Encrypted notes
-Version:        1.0.6
+Version:        1.0.7
 Release:        1
 License:        BSD
 Group:          Applications/File

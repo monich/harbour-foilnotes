@@ -43,6 +43,7 @@
 #define DCONF_KEY(x)                FOILNOTES_DCONF_ROOT x
 #define KEY_NEXT_COLOR_INDEX        DCONF_KEY("nextColorIndex")
 #define KEY_SHARED_KEY_WARNING      DCONF_KEY("sharedKeyWarning")
+#define KEY_SHARED_KEY_WARNING2     DCONF_KEY("sharedKeyWarning2")
 
 #define DEFAULT_NEXT_COLOR_INDEX    0
 #define DEFAULT_SHARED_KEY_WARNING  true
@@ -61,6 +62,7 @@ public:
     QStringList iAvailableColors;
     MGConfItem* iNextColorIndex;
     MGConfItem* iSharedKeyWarning;
+    MGConfItem* iSharedKeyWarning2;
 };
 
 const char* FoilNotesSettings::Private::gAvailableColors[] = {
@@ -73,12 +75,15 @@ const char* FoilNotesSettings::Private::gAvailableColors[] = {
 
 FoilNotesSettings::Private::Private(QObject* aParent) :
     iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent)),
-    iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent))
+    iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent)),
+    iSharedKeyWarning2(new MGConfItem(KEY_SHARED_KEY_WARNING2, aParent))
 {
     QObject::connect(iNextColorIndex, SIGNAL(valueChanged()),
         aParent, SIGNAL(nextColorIndexChanged()));
     QObject::connect(iSharedKeyWarning, SIGNAL(valueChanged()),
         aParent, SIGNAL(sharedKeyWarningChanged()));
+    QObject::connect(iSharedKeyWarning2, SIGNAL(valueChanged()),
+        aParent, SIGNAL(sharedKeyWarning2Changed()));
 
     const uint n = sizeof(gAvailableColors)/sizeof(gAvailableColors[0]);
     iAvailableColors.reserve(n);
@@ -152,11 +157,18 @@ FoilNotesSettings::pickColor()
 }
 
 // sharedKeyWarning
+// sharedKeyWarning2
 
 bool
 FoilNotesSettings::sharedKeyWarning() const
 {
     return iPrivate->iSharedKeyWarning->value(DEFAULT_SHARED_KEY_WARNING).toBool();
+}
+
+bool
+FoilNotesSettings::sharedKeyWarning2() const
+{
+    return iPrivate->iSharedKeyWarning2->value(DEFAULT_SHARED_KEY_WARNING).toBool();
 }
 
 void
@@ -165,4 +177,12 @@ FoilNotesSettings::setSharedKeyWarning(
 {
     HDEBUG(aValue);
     iPrivate->iSharedKeyWarning->set(aValue);
+}
+
+void
+FoilNotesSettings::setSharedKeyWarning2(
+    bool aValue)
+{
+    HDEBUG(aValue);
+    iPrivate->iSharedKeyWarning2->set(aValue);
 }

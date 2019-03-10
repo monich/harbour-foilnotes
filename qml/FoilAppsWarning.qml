@@ -3,8 +3,12 @@ import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
 Item {
+    id: warning
+
     height: Theme.itemSizeSmall
     opacity: 0.6
+
+    signal clicked()
 
     Timer {
         running: true
@@ -43,7 +47,7 @@ Item {
         readonly property bool down: pressed && containsMouse
         readonly property bool showPress: down || pressTimer.running
 
-        onClicked: FoilNotesSettings.sharedKeyWarning = false
+        onClicked: warning.clicked()
 
         onPressedChanged: {
             if (pressed) {

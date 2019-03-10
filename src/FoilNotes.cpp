@@ -59,6 +59,7 @@ public:
 
     static bool foilPicsInstalled();
     static bool foilAuthInstalled();
+    static bool otherFoilAppsInstalled();
     FoilNotes* foilNotes() const;
 
 public Q_SLOTS:
@@ -66,8 +67,7 @@ public Q_SLOTS:
 
 public:
     QFileSystemWatcher* iFileWatcher;
-    bool iFoilPicsInstalled;
-    bool iFoilAuthInstalled;
+    bool iOtherFoilAppsInstalled;
 };
 
 FoilNotes::Private::Private(FoilNotes* aParent) :
@@ -79,8 +79,7 @@ FoilNotes::Private::Private(FoilNotes* aParent) :
     if (!iFileWatcher->addPath(FOILAPPS_DIR)) {
         HWARN("Failed to watch " FOILAPPS_DIR);
     }
-    iFoilPicsInstalled = foilPicsInstalled();
-    iFoilAuthInstalled = foilAuthInstalled();
+    iOtherFoilAppsInstalled = otherFoilAppsInstalled();
 }
 
 inline FoilNotes* FoilNotes::Private::foilNotes() const
@@ -102,17 +101,17 @@ bool FoilNotes::Private::foilAuthInstalled()
     return installed;
 }
 
+bool FoilNotes::Private::otherFoilAppsInstalled()
+{
+    return foilPicsInstalled() || foilAuthInstalled();
+}
+
 void FoilNotes::Private::checkFoilAppsInstalled()
 {
-    const bool foilPicsFound = foilPicsInstalled();
-    if (iFoilPicsInstalled != foilPicsFound) {
-        iFoilPicsInstalled = foilPicsFound;
-        Q_EMIT foilNotes()->foilPicsInstalledChanged();
-    }
-    const bool foilAuthFound = foilAuthInstalled();
-    if (iFoilAuthInstalled != foilAuthFound) {
-        iFoilAuthInstalled = foilAuthFound;
-        Q_EMIT foilNotes()->foilAuthInstalledChanged();
+    const bool haveOtherFoilApps = otherFoilAppsInstalled();
+    if (iOtherFoilAppsInstalled != haveOtherFoilApps) {
+        iOtherFoilAppsInstalled = haveOtherFoilApps;
+        Q_EMIT foilNotes()->otherFoilInstalledChanged();
     }
 }
 
@@ -153,14 +152,9 @@ QString FoilNotes::generateFileName(QString aText)
     }
 }
 
-bool FoilNotes::foilPicsInstalled() const
+bool FoilNotes::otherFoilAppsInstalled() const
 {
-    return iPrivate->iFoilPicsInstalled;
-}
-
-bool FoilNotes::foilAuthInstalled() const
-{
-    return iPrivate->iFoilAuthInstalled;
+    return iPrivate->iOtherFoilAppsInstalled;
 }
 
 #include "FoilNotes.moc"

@@ -45,6 +45,7 @@ class FoilNotesSettings : public QObject {
     Q_PROPERTY(QStringList availableColors READ availableColors CONSTANT)
     Q_PROPERTY(int nextColorIndex READ nextColorIndex WRITE setNextColorIndex NOTIFY nextColorIndexChanged)
     Q_PROPERTY(bool sharedKeyWarning READ sharedKeyWarning WRITE setSharedKeyWarning NOTIFY sharedKeyWarningChanged)
+    Q_PROPERTY(bool sharedKeyWarning2 READ sharedKeyWarning2 WRITE setSharedKeyWarning2 NOTIFY sharedKeyWarning2Changed)
 
 public:
     explicit FoilNotesSettings(QObject* aParent = Q_NULLPTR);
@@ -58,7 +59,9 @@ public:
     void setNextColorIndex(int aValue);
 
     bool sharedKeyWarning() const;
+    bool sharedKeyWarning2() const;
     void setSharedKeyWarning(bool aValue);
+    void setSharedKeyWarning2(bool aValue);
 
     Q_INVOKABLE int pickColorIndex();
     Q_INVOKABLE QColor pickColor();
@@ -66,6 +69,7 @@ public:
 Q_SIGNALS:
     void nextColorIndexChanged();
     void sharedKeyWarningChanged();
+    void sharedKeyWarning2Changed();
 
 private:
     class Private;

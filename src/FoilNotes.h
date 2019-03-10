@@ -43,8 +43,7 @@ class QJSEngine;
 // Static utilities
 class FoilNotes : public QObject {
     Q_OBJECT
-    Q_PROPERTY(bool foilPicsInstalled READ foilPicsInstalled NOTIFY foilPicsInstalledChanged)
-    Q_PROPERTY(bool foilAuthInstalled READ foilAuthInstalled NOTIFY foilAuthInstalledChanged)
+    Q_PROPERTY(bool otherFoilAppsInstalled READ otherFoilAppsInstalled NOTIFY otherFoilInstalledChanged)
 
 public:
     explicit FoilNotes(QObject* aParent = Q_NULLPTR);
@@ -54,12 +53,10 @@ public:
 
     Q_INVOKABLE static QString generateFileName(QString aText);
 
-    bool foilPicsInstalled() const;
-    bool foilAuthInstalled() const;
+    bool otherFoilAppsInstalled() const;
 
 Q_SIGNALS:
-    void foilPicsInstalledChanged();
-    void foilAuthInstalledChanged();
+    void otherFoilInstalledChanged();
 
 private:
     class Private;

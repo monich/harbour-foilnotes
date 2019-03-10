@@ -112,8 +112,12 @@ SilicaFlickable {
             right: parent.right
             rightMargin: Theme.horizontalPageMargin
         }
-        active: FoilNotesSettings.sharedKeyWarning && (FoilNotes.foilPicsInstalled || FoilNotes.foilAuthInstalled)
-        sourceComponent: Component { FoilAppsWarning { } }
+        active: FoilNotesSettings.sharedKeyWarning && FoilNotes.otherFoilAppsInstalled
+        sourceComponent: Component {
+            FoilAppsWarning {
+                onClicked: FoilNotesSettings.sharedKeyWarning = false
+            }
+        }
         Behavior on opacity { FadeAnimation {} }
     }
 

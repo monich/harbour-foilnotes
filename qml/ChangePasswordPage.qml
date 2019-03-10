@@ -14,6 +14,7 @@ Page {
     property bool wrongPassword
     property alias currentPassword: currentPasswordInput.text
     property alias newPassword: newPasswordInput.text
+    readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
 
     function canChangePassword() {
         return currentPassword.length > 0 && newPassword.length > 0 && currentPassword !== newPassword && !wrongPassword
@@ -90,8 +91,22 @@ Page {
         }
     }
 
-    FoilPicsWarning {
-        topPanel: column
+    Loader {
+        anchors {
+            top: parent.top
+            topMargin: screenHeight - height - Theme.paddingLarge
+            left: parent.left
+            leftMargin: Theme.horizontalPageMargin
+            right: parent.right
+            rightMargin: Theme.horizontalPageMargin
+        }
+        active: FoilNotesSettings.sharedKeyWarning2 && FoilNotes.otherFoilAppsInstalled
+        sourceComponent: Component {
+            FoilAppsWarning {
+                onClicked: FoilNotesSettings.sharedKeyWarning2 = false
+            }
+        }
+        Behavior on opacity { FadeAnimation {} }
     }
 
     HarbourShakeAnimation  {

@@ -280,7 +280,7 @@
     <message id="foilnotes-foil_apps_warning">
         <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation type="unfinished">Notera att Foil Notes och Foil Pics delar krypteringsnyckel och lösenord.</translation>
+        <translation>Notera att alla Foil-appar delar krypteringsnyckel och lösenord.</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

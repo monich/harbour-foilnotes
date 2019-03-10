@@ -34,13 +34,17 @@
 #ifndef FOILNOTES_SETTINGS_H
 #define FOILNOTES_SETTINGS_H
 
-#include <QtQml>
+#include <QObject>
 #include <QColor>
+
+class QQmlEngine;
+class QJSEngine;
 
 class FoilNotesSettings : public QObject {
     Q_OBJECT
     Q_PROPERTY(QStringList availableColors READ availableColors CONSTANT)
     Q_PROPERTY(int nextColorIndex READ nextColorIndex WRITE setNextColorIndex NOTIFY nextColorIndexChanged)
+    Q_PROPERTY(bool sharedKeyWarning READ sharedKeyWarning WRITE setSharedKeyWarning NOTIFY sharedKeyWarningChanged)
 
 public:
     explicit FoilNotesSettings(QObject* aParent = Q_NULLPTR);
@@ -52,17 +56,20 @@ public:
 
     int nextColorIndex() const;
     void setNextColorIndex(int aValue);
+
+    bool sharedKeyWarning() const;
+    void setSharedKeyWarning(bool aValue);
+
     Q_INVOKABLE int pickColorIndex();
     Q_INVOKABLE QColor pickColor();
 
 Q_SIGNALS:
     void nextColorIndexChanged();
+    void sharedKeyWarningChanged();
 
 private:
     class Private;
     Private* iPrivate;
 };
-
-QML_DECLARE_TYPE(FoilNotesSettings)
 
 #endif // FOILNOTES_SETTINGS_H

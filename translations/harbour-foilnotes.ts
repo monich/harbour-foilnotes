@@ -277,10 +277,10 @@
             <numerusform>Decrypting %0 selected notes</numerusform>
         </translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+    <message id="foilnotes-foil_apps_warning">
+        <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Note that Foil Notes and Foil Pics share the encryption key and the password.</translation>
+        <translation>Note that all Foil apps share the encryption key and the password.</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

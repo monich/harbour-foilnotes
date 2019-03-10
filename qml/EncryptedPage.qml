@@ -8,6 +8,7 @@ Page {
 
     property var hints
     property var foilModel
+    readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
 
     // nextPage is either
     // a) our attached page; or

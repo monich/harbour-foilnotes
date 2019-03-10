@@ -280,10 +280,10 @@
             <numerusform>Odszyfrowywanie %0 wybranych notatek</numerusform>
         </translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+    <message id="foilnotes-foil_apps_warning">
+        <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Zwróć uwagę, że Foil Notes i Foil Pics dzielą klucz szyfrowania i hasło.</translation>
+        <translation type="unfinished">Zwróć uwagę, że Foil Notes i Foil Pics dzielą klucz szyfrowania i hasło.</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

@@ -280,10 +280,10 @@
             <numerusform>Расшифровка %0 записей</numerusform>
         </translation>
     </message>
-    <message id="foilnotes-foil_pics_warning">
-        <source>Note that Foil Notes and Foil Pics share the encryption key and the password.</source>
+    <message id="foilnotes-foil_apps_warning">
+        <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Имейте в виду, что Foil Pics использует тот же ключ с тем же паролем, что и Foil Notes.</translation>
+        <translation>Имейте в виду, что все Foil приложения использует тот же ключ с тем же паролем.</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

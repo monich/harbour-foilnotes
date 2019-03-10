@@ -103,8 +103,18 @@ SilicaFlickable {
         }
     }
 
-    FoilPicsWarning {
-        topPanel: panel
+    Loader {
+        anchors {
+            top: parent.top
+            topMargin: screenHeight - height - Theme.paddingLarge
+            left: parent.left
+            leftMargin: Theme.horizontalPageMargin
+            right: parent.right
+            rightMargin: Theme.horizontalPageMargin
+        }
+        active: FoilNotesSettings.sharedKeyWarning && (FoilNotes.foilPicsInstalled || FoilNotes.foilAuthInstalled)
+        sourceComponent: Component { FoilAppsWarning { } }
+        Behavior on opacity { FadeAnimation {} }
     }
 
     HarbourShakeAnimation  {

@@ -38,8 +38,14 @@
 
 #include <MGConfItem>
 
+#include <QQmlEngine>
+
 #define DCONF_KEY(x)                FOILNOTES_DCONF_ROOT x
 #define KEY_NEXT_COLOR_INDEX        DCONF_KEY("nextColorIndex")
+#define KEY_SHARED_KEY_WARNING      DCONF_KEY("sharedKeyWarning")
+
+#define DEFAULT_NEXT_COLOR_INDEX    0
+#define DEFAULT_SHARED_KEY_WARNING  true
 
 // ==========================================================================
 // FoilNotesSettings::Private
@@ -54,6 +60,7 @@ public:
 public:
     QStringList iAvailableColors;
     MGConfItem* iNextColorIndex;
+    MGConfItem* iSharedKeyWarning;
 };
 
 const char* FoilNotesSettings::Private::gAvailableColors[] = {
@@ -65,10 +72,13 @@ const char* FoilNotesSettings::Private::gAvailableColors[] = {
 };
 
 FoilNotesSettings::Private::Private(QObject* aParent) :
-    iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent))
+    iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent)),
+    iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent))
 {
     QObject::connect(iNextColorIndex, SIGNAL(valueChanged()),
         aParent, SIGNAL(nextColorIndexChanged()));
+    QObject::connect(iSharedKeyWarning, SIGNAL(valueChanged()),
+        aParent, SIGNAL(sharedKeyWarningChanged()));
 
     const uint n = sizeof(gAvailableColors)/sizeof(gAvailableColors[0]);
     iAvailableColors.reserve(n);
@@ -114,7 +124,7 @@ FoilNotesSettings::availableColors() const
 int
 FoilNotesSettings::nextColorIndex() const
 {
-    return iPrivate->iNextColorIndex->value(0).toInt() %
+    return iPrivate->iNextColorIndex->value(DEFAULT_NEXT_COLOR_INDEX).toInt() %
         iPrivate->iAvailableColors.count();
 }
 
@@ -139,4 +149,20 @@ QColor
 FoilNotesSettings::pickColor()
 {
     return QColor(iPrivate->iAvailableColors.at(pickColorIndex()));
+}
+
+// sharedKeyWarning
+
+bool
+FoilNotesSettings::sharedKeyWarning() const
+{
+    return iPrivate->iSharedKeyWarning->value(DEFAULT_SHARED_KEY_WARNING).toBool();
+}
+
+void
+FoilNotesSettings::setSharedKeyWarning(
+    bool aValue)
+{
+    HDEBUG(aValue);
+    iPrivate->iSharedKeyWarning->set(aValue);
 }

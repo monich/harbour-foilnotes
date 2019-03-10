@@ -36,14 +36,16 @@
 #include "HarbourDebug.h"
 
 #include <QQmlEngine>
+#include <QFile>
 #include <QFileSystemWatcher>
 
 #include <ctype.h>
 
 #define FOILNOTES_MAX_FILE_NAME (8)
 
-#define FOILPICS_DIR    "/usr/bin"
-#define FOILPICS_PATH   FOILPICS_DIR "/harbour-foilpics"
+#define FOILAPPS_DIR    "/usr/bin"
+#define FOILPICS_PATH   FOILAPPS_DIR "/harbour-foilpics"
+#define FOILAUTH_PATH   FOILAPPS_DIR "/harbour-foilauth"
 
 // ==========================================================================
 // FoilNotes::Private
@@ -56,27 +58,29 @@ public:
     Private(FoilNotes* aParent);
 
     static bool foilPicsInstalled();
+    static bool foilAuthInstalled();
     FoilNotes* foilNotes() const;
 
 public Q_SLOTS:
-    void checkFoilPicsInstalled();
+    void checkFoilAppsInstalled();
 
 public:
     QFileSystemWatcher* iFileWatcher;
     bool iFoilPicsInstalled;
+    bool iFoilAuthInstalled;
 };
 
 FoilNotes::Private::Private(FoilNotes* aParent) :
     QObject(aParent),
     iFileWatcher(new QFileSystemWatcher(this))
 {
-    connect(iFileWatcher, SIGNAL(fileChanged(QString)),
-            SLOT(checkFoilPicsInstalled()));
     connect(iFileWatcher, SIGNAL(directoryChanged(QString)),
-        SLOT(checkFoilPicsInstalled()));
-    iFileWatcher->addPath(FOILPICS_DIR);
-    iFileWatcher->addPath(FOILPICS_PATH);
+        SLOT(checkFoilAppsInstalled()));
+    if (!iFileWatcher->addPath(FOILAPPS_DIR)) {
+        HWARN("Failed to watch " FOILAPPS_DIR);
+    }
     iFoilPicsInstalled = foilPicsInstalled();
+    iFoilAuthInstalled = foilAuthInstalled();
 }
 
 inline FoilNotes* FoilNotes::Private::foilNotes() const
@@ -86,17 +90,29 @@ inline FoilNotes* FoilNotes::Private::foilNotes() const
 
 bool FoilNotes::Private::foilPicsInstalled()
 {
-    bool installed = QFile::exists(FOILPICS_PATH);
+    const bool installed = QFile::exists(FOILPICS_PATH);
     HDEBUG("FoilPics is" << (installed ? "installed" : "not installed"));
     return installed;
 }
 
-void FoilNotes::Private::checkFoilPicsInstalled()
+bool FoilNotes::Private::foilAuthInstalled()
 {
-    const bool installed = foilPicsInstalled();
-    if (iFoilPicsInstalled != installed) {
-        iFoilPicsInstalled = installed;
+    const bool installed = QFile::exists(FOILAUTH_PATH);
+    HDEBUG("FoilAuth is" << (installed ? "installed" : "not installed"));
+    return installed;
+}
+
+void FoilNotes::Private::checkFoilAppsInstalled()
+{
+    const bool foilPicsFound = foilPicsInstalled();
+    if (iFoilPicsInstalled != foilPicsFound) {
+        iFoilPicsInstalled = foilPicsFound;
         Q_EMIT foilNotes()->foilPicsInstalledChanged();
+    }
+    const bool foilAuthFound = foilAuthInstalled();
+    if (iFoilAuthInstalled != foilAuthFound) {
+        iFoilAuthInstalled = foilAuthFound;
+        Q_EMIT foilNotes()->foilAuthInstalledChanged();
     }
 }
 
@@ -140,6 +156,11 @@ QString FoilNotes::generateFileName(QString aText)
 bool FoilNotes::foilPicsInstalled() const
 {
     return iPrivate->iFoilPicsInstalled;
+}
+
+bool FoilNotes::foilAuthInstalled() const
+{
+    return iPrivate->iFoilAuthInstalled;
 }
 
 #include "FoilNotes.moc"

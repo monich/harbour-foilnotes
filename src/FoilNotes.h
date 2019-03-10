@@ -34,7 +34,8 @@
 #ifndef FOILNOTES_H
 #define FOILNOTES_H
 
-#include "FoilNotesModel.h"
+#include <QObject>
+#include <QString>
 
 class QQmlEngine;
 class QJSEngine;
@@ -43,6 +44,7 @@ class QJSEngine;
 class FoilNotes : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool foilPicsInstalled READ foilPicsInstalled NOTIFY foilPicsInstalledChanged)
+    Q_PROPERTY(bool foilAuthInstalled READ foilAuthInstalled NOTIFY foilAuthInstalledChanged)
 
 public:
     explicit FoilNotes(QObject* aParent = Q_NULLPTR);
@@ -53,9 +55,11 @@ public:
     Q_INVOKABLE static QString generateFileName(QString aText);
 
     bool foilPicsInstalled() const;
+    bool foilAuthInstalled() const;
 
 Q_SIGNALS:
     void foilPicsInstalledChanged();
+    void foilAuthInstalledChanged();
 
 private:
     class Private;

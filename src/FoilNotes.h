@@ -43,7 +43,7 @@ class QJSEngine;
 // Static utilities
 class FoilNotes : public QObject {
     Q_OBJECT
-    Q_PROPERTY(bool otherFoilAppsInstalled READ otherFoilAppsInstalled NOTIFY otherFoilInstalledChanged)
+    Q_PROPERTY(bool otherFoilAppsInstalled READ otherFoilAppsInstalled NOTIFY otherFoilAppsInstalledChanged)
 
 public:
     explicit FoilNotes(QObject* aParent = Q_NULLPTR);
@@ -56,7 +56,7 @@ public:
     bool otherFoilAppsInstalled() const;
 
 Q_SIGNALS:
-    void otherFoilInstalledChanged();
+    void otherFoilAppsInstalledChanged();
 
 private:
     class Private;

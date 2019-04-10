@@ -111,7 +111,7 @@ void FoilNotes::Private::checkFoilAppsInstalled()
     const bool haveOtherFoilApps = otherFoilAppsInstalled();
     if (iOtherFoilAppsInstalled != haveOtherFoilApps) {
         iOtherFoilAppsInstalled = haveOtherFoilApps;
-        Q_EMIT foilNotes()->otherFoilInstalledChanged();
+        Q_EMIT foilNotes()->otherFoilAppsInstalledChanged();
     }
 }
 

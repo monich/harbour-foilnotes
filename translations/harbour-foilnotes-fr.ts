@@ -11,7 +11,7 @@
     <message id="foilnotes-notification-copied_to_clipboard">
         <source>Copied to clipboard</source>
         <extracomment>Pop-up notification</extracomment>
-        <translation>Copié dans le presse-papier</translation>
+        <translation>Copié dans le presse-papiers</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
@@ -247,12 +247,12 @@
     <message id="foilnotes-confirm_password_page-description">
         <source>Make sure you don&apos;t forget your password. It&apos;s impossible to either recover it or to access the encrypted notes without knowing it. Better take it seriously.</source>
         <extracomment>Password confirmation description</extracomment>
-        <translation>Make sure you don&apos;t forget your password. It&apos;s impossible to either recover it or to access the encrypted notes without knowing it. Better take it seriously.</translation>
+        <translation>Faites en sorte de ne pas oublier le mot de passe. Il est impossible de le récupérer ou d’accèder aux notes chiffrées sans le connaître. Prenez cela au sérieux.</translation>
     </message>
     <message id="foilnotes-confirm_password_page-text_field_placeholder-new_password">
         <source>New password again</source>
         <extracomment>Placeholder for the password confirmation prompt</extracomment>
-        <translation>Nouveau mot de passe (confirmer)</translation>
+        <translation>Nouveau mot de passe (confirmez)</translation>
     </message>
     <message id="foilnotes-confirm_password_page-text_field_label-new_password">
         <source>New password</source>
@@ -280,7 +280,7 @@
     <message id="foilnotes-foil_apps_warning">
         <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation type="unfinished">Sachez que toutes les applications Foil partagent leur clef de chiffrement et leur mot de passe.</translation>
+        <translation>Sachez que toutes les applications Foil partagent leur clef de chiffrement et leur mot de passe.</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

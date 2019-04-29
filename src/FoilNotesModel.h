@@ -47,7 +47,6 @@ class FoilNotesModel : public FoilNotesBaseModel {
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool keyAvailable READ keyAvailable NOTIFY keyAvailableChanged)
     Q_PROPERTY(FoilState foilState READ foilState NOTIFY foilStateChanged)
-    Q_PROPERTY(bool mayHaveEncryptedNotes READ mayHaveEncryptedNotes NOTIFY mayHaveEncryptedNotesChanged)
     Q_PROPERTY(int textIndex READ textIndex WRITE setTextIndex NOTIFY textIndexChanged)
     Q_PROPERTY(QString text READ text NOTIFY textChanged)
 
@@ -57,7 +56,6 @@ class FoilNotesModel : public FoilNotesBaseModel {
     class SaveInfoTask;
     class SaveNoteTask;
     class GenerateKeyTask;
-    class CheckNotesTask;
     class DecryptTask;
     class EncryptTask;
 
@@ -82,7 +80,6 @@ public:
     bool busy() const;
     bool keyAvailable() const;
     FoilState foilState() const;
-    bool mayHaveEncryptedNotes() const;
 
     QString text() const;
     int textIndex() const;
@@ -125,7 +122,6 @@ Q_SIGNALS:
     void busyChanged();
     void keyAvailableChanged();
     void foilStateChanged();
-    void mayHaveEncryptedNotesChanged();
     void keyGenerated();
     void passwordChanged();
     void decryptionStarted();

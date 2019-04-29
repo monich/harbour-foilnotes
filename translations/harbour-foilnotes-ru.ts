@@ -217,9 +217,9 @@
         <translation>Внимание!</translation>
     </message>
     <message id="foilnotes-generate_key_warning-text">
-        <source>You seem to have some encrypted files in the storage folder. Once you have generated a new key, you are going to lose access to those files. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to crack the new key.</source>
+        <source>Once you have generated a new key, you are going to lose access to all the files encrypted by the old key. Note that the same key is used by all Foil apps, such as Foil Auth and Foil Pics. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to decrypt files for which the key is lost.</source>
         <extracomment>Warning shown prior to generating the new key</extracomment>
-        <translation>Кажется, у вас есть какие-то файлы, которые могут быть зашифрованы старым ключём. Если вы затрёте старый ключ новым, то скорее всего навсегда потеряете доступ к таким файлам. Если вы забыли пароль и надеетесь когда-нибудь потом их расшифровать, то имейте в виду, что обычно подобрать пароль и восстановить старый ключ значительно проще, чем подбирать уничтоженный ключ. Последнее вообще практически невозможно.</translation>
+        <translation>Если вы затрёте старый ключ новым, то скорее всего навсегда потеряете доступ к файлам, зашифрованным старым ключём, включая файлы, зашифрованные &quot;дружественными&quot; приложениями вроде Foil Auth или Foil Pics. Если вы забыли пароль и надеетесь когда-нибудь потом расшифровать файлы, то имейте в виду, что, как правило, подобрать пароль и восстановить старый ключ значительно проще, чем расшифровать файлы, не имея ключа.</translation>
     </message>
     <message id="foilnotes-generating_key_view-generating_new_key">
         <source>Generating new key...</source>

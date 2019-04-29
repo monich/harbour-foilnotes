@@ -296,60 +296,6 @@ void FoilNotesModel::ModelInfo::save(QString aDir, FoilPrivateKey* aPrivate,
 }
 
 // ==========================================================================
-// FoilNotesModel::CheckNotesTask
-// ==========================================================================
-
-class FoilNotesModel::CheckNotesTask : public HarbourTask {
-    Q_OBJECT
-
-public:
-    CheckNotesTask(QThreadPool* aPool, QString aDir);
-
-    virtual void performTask();
-
-public:
-    QString iDir;
-    bool iMayHaveEncryptedNotes;
-};
-
-FoilNotesModel::CheckNotesTask::CheckNotesTask(QThreadPool* aPool, QString aDir) :
-    HarbourTask(aPool), iDir(aDir), iMayHaveEncryptedNotes(false)
-{
-}
-
-void FoilNotesModel::CheckNotesTask::performTask()
-{
-    const QString path(iDir);
-    HDEBUG("Checking" << iDir);
-
-    QDir dir(path);
-    QFileInfoList list = dir.entryInfoList(QDir::Files |
-        QDir::Dirs | QDir::NoDotAndDotDot, QDir::NoSort);
-
-    const QString infoFile(INFO_FILE);
-    for (int i = 0; i < list.count() && !iMayHaveEncryptedNotes; i++) {
-        const QFileInfo& info = list.at(i);
-        if (info.isFile() && info.fileName() != infoFile) {
-            const QByteArray fileNameBytes(info.filePath().toUtf8());
-            const char* fname = fileNameBytes.constData();
-            GMappedFile* map = g_mapped_file_new(fname, FALSE, NULL);
-            if (map) {
-                FoilBytes bytes;
-                bytes.val = (guint8*)g_mapped_file_get_contents(map);
-                bytes.len = g_mapped_file_get_length(map);
-                FoilMsgInfo* info = foilmsg_parse(&bytes);
-                if (info) {
-                    HDEBUG(fname << "may be a foiled note");
-                    iMayHaveEncryptedNotes = true;
-                    foilmsg_info_free(info);
-                }
-                g_mapped_file_unref(map);
-            }
-        }
-    }
-}
-
-// ==========================================================================
 // FoilNotesModel::BaseTask
 // ==========================================================================
 
@@ -821,7 +767,6 @@ public:
         SignalBusyChanged,
         SignalKeyAvailableChanged,
         SignalFoilStateChanged,
-        SignalMayHaveEncryptedNotesChanged,
         SignalKeyGenerated,
         SignalSelectedChanged,
         SignalTextIndexChanged,
@@ -834,7 +779,6 @@ public:
     ~Private();
 
 public Q_SLOTS:
-    void onCheckNotesTaskDone();
     void onDecryptNotesProgress(DecryptNotesTask::Progress::Ptr aProgress);
     void onDecryptNotesTaskDone();
     void onEncryptNoteDone();
@@ -879,7 +823,6 @@ public:
 public:
     SignalMask iQueuedSignals;
     Signal iFirstQueuedSignal;
-    bool iMayHaveEncryptedNotes;
     ModelData::List iData;
     FoilState iFoilState;
     QString iFoilNotesDir;
@@ -888,7 +831,6 @@ public:
     FoilPrivateKey* iPrivateKey;
     FoilKey* iPublicKey;
     QThreadPool* iThreadPool;
-    CheckNotesTask* iCheckNotesTask;
     SaveInfoTask* iSaveInfoTask;
     GenerateKeyTask* iGenerateKeyTask;
     DecryptNotesTask* iDecryptNotesTask;
@@ -903,7 +845,6 @@ FoilNotesModel::Private::Private(FoilNotesModel* aParent) :
     QObject(aParent),
     iQueuedSignals(0),
     iFirstQueuedSignal(SignalCount),
-    iMayHaveEncryptedNotes(false),
     iFoilState(FoilKeyMissing),
     iFoilNotesDir(QDir::homePath() + "/" FOIL_NOTES_DIR),
     iFoilKeyDir(QDir::homePath() + "/" FOIL_KEY_DIR),
@@ -911,7 +852,6 @@ FoilNotesModel::Private::Private(FoilNotesModel* aParent) :
     iPrivateKey(NULL),
     iPublicKey(NULL),
     iThreadPool(new QThreadPool(this)),
-    iCheckNotesTask(NULL),
     iSaveInfoTask(NULL),
     iGenerateKeyTask(NULL),
     iDecryptNotesTask(NULL),
@@ -961,16 +901,12 @@ FoilNotesModel::Private::Private(FoilNotesModel* aParent) :
         }
         g_error_free(error);
     }
-
-    iCheckNotesTask = new CheckNotesTask(iThreadPool, iFoilNotesDir);
-    iCheckNotesTask->submit(this, SLOT(onCheckNotesTaskDone()));
 }
 
 FoilNotesModel::Private::~Private()
 {
     foil_private_key_unref(iPrivateKey);
     foil_key_unref(iPublicKey);
-    if (iCheckNotesTask) iCheckNotesTask->release();
     if (iSaveInfoTask) iSaveInfoTask->release();
     if (iGenerateKeyTask) iGenerateKeyTask->release();
     if (iDecryptNotesTask) iDecryptNotesTask->release();
@@ -1011,7 +947,6 @@ void FoilNotesModel::Private::emitQueuedSignals()
         &FoilNotesModel::busyChanged,           // SignalBusyChanged
         &FoilNotesModel::keyAvailableChanged,   // SignalKeyAvailableChanged
         &FoilNotesModel::foilStateChanged,      // SignalFoilStateChanged
-        &FoilNotesModel::mayHaveEncryptedNotesChanged, // SignalMayHaveEncryptedNotesChanged
         &FoilNotesModel::keyGenerated,          // SignalKeyGenerated
         &FoilNotesModel::selectedChanged,       // SignalSelectedChanged
         &FoilNotesModel::textIndexChanged,      // SignalTextIndexChanged
@@ -1218,12 +1153,6 @@ void FoilNotesModel::Private::insertModelData(ModelData* aData)
     model->beginInsertRows(QModelIndex(), pos, pos);
     iData.insert(pos, aData);
     HDEBUG(aData->pagenr() << aData->colorName() << aData->body());
-
-    // And this tells the app that we better not generate a new key:
-    if (!iMayHaveEncryptedNotes) {
-        iMayHaveEncryptedNotes = true;
-        queueSignal(SignalMayHaveEncryptedNotesChanged);
-    }
     queueSignal(SignalCountChanged);
     model->endInsertRows();
     updateText();
@@ -1451,11 +1380,6 @@ void FoilNotesModel::Private::destroyItemAt(int aIndex)
         HDEBUG(iData.at(aIndex)->pagenr());
         model->beginRemoveRows(QModelIndex(), aIndex, aIndex);
         delete iData.takeAt(aIndex);
-        if (iData.isEmpty() && iMayHaveEncryptedNotes) {
-            // We no longer have any decryptable notes
-            iMayHaveEncryptedNotes = false;
-            queueSignal(SignalMayHaveEncryptedNotesChanged);
-        }
         model->endRemoveRows();
         updateText();
         updatePageNr(aIndex);
@@ -1579,11 +1503,6 @@ void FoilNotesModel::Private::clearModel()
         model->beginRemoveRows(QModelIndex(), 0, n - 1);
         qDeleteAll(iData);
         iData.clear();
-        // We no longer have any decryptable notes:
-        if (iMayHaveEncryptedNotes) {
-            iMayHaveEncryptedNotes = false;
-            queueSignal(SignalMayHaveEncryptedNotesChanged);
-        }
         model->endRemoveRows();
         queueSignal(SignalCountChanged);
     }
@@ -1687,29 +1606,9 @@ bool FoilNotesModel::Private::unlock(QString aPassword)
     return ok;
 }
 
-void FoilNotesModel::Private::onCheckNotesTaskDone()
-{
-    HDEBUG("Done");
-    if (sender() == iCheckNotesTask) {
-        const bool mayHave = iCheckNotesTask->iMayHaveEncryptedNotes;
-        if (iMayHaveEncryptedNotes != mayHave) {
-            iMayHaveEncryptedNotes = mayHave;
-            queueSignal(SignalMayHaveEncryptedNotesChanged);
-        }
-        iCheckNotesTask->release();
-        iCheckNotesTask = NULL;
-        if (!busy()) {
-            // We know we were busy when we received this signal
-            queueSignal(SignalBusyChanged);
-        }
-        emitQueuedSignals();
-    }
-}
-
 bool FoilNotesModel::Private::busy() const
 {
-    if (iCheckNotesTask ||
-        iSaveInfoTask ||
+    if (iSaveInfoTask ||
         iGenerateKeyTask ||
         iDecryptNotesTask ||
         !iEncryptTasks.isEmpty()) {
@@ -1854,11 +1753,6 @@ bool FoilNotesModel::moveRows(const QModelIndex &aSrcParent, int aSrcRow,
 bool FoilNotesModel::busy() const
 {
     return iPrivate->busy();
-}
-
-bool FoilNotesModel::mayHaveEncryptedNotes() const
-{
-    return iPrivate->iMayHaveEncryptedNotes;
 }
 
 bool FoilNotesModel::keyAvailable() const

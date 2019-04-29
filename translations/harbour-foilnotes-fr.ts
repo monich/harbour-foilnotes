@@ -215,9 +215,9 @@
         <translation>Attention</translation>
     </message>
     <message id="foilnotes-generate_key_warning-text">
-        <source>You seem to have some encrypted files in the storage folder. Once you have generated a new key, you are going to lose access to those files. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to crack the new key.</source>
+        <source>Once you have generated a new key, you are going to lose access to all the files encrypted by the old key. Note that the same key is used by all Foil apps, such as Foil Auth and Foil Pics. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to decrypt files for which the key is lost.</source>
         <extracomment>Warning shown prior to generating the new key</extracomment>
-        <translation>Il semble que vous ayez des fichiers chiffrés dans le dossier. Une fois une nouvelle clef générée, vous perdrez l&apos;accès à ces fichiers. Si vous avez oublié votre mot de passe, gardez à l&apos;esprit qu&apos;il est plus simple de brute-forcer votre mot de passe que de récupérer votre ancienne clef.</translation>
+        <translation>Une fois la nouvelle clef générée, vous perdrez l’accès à tous vos anciens fichiers chiffrés avec l’ancienne clef. Notez que les applications Foil utilisent la même clef, telles que Foil Auth et Foil Pics. Si vous avez oublié votre mot de passe, gardez à l&apos;esprit qu&apos;il est plus simple de brute-forcer votre mot de passe pour récupérer votre ancienne clef que de déchiffrer les fichiers liés à la clef perdue.</translation>
     </message>
     <message id="foilnotes-generating_key_view-generating_new_key">
         <source>Generating new key...</source>

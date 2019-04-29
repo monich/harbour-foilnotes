@@ -213,9 +213,9 @@
         <translation>警告!</translation>
     </message>
     <message id="foilnotes-generate_key_warning-text">
-        <source>You seem to have some encrypted files in the storage folder. Once you have generated a new key, you are going to lose access to those files. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to crack the new key.</source>
+        <source>Once you have generated a new key, you are going to lose access to all the files encrypted by the old key. Note that the same key is used by all Foil apps, such as Foil Auth and Foil Pics. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to decrypt files for which the key is lost.</source>
         <extracomment>Warning shown prior to generating the new key</extracomment>
-        <translation>你似乎在存储文件夹中有一些加密的文件。一旦生成了新密钥, 您将失去对这些文件的访问权限。如果您忘记了密码, 请记住,  很可能在计算上更容易使用强制输入密码并恢复旧密钥, 而不是破解新密钥。</translation>
+        <translation>生成新密钥后，你将无法访问由旧密钥加密的所有文件。 请注意，所有 Foil 系列软件都使用相同的密钥，例如 Foil Auth 和 Foil Pics。 如果你忘记了密码，请记住，极可能在计算上更容易破解密码并恢复旧密钥，而不是解密密钥丢失的文件。</translation>
     </message>
     <message id="foilnotes-generating_key_view-generating_new_key">
         <source>Generating new key...</source>

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
+
 import "harbour"
 
 SilicaFlickable {
@@ -29,32 +30,25 @@ SilicaFlickable {
             //% "Generate a new key"
             text: qsTrId("foilnotes-menu-generate_key")
             onClicked: {
-                if (foilModel.mayHaveEncryptedNotes) {
-                    var warning = pageStack.push(Qt.resolvedUrl("GenerateKeyWarning.qml"));
-                    warning.accepted.connect(function() {
-                        // Replace the warning page with a slide. This may
-                        // occasionally generate "Warning: cannot pop while
-                        // transition is in progress" if the user taps the
-                        // page stack indicator (as opposed to the Accept
-                        // button) but this warning is fairly harmless:
-                        //
-                        // _dialogDone (Dialog.qml:124)
-                        // on_NavigationChanged (Dialog.qml:177)
-                        // navigateForward (PageStack.qml:291)
-                        // onClicked (private/PageStackIndicator.qml:174)
-                        //
-                        warning.canNavigateForward = false
-                        pageStack.replace(Qt.resolvedUrl("GenerateKeyPage.qml"), {
-                            mainPage: view.mainPage,
-                            foilModel: foilModel
-                        })
-                    })
-                } else {
-                    pageStack.push(Qt.resolvedUrl("GenerateKeyPage.qml"), {
+                var warning = pageStack.push(Qt.resolvedUrl("GenerateKeyWarning.qml"));
+                warning.accepted.connect(function() {
+                    // Replace the warning page with a slide. This may
+                    // occasionally generate "Warning: cannot pop while
+                    // transition is in progress" if the user taps the
+                    // page stack indicator (as opposed to the Accept
+                    // button) but this warning is fairly harmless:
+                    //
+                    // _dialogDone (Dialog.qml:124)
+                    // on_NavigationChanged (Dialog.qml:177)
+                    // navigateForward (PageStack.qml:291)
+                    // onClicked (private/PageStackIndicator.qml:174)
+                    //
+                    warning.canNavigateForward = false
+                    pageStack.replace(Qt.resolvedUrl("GenerateKeyPage.qml"), {
                         mainPage: view.mainPage,
                         foilModel: foilModel
                     })
-                }
+                })
             }
         }
     }

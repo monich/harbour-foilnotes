@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
@@ -47,6 +47,12 @@ Page {
         saveBody(body)
     }
 
+    QrCodeGenerator {
+        id: generator
+
+        text: page.body
+    }
+
     SilicaFlickable {
         id: noteview
 
@@ -60,6 +66,16 @@ Page {
                 enabled: text.length > 0
                 visible: enabled
                 onClicked: page.performAction()
+            }
+            MenuItem {
+                //: Show QR code for the current note
+                //% "Show QR code"
+                text: qsTrId("foilnotes-menu-show_qrcode")
+                visible: generator.qrcode !== ""
+                onClicked: pageStack.push("QrCodePage.qml", {
+                    qrcode: generator.qrcode,
+                    allowedOrientations: page.allowedOrientations
+                })
             }
             MenuItem {
                 //: Select note color

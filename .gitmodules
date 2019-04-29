@@ -7,3 +7,6 @@
 [submodule "libglibutil"]
 	path = libglibutil
 	url = https://github.com/monich/libglibutil.git
+[submodule "libqrencode"]
+	path = libqrencode
+	url = https://github.com/fukuchi/libqrencode.git

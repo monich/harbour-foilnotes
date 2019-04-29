@@ -38,6 +38,11 @@
         <extracomment>Create a new secret note ready for editing</extracomment>
         <translation>New secret note</translation>
     </message>
+    <message id="foilnotes-menu-show_qrcode">
+        <source>Show QR code</source>
+        <extracomment>Show QR code for the current note</extracomment>
+        <translation>Show QR code</translation>
+    </message>
     <message id="foilnotes-menu-select_color">
         <source>Select color</source>
         <extracomment>Select note color</extracomment>

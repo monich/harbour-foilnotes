@@ -45,8 +45,10 @@ LIBFOILMSG_DIR = $${FOIL_DIR}/libfoilmsg
 LIBFOILMSG_INCLUDE = $${LIBFOILMSG_DIR}/include
 LIBFOILMSG_SRC = $${LIBFOILMSG_DIR}/src
 
+LIBQRENCODE_DIR = $${_PRO_FILE_PWD_}/libqrencode
+
 # Libraries
-LIBS += -ldl
+LIBS += libqrencode.a -ldl
 
 OTHER_FILES += \
     *.desktop \
@@ -60,7 +62,8 @@ INCLUDEPATH += \
     $${LIBFOIL_SRC} \
     $${LIBFOIL_INCLUDE} \
     $${LIBFOILMSG_INCLUDE} \
-    $${LIBGLIBUTIL_INCLUDE}
+    $${LIBGLIBUTIL_INCLUDE} \
+    $${LIBQRENCODE_DIR}
 
 HEADERS += \
     src/FoilNotes.h \
@@ -70,7 +73,9 @@ HEADERS += \
     src/FoilNotesModel.h \
     src/FoilNotesPlaintextModel.h \
     src/FoilNotesSearchModel.h \
-    src/FoilNotesSettings.h
+    src/FoilNotesSettings.h \
+    src/QrCodeGenerator.h \
+    src/QrCodeImageProvider.h
 
 SOURCES += \
     src/FoilNotes.cpp \
@@ -80,7 +85,9 @@ SOURCES += \
     src/FoilNotesPlaintextModel.cpp \
     src/FoilNotesSearchModel.cpp \
     src/FoilNotesSettings.cpp \
-    src/main.cpp
+    src/main.cpp \
+    src/QrCodeGenerator.cpp \
+    src/QrCodeImageProvider.cpp
 
 SOURCES += \
     $${LIBFOIL_SRC}/*.c \
@@ -99,6 +106,7 @@ INCLUDEPATH += \
     $${HARBOUR_LIB_DIR}/include
 
 HEADERS += \
+    $${HARBOUR_LIB_INCLUDE}/HarbourBase32.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourDebug.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourImageProvider.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
@@ -108,6 +116,7 @@ HEADERS += \
     $${HARBOUR_LIB_SRC}/HarbourMce.h
 
 SOURCES += \
+    $${HARBOUR_LIB_SRC}/HarbourBase32.cpp \
     $${HARBOUR_LIB_SRC}/HarbourImageProvider.cpp \
     $${HARBOUR_LIB_SRC}/HarbourMce.cpp \
     $${HARBOUR_LIB_SRC}/HarbourOrganizeListModel.cpp \

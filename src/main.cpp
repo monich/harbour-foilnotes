@@ -39,6 +39,9 @@
 #include "FoilNotesSettings.h"
 #include "FoilNotes.h"
 
+#include "QrCodeGenerator.h"
+#include "QrCodeImageProvider.h"
+
 #include "HarbourDebug.h"
 #include "HarbourImageProvider.h"
 #include "HarbourOrganizeListModel.h"
@@ -60,6 +63,7 @@ static void register_types(const char* uri, int v1 = 1, int v2 = 0)
     qmlRegisterType<FoilNotesSearchModel>(uri, v1, v2, "FoilNotesSearchModel");
     qmlRegisterType<HarbourOrganizeListModel>(uri, v1, v2, "HarbourOrganizeListModel");
     qmlRegisterType<FoilNotesPlaintextModel>(uri, v1, v2, "FoilNotesPlaintextModel");
+    qmlRegisterType<QrCodeGenerator>(uri, v1, v2, "QrCodeGenerator");
     qmlRegisterSingletonType<FoilNotes>(uri, v1, v2, "FoilNotes", FoilNotes::createSingleton);
     qmlRegisterSingletonType<FoilNotesModel>(uri, v1, v2, "FoilNotesModel", FoilNotesModel::createSingleton);
 }
@@ -120,6 +124,7 @@ int main(int argc, char *argv[])
     QString providerDarkOnLight("harbour-dark");
     engine->addImageProvider(providerDefault, new HarbourImageProvider);
     engine->addImageProvider(providerDarkOnLight, new HarbourImageProvider);
+    engine->addImageProvider("qrcode", new QrCodeImageProvider);
 
     // Initialize global properties
     context->setContextProperty("MaximumHintCount", 1);

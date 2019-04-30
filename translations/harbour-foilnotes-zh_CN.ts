@@ -41,7 +41,7 @@
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
         <extracomment>Show QR code for the current note</extracomment>
-        <translation type="unfinished">显示二维码</translation>
+        <translation>显示二维码</translation>
     </message>
     <message id="foilnotes-menu-select_color">
         <source>Select color</source>
@@ -117,7 +117,7 @@
         <source>Deleting %0 selected notes</source>
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
-            <numerusform>删除选择的%0笔记</numerusform>
+            <numerusform>删除选择的 %0 笔记</numerusform>
         </translation>
     </message>
     <message id="foilnotes-organize_page-plaintext_header">
@@ -282,7 +282,7 @@
     <message id="foilnotes-foil_apps_warning">
         <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation type="unfinished">请注意, &quot;Foil Notes&quot; 和 &quot;Foil Pics&quot; 共享加密密钥和密码。</translation>
+        <translation>请注意所有的Foil系列软件共享加密密钥和密码。</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>

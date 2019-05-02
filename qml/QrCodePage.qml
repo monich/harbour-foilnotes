@@ -11,8 +11,8 @@ Page {
 
     Rectangle {
         color: "white"
-        x: (actualWidth - width)/2
-        y: (actualHeight - height)/2
+        x: Math.floor((actualWidth - width)/2)
+        y: Math.floor((actualHeight - height)/2)
         width: qrcodeImage.width + 2 * Theme.horizontalPageMargin
         height: qrcodeImage.height + 2 * Theme.horizontalPageMargin
 

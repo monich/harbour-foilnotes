@@ -11,6 +11,7 @@ Page {
 
     Rectangle {
         color: "white"
+        radius: Theme.paddingMedium
         x: Math.floor((actualWidth - width)/2)
         y: Math.floor((actualHeight - height)/2)
         width: qrcodeImage.width + 2 * Theme.horizontalPageMargin

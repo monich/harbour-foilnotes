@@ -47,7 +47,7 @@ Page {
         saveBody(body)
     }
 
-    QrCodeGenerator {
+    HarbourQrCodeGenerator {
         id: generator
 
         text: page.body

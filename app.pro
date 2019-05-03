@@ -73,9 +73,7 @@ HEADERS += \
     src/FoilNotesModel.h \
     src/FoilNotesPlaintextModel.h \
     src/FoilNotesSearchModel.h \
-    src/FoilNotesSettings.h \
-    src/QrCodeGenerator.h \
-    src/QrCodeImageProvider.h
+    src/FoilNotesSettings.h
 
 SOURCES += \
     src/FoilNotes.cpp \
@@ -85,9 +83,7 @@ SOURCES += \
     src/FoilNotesPlaintextModel.cpp \
     src/FoilNotesSearchModel.cpp \
     src/FoilNotesSettings.cpp \
-    src/main.cpp \
-    src/QrCodeGenerator.cpp \
-    src/QrCodeImageProvider.cpp
+    src/main.cpp
 
 SOURCES += \
     $${LIBFOIL_SRC}/*.c \
@@ -110,6 +106,8 @@ HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourDebug.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourImageProvider.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeGenerator.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeImageProvider.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystemState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourTask.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourTheme.h \
@@ -120,6 +118,8 @@ SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourImageProvider.cpp \
     $${HARBOUR_LIB_SRC}/HarbourMce.cpp \
     $${HARBOUR_LIB_SRC}/HarbourOrganizeListModel.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourQrCodeGenerator.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourQrCodeImageProvider.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystemState.cpp \
     $${HARBOUR_LIB_SRC}/HarbourTask.cpp \
     $${HARBOUR_LIB_SRC}/HarbourTheme.cpp

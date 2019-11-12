@@ -41,7 +41,7 @@
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
         <extracomment>Show QR code for the current note</extracomment>
-        <translation type="unfinished">Pokaż kod QR</translation>
+        <translation>Pokaż kod QR</translation>
     </message>
     <message id="foilnotes-menu-select_color">
         <source>Select color</source>

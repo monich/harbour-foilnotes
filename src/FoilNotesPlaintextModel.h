@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2020 Jolla Ltd.
+ * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -46,7 +46,7 @@ class FoilNotesPlaintextModel: public FoilNotesBaseModel {
 public:
     FoilNotesPlaintextModel(QObject* aParent = NULL);
 
-    // FoilNotesPlaintextModel
+    // FoilNotesBaseModel
     void addNote(QColor aColor, QString aBody) Q_DECL_OVERRIDE;
     void deleteNoteAt(int aIndex) Q_DECL_OVERRIDE;
     void setBodyAt(int aRow, QString aBody) Q_DECL_OVERRIDE;

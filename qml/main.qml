@@ -35,11 +35,35 @@ ApplicationWindow {
         id: appPlaintextModel
     }
 
+    Timer {
+        id: lockTimer
+
+        interval: FoilNotesSettings.autoLockTime
+        onTriggered: FoilNotesModel.lock(true);
+    }
+
     Connections {
         target: HarbourSystemState
-        onLockModeChanged: {
+        property bool wasDimmed
+
+        onDisplayStatusChanged: {
+            if (target.displayStatus === HarbourSystemState.MCE_DISPLAY_DIM) {
+                wasDimmed = true
+            } else if (target.displayStatus === HarbourSystemState.MCE_DISPLAY_ON) {
+                wasDimmed = false
+            }
+        }
+
+        onLockedChanged: {
+            lockTimer.stop()
             if (target.locked) {
-                FoilNotesModel.lock(false);
+                if (wasDimmed) {
+                    // Give the user some time to wake wake up the screen
+                    // and prevent encrypted pictures from being locked
+                    lockTimer.start()
+                } else {
+                    FoilNotesModel.lock(false);
+                }
             }
         }
     }

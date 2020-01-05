@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2020 Jolla Ltd.
+ * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -44,9 +44,11 @@
 #define KEY_NEXT_COLOR_INDEX        DCONF_KEY("nextColorIndex")
 #define KEY_SHARED_KEY_WARNING      DCONF_KEY("sharedKeyWarning")
 #define KEY_SHARED_KEY_WARNING2     DCONF_KEY("sharedKeyWarning2")
+#define KEY_AUTO_LOCK_TIME          DCONF_KEY("autoLockTime")
 
 #define DEFAULT_NEXT_COLOR_INDEX    0
 #define DEFAULT_SHARED_KEY_WARNING  true
+#define DEFAULT_AUTO_LOCK_TIME      15000
 
 // ==========================================================================
 // FoilNotesSettings::Private
@@ -63,6 +65,9 @@ public:
     MGConfItem* iNextColorIndex;
     MGConfItem* iSharedKeyWarning;
     MGConfItem* iSharedKeyWarning2;
+    MGConfItem* iAutoLockTime;
+    QVariant iDefaultSharedKeyWarning;
+    QVariant iDefaultAutoLockTime;
 };
 
 const char* FoilNotesSettings::Private::gAvailableColors[] = {
@@ -76,7 +81,10 @@ const char* FoilNotesSettings::Private::gAvailableColors[] = {
 FoilNotesSettings::Private::Private(QObject* aParent) :
     iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent)),
     iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent)),
-    iSharedKeyWarning2(new MGConfItem(KEY_SHARED_KEY_WARNING2, aParent))
+    iSharedKeyWarning2(new MGConfItem(KEY_SHARED_KEY_WARNING2, aParent)),
+    iAutoLockTime(new MGConfItem(KEY_AUTO_LOCK_TIME, aParent)),
+    iDefaultSharedKeyWarning(DEFAULT_SHARED_KEY_WARNING),
+    iDefaultAutoLockTime(DEFAULT_AUTO_LOCK_TIME)
 {
     QObject::connect(iNextColorIndex, SIGNAL(valueChanged()),
         aParent, SIGNAL(nextColorIndexChanged()));
@@ -84,6 +92,8 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
         aParent, SIGNAL(sharedKeyWarningChanged()));
     QObject::connect(iSharedKeyWarning2, SIGNAL(valueChanged()),
         aParent, SIGNAL(sharedKeyWarning2Changed()));
+    QObject::connect(iAutoLockTime, SIGNAL(valueChanged()),
+        aParent, SIGNAL(autoLockTimeChanged()));
 
     const uint n = sizeof(gAvailableColors)/sizeof(gAvailableColors[0]);
     iAvailableColors.reserve(n);
@@ -162,13 +172,15 @@ FoilNotesSettings::pickColor()
 bool
 FoilNotesSettings::sharedKeyWarning() const
 {
-    return iPrivate->iSharedKeyWarning->value(DEFAULT_SHARED_KEY_WARNING).toBool();
+    return iPrivate->iSharedKeyWarning->value(iPrivate->
+        iDefaultSharedKeyWarning).toBool();
 }
 
 bool
 FoilNotesSettings::sharedKeyWarning2() const
 {
-    return iPrivate->iSharedKeyWarning2->value(DEFAULT_SHARED_KEY_WARNING).toBool();
+    return iPrivate->iSharedKeyWarning2->value(iPrivate->
+        iDefaultSharedKeyWarning).toBool();
 }
 
 void
@@ -185,4 +197,23 @@ FoilNotesSettings::setSharedKeyWarning2(
 {
     HDEBUG(aValue);
     iPrivate->iSharedKeyWarning2->set(aValue);
+}
+
+// autoLockTime
+
+int
+FoilNotesSettings::autoLockTime() const
+{
+    QVariant val(iPrivate->iAutoLockTime->value(iPrivate->iDefaultAutoLockTime));
+    bool ok;
+    const int ival(val.toInt(&ok));
+    return (ok && ival >= 0) ? ival : DEFAULT_AUTO_LOCK_TIME;
+}
+
+void
+FoilNotesSettings::setAutoLockTime(
+    int aValue)
+{
+    HDEBUG(aValue);
+    iPrivate->iAutoLockTime->set(aValue);
 }

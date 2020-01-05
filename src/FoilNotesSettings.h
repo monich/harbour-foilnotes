@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2020 Jolla Ltd.
+ * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -46,11 +46,13 @@ class FoilNotesSettings : public QObject {
     Q_PROPERTY(int nextColorIndex READ nextColorIndex WRITE setNextColorIndex NOTIFY nextColorIndexChanged)
     Q_PROPERTY(bool sharedKeyWarning READ sharedKeyWarning WRITE setSharedKeyWarning NOTIFY sharedKeyWarningChanged)
     Q_PROPERTY(bool sharedKeyWarning2 READ sharedKeyWarning2 WRITE setSharedKeyWarning2 NOTIFY sharedKeyWarning2Changed)
+    Q_PROPERTY(int autoLockTime READ autoLockTime WRITE setAutoLockTime NOTIFY autoLockTimeChanged)
 
 public:
     explicit FoilNotesSettings(QObject* aParent = Q_NULLPTR);
     ~FoilNotesSettings();
 
+    // Callback for qmlRegisterSingletonType<FoilNotesSettings>
     static QObject* createSingleton(QQmlEngine* aEngine, QJSEngine* aScript);
 
     QStringList availableColors() const;
@@ -63,6 +65,9 @@ public:
     void setSharedKeyWarning(bool aValue);
     void setSharedKeyWarning2(bool aValue);
 
+    int autoLockTime() const;
+    void setAutoLockTime(int aValue);
+
     Q_INVOKABLE int pickColorIndex();
     Q_INVOKABLE QColor pickColor();
 
@@ -70,6 +75,7 @@ Q_SIGNALS:
     void nextColorIndexChanged();
     void sharedKeyWarningChanged();
     void sharedKeyWarning2Changed();
+    void autoLockTimeChanged();
 
 private:
     class Private;

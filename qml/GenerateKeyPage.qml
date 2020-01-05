@@ -1,20 +1,29 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.foilnotes 1.0
 
 Page {
     id: page
 
-    property alias mainPage: view.mainPage
-    property alias foilModel: view.foilModel
+    property var foilModel
 
     allowedOrientations: Orientation.All
 
-    GenerateKeyView {
-        id: view
+    Connections {
+        target: page.foilModel
+        onFoilStateChanged: {
+            if (foilModel.foilState !== FoilNotesModel.FoilNotesReady) {
+                page.backNavigation = false
+                pageStack.pop(pageStack.previousPage(page))
+            }
+        }
+    }
 
+    GenerateKeyView {
         anchors.fill: parent
-        //: Label text
+        //: Prompt label
         //% "You are about to generate a new key"
-        title: qsTrId("foilnotes-generate_key_page-title")
+        prompt: qsTrId("foilnotes-generate_key_page-title")
+        foilModel: page.foilModel
     }
 }

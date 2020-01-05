@@ -147,8 +147,13 @@
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
-        <extracomment>Password prompt label</extracomment>
+        <extracomment>Password prompt label (long)</extracomment>
         <translation>选择的笔记已锁定，请输入你的密码</translation>
+    </message>
+    <message id="foilnotes-enter_password_view-label-enter_password_short">
+        <source>Please enter your password</source>
+        <extracomment>Password prompt label (short)</extracomment>
+        <translation>请输入你的密码</translation>
     </message>
     <message id="foilnotes-enter_password_view-button-unlocking">
         <source>Unlocking...</source>
@@ -177,7 +182,7 @@
     </message>
     <message id="foilnotes-generate_key_page-title">
         <source>You are about to generate a new key</source>
-        <extracomment>Label text</extracomment>
+        <extracomment>Prompt label</extracomment>
         <translation>你将生成新秘钥</translation>
     </message>
     <message id="foilnotes-generate_key_view-label-key_needed">

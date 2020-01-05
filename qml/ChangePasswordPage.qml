@@ -16,10 +16,8 @@ Page {
     property alias newPassword: newPasswordField.text
     readonly property bool landscapeLayout: isLandscape && Screen.sizeCategory < Screen.Large
     readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
-
-    function canChangePassword() {
-        return currentPassword.length > 0 && newPassword.length > 0 && currentPassword !== newPassword && !wrongPassword
-    }
+    readonly property bool canChangePassword: currentPassword.length > 0 && newPassword.length > 0 &&
+                            currentPassword !== newPassword && !wrongPassword
 
     function invalidPassword() {
         wrongPassword = true
@@ -28,9 +26,9 @@ Page {
     }
 
     function changePassword() {
-        if (canChangePassword()) {
+        if (canChangePassword) {
             if (foilModel.checkPassword(currentPassword)) {
-                pageStack.push(Qt.resolvedUrl("ConfirmPasswordPage.qml"), {
+                pageStack.push(Qt.resolvedUrl("ConfirmPasswordDialog.qml"), {
                     password: newPassword
                 }).passwordConfirmed.connect(function() {
                     if (foilModel.changePassword(currentPassword, newPassword)) {
@@ -85,8 +83,9 @@ Page {
             //% "Current password"
             label: qsTrId("foilnotes-change_password_page-text_field_label-current_password")
             placeholderText: label
-            EnterKey.onClicked: newPasswordField.focus = true
             onTextChanged: page.wrongPassword = false
+            EnterKey.enabled: text.length > 0
+            EnterKey.onClicked: newPasswordField.focus = true
         }
 
         HarbourPasswordInputField {
@@ -102,6 +101,7 @@ Page {
             //% "New password"
             placeholderText: qsTrId("foilnotes-change_password_page-text_field_label-new_password")
             label: placeholderText
+            EnterKey.enabled: page.canChangePassword
             EnterKey.onClicked: page.changePassword()
         }
 
@@ -111,9 +111,15 @@ Page {
             //: Button label
             //% "Change password"
             text: qsTrId("foilnotes-change_password_page-button-change_password")
-            enabled: canChangePassword()
+            enabled: page.canChangePassword
             onClicked: page.changePassword()
         }
+    }
+
+    HarbourShakeAnimation  {
+        id: wrongPasswordAnimation
+
+        target: panel
     }
 
     Loader {
@@ -125,19 +131,15 @@ Page {
             right: parent.right
             rightMargin: Theme.horizontalPageMargin
         }
-        active: FoilNotesSettings.sharedKeyWarning2 && FoilNotes.otherFoilAppsInstalled
+        readonly property bool display: FoilNotesSettings.sharedKeyWarning2 && FoilNotes.otherFoilAppsInstalled
+        opacity: display ? 1 : 0
+        active: opacity > 0
         sourceComponent: Component {
             FoilAppsWarning {
                 onClicked: FoilNotesSettings.sharedKeyWarning2 = false
             }
         }
         Behavior on opacity { FadeAnimation {} }
-    }
-
-    HarbourShakeAnimation  {
-        id: wrongPasswordAnimation
-
-        target: panel
     }
 
     states: [

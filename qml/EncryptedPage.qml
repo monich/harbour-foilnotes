@@ -89,10 +89,7 @@ Page {
             active: opacity > 0
             opacity: (foilModel.foilState === FoilNotesModel.FoilKeyMissing) ? 1 : 0
             sourceComponent: Component {
-                GenerateKeyView {
-                    mainPage: page
-                    foilModel: page.foilModel
-                }
+                GenerateKeyView { foilModel: page.foilModel }
             }
             Behavior on opacity { FadeAnimator {} }
         }
@@ -114,10 +111,7 @@ Page {
             opacity: (foilModel.foilState === FoilNotesModel.FoilLocked ||
                         foilModel.foilState === FoilNotesModel.FoilLockedTimedOut) ? 1 : 0
             sourceComponent: Component {
-                EnterPasswordView {
-                    mainPage: page
-                    foilModel: page.foilModel
-                }
+                EnterPasswordView { foilModel: page.foilModel }
             }
             Behavior on opacity { FadeAnimator {} }
         }
@@ -129,9 +123,7 @@ Page {
             opacity: (foilModel.foilState === FoilNotesModel.FoilDecrypting ||
                       decryptingTimer.running) ? 1 : 0
             sourceComponent: Component {
-                DecryptingView {
-                    foilModel: page.foilModel
-                }
+                DecryptingView { foilModel: page.foilModel  }
             }
             Behavior on opacity { FadeAnimator {} }
         }

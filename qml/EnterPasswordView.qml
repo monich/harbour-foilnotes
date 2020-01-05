@@ -7,18 +7,20 @@ import "harbour"
 SilicaFlickable {
     id: view
 
-    property Page mainPage
     property var foilModel
     property bool wrongPassword
+
     readonly property bool landscapeLayout: appLandscapeMode && Screen.sizeCategory < Screen.Large
     readonly property bool unlocking: foilModel.foilState !== FoilNotesModel.FoilLocked &&
                                     foilModel.foilState !== FoilNotesModel.FoilLockedTimedOut
+    readonly property bool canEnterPassword: inputField.text.length > 0 && !unlocking &&
+                                    !wrongPasswordAnimation.running && !wrongPassword
 
     function enterPassword() {
-        if (!foilModel.unlock(passphraseField.text)) {
+        if (!foilModel.unlock(inputField.text)) {
             wrongPassword = true
             wrongPasswordAnimation.start()
-            passphraseField.requestFocus()
+            inputField.requestFocus()
         }
     }
 
@@ -45,11 +47,35 @@ SilicaFlickable {
                     //
                     warning.canNavigateForward = false
                     pageStack.replace(Qt.resolvedUrl("GenerateKeyPage.qml"), {
-                        mainPage: view.mainPage,
                         foilModel: foilModel
                     })
                 })
             }
+        }
+    }
+
+    Rectangle {
+        id: circle
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Theme.itemSizeHuge
+        y: (panel.y > height) ? Math.floor((panel.y - height)/2) : (panel.y - height)
+        height: width
+        color: Theme.rgba(Theme.primaryColor, HarbourTheme.opacityFaint * HarbourTheme.opacityLow)
+        radius: width/2
+        visible: opacity > 0
+
+        // Hide it when it's only partially visible (i.e. in langscape)
+        // or getting too close to the edge of the screen
+        opacity: (y < Theme.paddingMedium) ? 0 : 1
+        Behavior on opacity { FadeAnimation { duration: landscapeLayout ? 0 : 100 } }
+
+        Image {
+            source: HarbourTheme.darkOnLight ? "images/lock-dark.svg" : "images/lock.svg"
+            height: Math.floor(circle.height * 5 / 8)
+            sourceSize.height: height
+            anchors.centerIn: circle
+            visible: parent.opacity > 0
         }
     }
 
@@ -58,32 +84,45 @@ SilicaFlickable {
 
         width: parent.width
         height: childrenRect.height
-        anchors.verticalCenter: parent.verticalCenter
+        y: (parent.height > height) ? Math.floor((parent.height - height)/2) : (parent.height - height)
+
+        readonly property bool showLongPrompt: y >= Theme.paddingMedium
 
         InfoLabel {
-            id: prompt
+            id: longPrompt
 
             height: implicitHeight
-            //: Password prompt label
+            visible: panel.showLongPrompt
+            //: Password prompt label (long)
             //% "Secret notes are locked. Please enter your password"
             text: qsTrId("foilnotes-enter_password_view-label-enter_password")
         }
 
+        InfoLabel {
+            height: implicitHeight
+            anchors.bottom: longPrompt.bottom
+            visible: !panel.showLongPrompt
+            //: Password prompt label (short)
+            //% "Please enter your password"
+            text: qsTrId("foilnotes-enter_password_view-label-enter_password_short")
+        }
+
         HarbourPasswordInputField {
-            id: passphraseField
+            id: inputField
 
             anchors {
                 left: panel.left
-                top: prompt.bottom
+                top: longPrompt.bottom
                 topMargin: Theme.paddingLarge
             }
             enabled: !unlocking
-            EnterKey.onClicked: view.enterPassword()
             onTextChanged: view.wrongPassword = false
+            EnterKey.onClicked: view.enterPassword()
+            EnterKey.enabled: view.canEnterPassword
         }
 
         Button {
-            id: unlockButton
+            id: button
 
             text: unlocking ?
                 //: Button label
@@ -92,9 +131,15 @@ SilicaFlickable {
                 //: Button label
                 //% "Unlock"
                 qsTrId("foilnotes-enter_password_view-button-unlock")
-            enabled: passphraseField.text.length > 0 && !unlocking && !wrongPasswordAnimation.running && !wrongPassword
+            enabled: view.canEnterPassword
             onClicked: view.enterPassword()
         }
+    }
+
+    HarbourShakeAnimation  {
+        id: wrongPasswordAnimation
+
+        target: panel
     }
 
     Loader {
@@ -106,7 +151,9 @@ SilicaFlickable {
             right: parent.right
             rightMargin: Theme.horizontalPageMargin
         }
-        active: FoilNotesSettings.sharedKeyWarning && FoilNotes.otherFoilAppsInstalled
+        readonly property bool display: FoilNotesSettings.sharedKeyWarning && FoilNotes.otherFoilAppsInstalled
+        opacity: display ? 1 : 0
+        active: opacity > 0
         sourceComponent: Component {
             FoilAppsWarning {
                 onClicked: FoilNotesSettings.sharedKeyWarning = false
@@ -115,34 +162,28 @@ SilicaFlickable {
         Behavior on opacity { FadeAnimation {} }
     }
 
-    HarbourShakeAnimation  {
-        id: wrongPasswordAnimation
-
-        target: panel
-    }
-
     states: [
         State {
             name: "portrait"
             when: !landscapeLayout
             changes: [
                 AnchorChanges {
-                    target: passphraseField
+                    target: inputField
                     anchors.right: panel.right
                 },
                 PropertyChanges {
-                    target: passphraseField
+                    target: inputField
                     anchors.rightMargin: 0
                 },
                 AnchorChanges {
-                    target: unlockButton
+                    target: button
                     anchors {
-                        top: passphraseField.bottom
+                        top: inputField.bottom
                         horizontalCenter: parent.horizontalCenter
                     }
                 },
                 PropertyChanges {
-                    target: unlockButton
+                    target: button
                     anchors {
                         topMargin: Theme.paddingLarge
                         rightMargin: 0
@@ -155,23 +196,23 @@ SilicaFlickable {
             when: landscapeLayout
             changes: [
                 AnchorChanges {
-                    target: passphraseField
-                    anchors.right: unlockButton.left
+                    target: inputField
+                    anchors.right: button.left
                 },
                 PropertyChanges {
-                    target: passphraseField
+                    target: inputField
                     anchors.rightMargin: Theme.horizontalPageMargin
                 },
                 AnchorChanges {
-                    target: unlockButton
+                    target: button
                     anchors {
-                        top: prompt.bottom
+                        top: longPrompt.bottom
                         right: panel.right
                         horizontalCenter: undefined
                     }
                 },
                 PropertyChanges {
-                    target: unlockButton
+                    target: button
                     anchors {
                         topMargin: Theme.paddingLarge
                         rightMargin: Theme.horizontalPageMargin

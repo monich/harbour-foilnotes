@@ -200,7 +200,7 @@ Page {
                 }
             }
         }
-        Behavior on opacity { FadeAnimator {} }
+        Behavior on opacity { FadeAnimation { } }
     }
 
     Loader {
@@ -239,6 +239,6 @@ Page {
                 }
             }
         }
-        Behavior on opacity { FadeAnimator {} }
+        Behavior on opacity { FadeAnimation { } }
     }
 }

@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 import org.nemomobile.notifications 1.0
@@ -91,7 +91,7 @@ Page {
             sourceComponent: Component {
                 GenerateKeyView { foilModel: page.foilModel }
             }
-            Behavior on opacity { FadeAnimator {} }
+            Behavior on opacity { FadeAnimation { } }
         }
 
         // GeneratingKeyView
@@ -100,8 +100,8 @@ Page {
             active: opacity > 0
             opacity: (foilModel.foilState === FoilNotesModel.FoilGeneratingKey ||
                         generatingKeyTimer.running) ? 1 : 0
-            sourceComponent: Component { GeneratingKeyView {} }
-            Behavior on opacity { FadeAnimator {} }
+            sourceComponent: Component { GeneratingKeyView { } }
+            Behavior on opacity { FadeAnimation { } }
         }
 
         // EnterPasswordView
@@ -113,7 +113,7 @@ Page {
             sourceComponent: Component {
                 EnterPasswordView { foilModel: page.foilModel }
             }
-            Behavior on opacity { FadeAnimator {} }
+            Behavior on opacity { FadeAnimation { } }
         }
 
         // DecryptingView
@@ -125,7 +125,7 @@ Page {
             sourceComponent: Component {
                 DecryptingView { foilModel: page.foilModel  }
             }
-            Behavior on opacity { FadeAnimator {} }
+            Behavior on opacity { FadeAnimation { } }
         }
 
         // EncryptedNotesView
@@ -158,7 +158,7 @@ Page {
                     pageStack.pop(page, PageStackAction.Immediate)
                 }
             }
-            Behavior on opacity { FadeAnimator {} }
+            Behavior on opacity { FadeAnimation { } }
         }
     }
 }

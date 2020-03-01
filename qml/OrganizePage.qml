@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
@@ -106,7 +106,7 @@ Page {
                         }
                     ]
 
-                    Behavior on scale { ScaleAnimator { duration: 150; easing.type: Easing.InOutQuad } }
+                    Behavior on scale { FadeAnimation { duration: 150 } }
 
                     Connections {
                         target: noteDelegate.dragging ? noteItem : null

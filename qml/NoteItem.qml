@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
@@ -22,7 +22,7 @@ Item {
         color: Theme.highlightBackgroundColor
         visible: opacity > 0
         opacity: showHighlightBackground ? Theme.highlightBackgroundOpacity : 0.0
-        Behavior on opacity { FadeAnimator { duration: 100 } }
+        Behavior on opacity { FadeAnimation { duration: 100 } }
     }
 
     Item {

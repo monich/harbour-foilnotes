@@ -123,7 +123,7 @@ FoilNotesSettings::createSingleton(
     QQmlEngine* aEngine,
     QJSEngine* aScript)
 {
-    return new FoilNotesSettings(aEngine);
+    return new FoilNotesSettings();
 }
 
 // availableColors

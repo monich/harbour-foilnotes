@@ -17,7 +17,7 @@ ApplicationWindow {
     // Global properties
     readonly property string appCurrentText: (appEncryptedPagelSelected &&
         FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) ?
-        FoilNotesModel.text : appPlaintextModel.text
+        FoilNotesModel.text : FoilNotesPlaintextModel.text
 
     readonly property int appPortraitColumnCount: Math.floor(_portraitWidth/_refCellSize)
     readonly property int appLandscapeColumnCount: Math.ceil(_landscapeWidth/_refCellSize)
@@ -30,10 +30,6 @@ ApplicationWindow {
     readonly property int appCellSize: appLandscapeMode ? appLandscapeCellSize : appPortraitCellSize
 
     signal newNoteFromCover()
-
-    FoilNotesPlaintextModel {
-        id: appPlaintextModel
-    }
 
     Timer {
         id: lockTimer
@@ -74,7 +70,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         // Let plaintext model know when encryption is finished:
-        FoilNotesModel.encryptionDone.connect(appPlaintextModel.onEncryptionDone)
+        FoilNotesModel.encryptionDone.connect(FoilNotesPlaintextModel.onEncryptionDone)
         pageStack.pushAttached(plaintextPageComponent)
     }
 
@@ -87,7 +83,7 @@ ApplicationWindow {
             foilModel: FoilNotesModel
             Component.onCompleted: appEncryptedPagelSelected = isCurrentPage
             onIsCurrentPageChanged: appEncryptedPagelSelected = isCurrentPage
-            onDecryptNote: appPlaintextModel.saveNote(note.pagenr, note.color, note.body)
+            onDecryptNote: FoilNotesPlaintextModel.saveNote(note.pagenr, note.color, note.body)
         }
     }
 
@@ -100,7 +96,7 @@ ApplicationWindow {
             allowedOrientations: appAllowedOrientations
             hints: FoilNotesHints
             foilModel: FoilNotesModel
-            plaintextModel: appPlaintextModel
+            plaintextModel: FoilNotesPlaintextModel
 
             Connections {
                 target: appWindow

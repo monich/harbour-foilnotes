@@ -74,6 +74,9 @@ public:
     int textIndex() const;
     void setTextIndex(int aIndex);
 
+    // Callback for qmlRegisterSingletonType<FoilNotesPlaintextModel>
+    static QObject* createSingleton(QQmlEngine* aEngine, QJSEngine* aScript);
+
 public Q_SLOTS:
     void onEncryptionDone(int requestId, bool success);
 

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2020 Jolla Ltd.
+ * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -60,12 +60,12 @@ static void register_types(const char* uri, int v1 = 1, int v2 = 0)
     qmlRegisterSingletonType<HarbourTheme>(uri, v1, v2, "HarbourTheme", HarbourTheme::createSingleton);
     qmlRegisterSingletonType<FoilNotesHints>(uri, v1, v2, "FoilNotesHints", FoilNotesHints::createSingleton);
     qmlRegisterSingletonType<FoilNotesSettings>(uri, v1, v2, "FoilNotesSettings", FoilNotesSettings::createSingleton);
-    qmlRegisterType<FoilNotesSearchModel>(uri, v1, v2, "FoilNotesSearchModel");
-    qmlRegisterType<HarbourOrganizeListModel>(uri, v1, v2, "HarbourOrganizeListModel");
-    qmlRegisterType<FoilNotesPlaintextModel>(uri, v1, v2, "FoilNotesPlaintextModel");
-    qmlRegisterType<HarbourQrCodeGenerator>(uri, v1, v2, "HarbourQrCodeGenerator");
     qmlRegisterSingletonType<FoilNotes>(uri, v1, v2, "FoilNotes", FoilNotes::createSingleton);
     qmlRegisterSingletonType<FoilNotesModel>(uri, v1, v2, "FoilNotesModel", FoilNotesModel::createSingleton);
+    qmlRegisterSingletonType<FoilNotesPlaintextModel>(uri, v1, v2, "FoilNotesPlaintextModel", FoilNotesPlaintextModel::createSingleton);
+    qmlRegisterType<FoilNotesSearchModel>(uri, v1, v2, "FoilNotesSearchModel");
+    qmlRegisterType<HarbourOrganizeListModel>(uri, v1, v2, "HarbourOrganizeListModel");
+    qmlRegisterType<HarbourQrCodeGenerator>(uri, v1, v2, "HarbourQrCodeGenerator");
 }
 
 int main(int argc, char *argv[])

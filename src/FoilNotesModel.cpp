@@ -46,8 +46,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#define ENCRYPT_KEY_TYPE FOILMSG_KEY_AES_256
-#define DIGEST_TYPE FOIL_DIGEST_MD5
+#define ENCRYPT_KEY_TYPE        FOILMSG_KEY_AES_256
+#define SIGNATURE_TYPE          FOILMSG_SIGNATURE_SHA256_RSA
 
 #define HEADER_COLOR            "color"
 
@@ -282,8 +282,9 @@ void FoilNotesModel::ModelInfo::save(QString aDir, FoilPrivateKey* aPrivate,
         headers.count++;
 
         FoilMsgEncryptOptions opt;
-        memset(&opt, 0, sizeof(opt));
+        foilmsg_encrypt_defaults(&opt);
         opt.key_type = ENCRYPT_KEY_TYPE;
+        opt.signature = SIGNATURE_TYPE;
 
         FoilBytes data;
         foil_bytes_from_string(&data, INFO_CONTENTS);
@@ -546,8 +547,9 @@ void FoilNotesModel::EncryptTask::performTask()
     FoilOutput* out = createFoilFile(iDestDir, dest);
     if (out) {
         FoilMsgEncryptOptions opt;
-        memset(&opt, 0, sizeof(opt));
+        foilmsg_encrypt_defaults(&opt);
         opt.key_type = ENCRYPT_KEY_TYPE;
+        opt.signature = SIGNATURE_TYPE;
 
         FoilMsgHeaders headers;
         FoilMsgHeader header[1];

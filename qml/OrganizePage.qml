@@ -106,7 +106,12 @@ Page {
                         }
                     ]
 
-                    Behavior on scale { FadeAnimation { duration: 150 } }
+                    Behavior on scale {
+                        NumberAnimation {
+                            easing.type: Easing.InQuad
+                            duration: 150
+                        }
+                    }
 
                     Connections {
                         target: noteDelegate.dragging ? noteItem : null

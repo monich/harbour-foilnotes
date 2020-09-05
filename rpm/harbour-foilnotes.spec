@@ -1,9 +1,8 @@
 Name:           harbour-foilnotes
 Summary:        Encrypted notes
-Version:        1.0.12
+Version:        1.0.13
 Release:        1
 License:        BSD
-Group:          Applications/File
 URL:            https://github.com/monich/harbour-foilnotes
 Source0:        %{name}-%{version}.tar.gz
 

@@ -24,11 +24,11 @@ SilicaGridView {
     property int removeAnimationDuration: 0
     property Component contextMenuComponent
     property Item contextMenu
-    property Item contextMenuItem: contextMenu ? contextMenu.parent : null
+    readonly property Item contextMenuItem: contextMenu ? contextMenu.parent : null
     readonly property int cellsPerRow: Math.floor(width/cellWidth)
     readonly property int minOffsetIndex: contextMenuItem ?
         contextMenuItem.modelIndex - (contextMenuItem.modelIndex % columnCount) + columnCount : 0
-    readonly property int yOffset: contextMenu ? contextMenu.height : 0
+    readonly property int expandHeight: contextMenu ? contextMenu.height : 0
 
     function newNote(model,transition) {
         var noteCreated = false
@@ -130,6 +130,7 @@ SilicaGridView {
             readonly property int modelIndex: model.index
             readonly property string modelText: model.body
             readonly property bool menuOpen: grid.contextMenuItem === noteDelegate
+            readonly property real contentYOffset: index >= grid.minOffsetIndex ? grid.expandHeight : 0.0
 
             function deleteNote() {
                 grid.positionViewAtIndex(noteDelegate.modelIndex, GridView.Visible)
@@ -142,12 +143,13 @@ SilicaGridView {
             }
 
             function remorseAction(text, callback) {
-                var item = noteDelegate
-                remorseComponent.createObject(item).execute(item, text,
+                var delegateItem = noteDelegate
+                var remorseParent = noteItem
+                remorseComponent.createObject(remorseParent).execute(remorseParent, text,
                     function() {
                         var prevAnimateDisplacement  = grid.animateDisplacement
                         grid.animateDisplacement = true
-                        callback(item.modelIndex)
+                        callback(delegateItem.modelIndex)
                         grid.animateDisplacement = prevAnimateDisplacement
                     })
             }
@@ -160,6 +162,7 @@ SilicaGridView {
             NoteItem {
                 id: noteItem
 
+                y: noteDelegate.contentYOffset
                 filter: grid.filter
                 body: modelText
                 color: model.color
@@ -169,14 +172,6 @@ SilicaGridView {
                 highlighted: noteDelegate.highlighted
                 selected: grid.showSelection && model.selected
                 secret: grid.secret
-
-                Connections {
-                    target: grid
-
-                    onMinOffsetIndexChanged: updateY()
-                    onYOffsetChanged: updateY()
-                    function updateY() { noteItem.y = noteDelegate.modelIndex >= grid.minOffsetIndex ? grid.yOffset : 0 }
-                }
             }
 
             onClicked: {
@@ -252,5 +247,5 @@ SilicaGridView {
         }
     }
 
-    VerticalScrollDecorator { }
+    VerticalScrollDecorator { flickable: grid }
 }

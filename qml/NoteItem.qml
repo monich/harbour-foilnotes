@@ -9,8 +9,9 @@ Item {
     property color color
     property string body
     property string filter
-    property bool highlighted
+    property bool pressed
     property bool selected
+    property bool highlighted
     property bool secret
 
     readonly property color gradientColor0: secret ? Theme.rgba(noteItem.color, 0.1) : Theme.rgba(Theme.primaryColor, 0.0)
@@ -18,11 +19,10 @@ Item {
     readonly property int fadeDiration: 100
 
     Rectangle {
-        readonly property bool showHighlightBackground: highlighted || selected
         anchors.fill: parent
         color: Theme.highlightBackgroundColor
         visible: opacity > 0
-        opacity: showHighlightBackground ? Theme.highlightBackgroundOpacity : 0.0
+        opacity: (pressed || selected) ? Theme.highlightBackgroundOpacity : 0.0
         Behavior on opacity { FadeAnimation { duration: fadeDiration } }
     }
 
@@ -39,7 +39,7 @@ Item {
         color: "transparent"
         smooth: true
         visible: opacity > 0
-        opacity: noteItem.selected ? HarbourTheme.opacityHigh : 0
+        opacity: selected ? HarbourTheme.opacityHigh : 0
         Behavior on opacity { FadeAnimation { duration: fadeDiration } }
     }
 
@@ -113,11 +113,7 @@ Item {
             radius: Math.round(Theme.paddingSmall/3)
             color: noteItem.color
             visible: !secret
-            opacity: secret ? 0 : (noteItem.highlighted ? HarbourTheme.opacityLow : 1)
-            Behavior on opacity {
-                enabled: !secret
-                FadeAnimation { duration: fadeDiration }
-            }
+            opacity: secret ? 0.0 : 1.0
         }
     }
 
@@ -143,11 +139,6 @@ Item {
     Loader {
         anchors.fill: parent
         active: secret
-        opacity: noteItem.highlighted ? HarbourTheme.opacityLow : 1
-        Behavior on opacity {
-            enabled: secret
-            FadeAnimation { duration: fadeDiration }
-        }
         sourceComponent: Component {
             Item {
                 Image {
@@ -167,7 +158,7 @@ Item {
         z: noteItem.z + 1
         anchors.fill: parent
         active: opacity > 0
-        opacity: noteItem.selected ? (noteItem.highlighted ? HarbourTheme.opacityLow : 1 ): 0
+        opacity: selected ? (highlighted ? HarbourTheme.opacityLow : 1 ): 0
         Behavior on opacity { FadeAnimation { duration: fadeDiration } }
         sourceComponent: Component {
             Item {

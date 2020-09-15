@@ -126,7 +126,9 @@ SilicaGridView {
             width: grid.cellWidth
             height: menuOpen ? grid.cellHeight + grid.contextMenu.height : grid.cellHeight
 
-            readonly property bool highlighted: (pressed && containsMouse) || menuOpen
+            readonly property bool down: pressed && containsMouse
+            readonly property bool selected: grid.showSelection && model.selected
+            readonly property bool highlighted: down || menuOpen || selected
             readonly property int modelIndex: model.index
             readonly property string modelText: model.body
             readonly property bool menuOpen: grid.contextMenuItem === noteDelegate
@@ -169,8 +171,9 @@ SilicaGridView {
                 pageNumber: model.pagenr
                 width: grid.cellWidth
                 height: grid.cellHeight
+                pressed: noteDelegate.down && !noteDelegate.menuOpen
+                selected: noteDelegate.selected
                 highlighted: noteDelegate.highlighted
-                selected: grid.showSelection && model.selected
                 secret: grid.secret
             }
 

@@ -58,12 +58,6 @@ Page {
     }
 
     Component {
-        id: notePageComponent
-
-        NotePage { }
-    }
-
-    Component {
         id: organizePageComponent
 
         OrganizePage {

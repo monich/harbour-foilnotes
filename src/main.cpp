@@ -11,8 +11,8 @@
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
+ *      notice, this list of conditions and the following disclaimer
+ *      in the documentation and/or other materials provided with the
  *      distribution.
  *   3. Neither the names of the copyright holders nor the names of its
  *      contributors may be used to endorse or promote products derived
@@ -43,7 +43,6 @@
 #include "HarbourQrCodeImageProvider.h"
 
 #include "HarbourDebug.h"
-#include "HarbourImageProvider.h"
 #include "HarbourOrganizeListModel.h"
 #include "HarbourSystemState.h"
 #include "HarbourTheme.h"
@@ -118,18 +117,10 @@ int main(int argc, char *argv[])
     QQmlContext* context = view->rootContext();
     QQmlEngine* engine = context->engine();
 
-    // Register our image provider (two sets - one for light-on-dark and
-    // one for dark-on-light, doesn't really matter which one)
-    QString providerDefault("harbour");
-    QString providerDarkOnLight("harbour-dark");
-    engine->addImageProvider(providerDefault, new HarbourImageProvider);
-    engine->addImageProvider(providerDarkOnLight, new HarbourImageProvider);
     engine->addImageProvider("qrcode", new HarbourQrCodeImageProvider);
 
     // Initialize global properties
     context->setContextProperty("MaximumHintCount", 1);
-    context->setContextProperty("ImageProviderDefault", providerDefault);
-    context->setContextProperty("ImageProviderDarkOnLight", providerDarkOnLight);
     context->setContextProperty("FoilNotesAppName", FOILNOTES_APP_NAME);
 
     // Initialize the view and show it

@@ -2,6 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "harbour"
+
 Page {
     id: page
 
@@ -11,7 +13,6 @@ Page {
     property alias dirty: shortSaveTimer.running
     property alias actionMenuText: actionMenuItem.text
 
-    readonly property string imageProvider: HarbourTheme.darkOnLight ? ImageProviderDarkOnLight : ImageProviderDefault
     readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
     readonly property bool canUndo: "_editor" in textArea && textArea._editor.canUndo
     readonly property bool canRedo: "_editor" in textArea && textArea._editor.canRedo
@@ -174,25 +175,22 @@ Page {
             leftMargin: Theme.horizontalPageMargin
         }
         sourceComponent: Component {
-            IconButton {
+            HarbourHintIconButton {
                 id: undoButton
 
-                icon {
-                    source: "image://" + imageProvider + "/" + Qt.resolvedUrl("images/undo.svg")
-                    sourceSize: Qt.size(Theme.itemSizeSmall, Theme.itemSizeSmall)
-                }
+                //: Hint text
+                //% "Undo"
+                hint: qsTrId("foilnotes-hint-undo")
+                icon.source: "images/undo.svg"
                 onClicked: {
                     cancelHint()
                     textArea._editor.undo()
                 }
-                onReleased: cancelHint()
-                onCanceled: cancelHint()
-                onPressAndHold: {
-                    //: Hint text
-                    //% "Undo"
-                    selectionHint.text = qsTrId("foilnotes-hint-undo")
+                onShowHint: {
+                    selectionHint.text = hint
                     selectionHint.item = undoButton
                 }
+                onHideHint: cancelHint()
                 function cancelHint() {
                     if (selectionHint.item === undoButton) {
                         selectionHint.item = null
@@ -213,25 +211,22 @@ Page {
             rightMargin: Theme.horizontalPageMargin
         }
         sourceComponent: Component {
-            IconButton {
+            HarbourHintIconButton {
                 id: redoButton
 
-                icon {
-                    source: "image://" + imageProvider + "/" + Qt.resolvedUrl("images/redo.svg")
-                    sourceSize: Qt.size(Theme.itemSizeSmall, Theme.itemSizeSmall)
-                }
+                //: Hint text
+                //% "Redo"
+                hint: qsTrId("foilnotes-hint-redo")
+                icon.source: "images/redo.svg"
                 onClicked: {
                     cancelHint()
                     textArea._editor.redo()
                 }
-                onReleased: cancelHint()
-                onCanceled: cancelHint()
-                onPressAndHold: {
-                    //: Hint text
-                    //% "Redo"
-                    selectionHint.text = qsTrId("foilnotes-hint-redo")
+                onShowHint: {
+                    selectionHint.text = hint
                     selectionHint.item = redoButton
                 }
+                onHideHint: cancelHint()
                 function cancelHint() {
                     if (selectionHint.item === redoButton) {
                         selectionHint.item = null

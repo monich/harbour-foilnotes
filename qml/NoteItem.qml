@@ -2,6 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "harbour"
+
 Item {
     id: noteItem
 
@@ -141,8 +143,9 @@ Item {
         active: secret
         sourceComponent: Component {
             Item {
-                Image {
-                    source: "image://" + ImageProviderDefault + "/" + Qt.resolvedUrl(HarbourTheme.darkOnLight ? "images/cover-lock-dark.svg" : "images/cover-lock.svg") + "?" + noteItem.color
+                HarbourHighlightIcon {
+                    source: "images/cover-lock.svg"
+                    highlightColor: noteItem.color
                     x: Theme.paddingLarge
                     y: pagenumber.y + Math.floor((pagenumber.height - height)/2)
                     height: size

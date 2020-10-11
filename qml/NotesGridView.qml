@@ -186,6 +186,7 @@ SilicaGridView {
                         pagenr: model.pagenr,
                         color: model.color,
                         body: modelText,
+                        secret: grid.secret,
                         allowedOrientations: page.allowedOrientations,
                         actionMenuText: noteActionMenuText
                     })

@@ -12,6 +12,7 @@ Page {
     property alias body: textArea.text
     property alias dirty: shortSaveTimer.running
     property alias actionMenuText: actionMenuItem.text
+    property bool secret
 
     readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
     readonly property bool canUndo: "_editor" in textArea && textArea._editor.canUndo
@@ -101,11 +102,81 @@ Page {
                 width: parent.width
                 height: Theme.itemSizeLarge
 
-                ColorItem {
+                Item {
                     id: colorItem
-                    color: page.color
-                    number: page.pagenr
-                    onClicked: page.pickColor()
+
+                    height: Theme.itemSizeSmall
+                    width: Theme.itemSizeSmall
+                    anchors {
+                        right: parent.right
+                        rightMargin: Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    // Pick the most different standard color out od these two:
+                    readonly property color pagenrColor1: Theme.primaryColor
+                    readonly property color pagenrColor2: Theme.highlightBackgroundColor
+                    readonly property real pagenrColorDiff1: HarbourTheme.colorDifference(page.color, pagenrColor1)
+                    readonly property real pagenrColorDiff2: HarbourTheme.colorDifference(page.color, pagenrColor2)
+                    readonly property color pagenrColor: (pagenrColorDiff2 > pagenrColorDiff2) ? pagenrColor2 : pagenrColor1
+
+                    Loader {
+                        active: page.secret
+                        anchors.fill: parent
+                        sourceComponent: Item {
+                            HarbourHighlightIcon {
+                                source: "images/lock.svg"
+                                highlightColor: page.color
+                                sourceSize: Qt.size(colorItem.width, colorItem.height)
+                                anchors.fill: parent
+                            }
+
+                            HarbourFitLabel {
+                                text: page.pagenr
+                                color: colorItem.pagenrColor
+                                font.bold: true
+                                maxFontSize: Theme.fontSizeLarge
+                                maxWidth: Math.round(parent.width * 12 / 16) - Theme.paddingSmall
+                                maxHeight: Math.round(parent.height * 9 / 16) - Theme.paddingSmall
+                                anchors {
+                                    centerIn: parent
+                                    verticalCenterOffset: Math.round(parent.height * 3 / 16)
+                                }
+                            }
+                        }
+                    }
+
+                    Loader {
+                        active: !page.secret
+                        height: Theme.itemSizeExtraSmall
+                        width: Theme.itemSizeExtraSmall
+                        anchors.centerIn: parent
+                        sourceComponent: Item {
+                            Rectangle {
+                                color: page.color
+                                radius: Theme.paddingSmall/2
+                                anchors.fill: parent
+                            }
+
+                            HarbourFitLabel {
+                                text: page.pagenr
+                                color: colorItem.pagenrColor
+                                font.bold: true
+                                maxFontSize: Theme.fontSizeLarge
+                                maxWidth: parent.width - Theme.paddingSmall
+                                maxHeight: parent.height - Theme.paddingSmall
+                                anchors.centerIn: parent
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors {
+                            fill: parent
+                            margins: -Theme.paddingMedium
+                        }
+                        onClicked: page.pickColor()
+                    }
                 }
             }
 

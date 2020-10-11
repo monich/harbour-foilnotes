@@ -63,51 +63,51 @@ Item {
     Item {
         anchors {
             fill: parent
-            margins: Theme.paddingLarge
+            topMargin: Theme.paddingMedium
+            leftMargin: Theme.paddingLarge
+            rightMargin: Theme.paddingLarge
         }
+
         Text {
             id: summary
 
             anchors {
                 top: parent.top
-                topMargin: - (font.pixelSize / 4)
                 left: parent.left
                 right: parent.right
             }
             height: parent.height
             text: body ? Theme.highlightText(body.substr(0, Math.min(body.length, 300)), noteItem.filter, Theme.highlightColor).replace(/\n/g, '<br/>') : ""
             textFormat: Text.StyledText
+            lineHeightMode: Text.FixedHeight
+            lineHeight: font.pixelSize + Theme.paddingSmall
+            wrapMode: Text.Wrap
             font {
                 family: Theme.fontFamily
                 pixelSize: Theme.fontSizeSmall
             }
             color: highlighted ? Theme.highlightColor : Theme.primaryColor
-            wrapMode: Text.Wrap
-            readonly property real bottomMargin: Theme.paddingMedium
-            readonly property real maxPaintedHeight: Math.max(height - bottomMargin, bottomMargin)
-            readonly property int defaultLineCount: Math.floor(maxPaintedHeight/font.pixelSize)
-            elide: Text.ElideRight
-            onTextChanged: maximumLineCount = defaultLineCount
-            onDefaultLineCountChanged: maximumLineCount = defaultLineCount
-            onPaintedHeightChanged: adjustLineCount()
-            onMaxPaintedHeightChanged: adjustLineCount()
-            function adjustLineCount() {
-                if (paintedHeight > maxPaintedHeight && maximumLineCount > 1) {
-                    maximumLineCount--
-                }
-            }
+            maximumLineCount: maxPaintedLines + 1
+            readonly property real bottomMargin: Theme.paddingLarge + colorRect.height
+            readonly property int maxPaintedLines: Math.floor((height - bottomMargin)/lineHeight)
+            readonly property real maxPaintedHeight: lineHeight * maxPaintedLines - Theme.paddingSmall / 2.0
+            readonly property real opacityRampHeight: Math.min(3 * lineHeight, maxPaintedHeight / 2.0)
         }
 
         OpacityRampEffect {
             sourceItem: summary
-            slope: 0.6
-            offset: 0
+            enabled: summary.lineCount >= summary.maxPaintedLines
+            slope: summary.height/summary.opacityRampHeight
+            offset: summary.height ? (summary.maxPaintedHeight - summary.opacityRampHeight)/summary.height : 0.0
             direction: OpacityRamp.TopToBottom
         }
 
         Rectangle {
+            id: colorRect
+
             anchors {
                 bottom: parent.bottom
+                bottomMargin: Theme.paddingLarge
                 left: parent.left
             }
             width: Theme.itemSizeExtraSmall

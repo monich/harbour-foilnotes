@@ -144,7 +144,7 @@ Item {
         sourceComponent: Component {
             Item {
                 HarbourHighlightIcon {
-                    source: "images/cover-lock.svg"
+                    source: "images/lock.svg"
                     highlightColor: noteItem.color
                     x: Theme.paddingLarge
                     y: pagenumber.y + Math.floor((pagenumber.height - height)/2)

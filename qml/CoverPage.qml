@@ -13,7 +13,7 @@ CoverBackground {
 
     Image {
         visible: opacity > 0
-        source: HarbourTheme.darkOnLight ? "images/lock-dark.svg" : "images/lock.svg"
+        source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
         height: size
         sourceSize.height: size
         anchors.centerIn: parent
@@ -68,7 +68,7 @@ CoverBackground {
 
     CoverActionList {
         CoverAction {
-            readonly property url lockIcon: Qt.resolvedUrl("images/" + (HarbourTheme.darkOnLight ? "cover-lock-dark.svg" :  "cover-lock.svg"))
+            readonly property url lockIcon: Qt.resolvedUrl("images/" + (HarbourTheme.darkOnLight ? "lock-dark.svg" : "lock.svg"))
             iconSource: FoilNotesModel.keyAvailable ? lockIcon : "image://theme/icon-cover-new"
             onTriggered: {
                 if (FoilNotesModel.keyAvailable) {

@@ -71,7 +71,7 @@ SilicaFlickable {
         Behavior on opacity { FadeAnimation { duration: landscapeLayout ? 0 : 100 } }
 
         Image {
-            source: HarbourTheme.darkOnLight ? "images/lock-dark.svg" : "images/lock.svg"
+            source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
             height: Math.floor(circle.height * 5 / 8)
             sourceSize.height: height
             anchors.centerIn: circle

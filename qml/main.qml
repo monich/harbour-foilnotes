@@ -101,7 +101,13 @@ ApplicationWindow {
             Connections {
                 target: appWindow
                 onNewNoteFromCover: {
-                    pageStack.pop(null, PageStackAction.Immediate)
+                    var firstPage = pageStack.currentPage
+                    var prevPage = pageStack.previousPage(firstPage)
+                    while (prevPage) {
+                        firstPage = prevPage
+                        prevPage = pageStack.previousPage(prevPage)
+                    }
+                    pageStack.pop(firstPage, PageStackAction.Immediate)
                     pageStack.navigateForward(PageStackAction.Immediate)
                     plaintextPage.newNoteFromCover()
                     activate()

@@ -24,10 +24,6 @@ ApplicationWindow {
     readonly property int appPortraitCellSize: Math.floor(_portraitWidth/appPortraitColumnCount)
     readonly property int appLandscapeCellSize: Math.floor(_landscapeWidth/appLandscapeColumnCount)
     readonly property int appAllowedOrientations: Orientation.All
-    readonly property bool appLandscapeMode: orientation === Qt.LandscapeOrientation ||
-        orientation === Qt.InvertedLandscapeOrientation
-    readonly property int appColumnCount: appLandscapeMode ? appLandscapeColumnCount : appPortraitColumnCount
-    readonly property int appCellSize: appLandscapeMode ? appLandscapeCellSize : appPortraitCellSize
 
     signal newNoteFromCover()
 

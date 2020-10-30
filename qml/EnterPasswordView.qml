@@ -4,13 +4,15 @@ import harbour.foilnotes 1.0
 
 import "harbour"
 
-SilicaFlickable {
+Item {
     id: view
 
     property var foilModel
+    property bool isLandscape
+    property bool orientationTransitionRunning
     property bool wrongPassword
 
-    readonly property bool landscapeLayout: appLandscapeMode && Screen.sizeCategory < Screen.Large
+    readonly property bool landscapeLayout: isLandscape && Screen.sizeCategory < Screen.Large
     readonly property bool unlocking: foilModel.foilState !== FoilNotesModel.FoilLocked &&
                                     foilModel.foilState !== FoilNotesModel.FoilLockedTimedOut
     readonly property bool canEnterPassword: inputField.text.length > 0 && !unlocking &&
@@ -58,17 +60,20 @@ SilicaFlickable {
         id: circle
 
         anchors.horizontalCenter: parent.horizontalCenter
-        width: Theme.itemSizeHuge
         y: (panel.y > height) ? Math.floor((panel.y - height)/2) : (panel.y - height)
+        width: Theme.itemSizeHuge
         height: width
         color: Theme.rgba(Theme.primaryColor, HarbourTheme.opacityFaint * HarbourTheme.opacityLow)
         radius: width/2
-        visible: opacity > 0
+        visible: opacity > 0 && !orientationTransitionRunning
 
         // Hide it when it's only partially visible (i.e. in langscape)
         // or getting too close to the edge of the screen
         opacity: (y < Theme.paddingMedium) ? 0 : 1
-        Behavior on opacity { FadeAnimation { duration: landscapeLayout ? 0 : 100 } }
+        Behavior on opacity {
+            enabled: !orientationTransitionRunning
+            FadeAnimation { duration: 100 }
+        }
 
         Image {
             source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
@@ -91,7 +96,6 @@ SilicaFlickable {
         InfoLabel {
             id: longPrompt
 
-            height: implicitHeight
             visible: panel.showLongPrompt
             //: Password prompt label (long)
             //% "Secret notes are locked. Please enter your password"
@@ -99,7 +103,6 @@ SilicaFlickable {
         }
 
         InfoLabel {
-            height: implicitHeight
             anchors.bottom: longPrompt.bottom
             visible: !panel.showLongPrompt
             //: Password prompt label (short)

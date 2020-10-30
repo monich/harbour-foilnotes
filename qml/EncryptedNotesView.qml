@@ -11,6 +11,7 @@ SilicaFlickable {
     property var hints
     property var foilModel
     property var pulleyFlickable
+    property bool isLandscape
 
     property string filter
     property bool searchMode
@@ -273,8 +274,8 @@ SilicaFlickable {
             id: grid
 
             anchors.topMargin: flickable.searchAreaHeight
-            columnCount: appColumnCount
-            cellSize: appCellSize
+            columnCount: isLandscape ? appLandscapeColumnCount : appPortraitColumnCount
+            cellSize: isLandscape ? appLandscapeCellSize : appPortraitCellSize
             filter: view.filter
             model: foilModel
             showSelection: bulkActionRemorse.visible

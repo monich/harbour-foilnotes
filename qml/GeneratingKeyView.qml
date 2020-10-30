@@ -2,6 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Item {
+    property bool isLandscape
+
     Label {
         width: parent.width - 2 * Theme.horizontalPageMargin
         height: implicitHeight
@@ -20,7 +22,7 @@ Item {
 
     BusyIndicator {
         id: busyIndicator
-        y: Math.floor(((appLandscapeMode ? Screen.width : Screen.height) - height) /2)
+        y: Math.floor(((isLandscape ? Screen.width : Screen.height) - height) /2)
         anchors.horizontalCenter: parent.horizontalCenter
         size: BusyIndicatorSize.Large
         running: true

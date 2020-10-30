@@ -6,9 +6,11 @@ import "harbour"
 
 Item {
     property var foilModel
+    property bool isLandscape
+
+    property int shownCount
     readonly property bool unlocking: !foilModel || !foilModel.count || unlockingTimer.running
     readonly property int realCount: foilModel ? foilModel.count : 0
-    property int shownCount: 0
 
     onRealCountChanged: syncCounts()
     onUnlockingChanged: syncCounts()
@@ -51,7 +53,7 @@ Item {
 
     BusyIndicator {
         id: busyIndicator
-        y: Math.floor(((appLandscapeMode ? Screen.width : Screen.height) - height) /2)
+        y: Math.floor(((isLandscape ? Screen.width : Screen.height) - height) /2)
         anchors.horizontalCenter: parent.horizontalCenter
         size: BusyIndicatorSize.Large
         running: true

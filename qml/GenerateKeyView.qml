@@ -8,11 +8,13 @@ Item {
     id: view
 
     property var foilModel
+    property bool isLandscape
     property alias prompt: promptLabel.text
+
     readonly property int minPassphraseLen: 8
     readonly property bool canGenerate: inputField.text.length >= minPassphraseLen && !generating
     readonly property bool generating: foilModel.foilState === FoilNotesModel.FoilGeneratingKey
-    readonly property bool landscapeLayout: appLandscapeMode && Screen.sizeCategory < Screen.Large
+    readonly property bool landscapeLayout: isLandscape && Screen.sizeCategory < Screen.Large
 
     function generateKey() {
         if (canGenerate) {

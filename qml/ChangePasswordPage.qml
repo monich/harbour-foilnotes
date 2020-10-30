@@ -49,35 +49,41 @@ Page {
         }
     }
 
+    // Otherwise width is changing with a delay, causing visible layout changes
+    onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
+
+    InfoLabel {
+        //: Password change prompt
+        //% "Please enter the current and the new password"
+        text: qsTrId("foilnotes-change_password_page-label-enter_passwords")
+
+        // Bind to panel x position for shake animation
+        x: Theme.horizontalPageMargin + panel.x
+        width: parent.width - 2 * Theme.horizontalPageMargin
+        anchors {
+            bottom: panel.top
+            bottomMargin: Theme.paddingLarge
+        }
+
+        // Hide it when it's only partially visible
+        opacity: (y < Theme.paddingSmall) ? 0 : 1
+        Behavior on opacity {
+            enabled: !orientationTransitionRunning
+            FadeAnimation { }
+        }
+    }
+
     Item {
         id: panel
 
         width: parent.width
         height: childrenRect.height
-        y: Math.min((parent.height - panel.height)/2,
-            parent.height - (changePasswordButton.y + changePasswordButton.height + Theme.paddingMedium))
-
-        InfoLabel {
-            id: prompt
-
-            //: Password change prompt
-            //% "Please enter the current and the new password"
-            text: qsTrId("foilnotes-change_password_page-label-enter_passwords")
-
-            // Hide it when it's only partially visible
-            opacity: (panel.y < 0) ? 0 : 1
-            Behavior on opacity { FadeAnimation {} }
-        }
+        y: (parent.height > height) ? Math.floor((parent.height - height)/2) : (parent.height - height)
 
         HarbourPasswordInputField {
             id: currentPasswordField
 
-            anchors {
-                left: panel.left
-                top: prompt.bottom
-                topMargin: Theme.paddingLarge
-                bottomMargin: Theme.paddingLarge
-            }
+            anchors.left: panel.left
 
             //: Placeholder and label for the current password prompt
             //% "Current password"
@@ -107,6 +113,11 @@ Page {
 
         Button {
             id: changePasswordButton
+
+            anchors {
+                topMargin: Theme.paddingLarge
+                bottomMargin: 2 * Theme.paddingSmall
+            }
 
             //: Button label
             //% "Change password"
@@ -194,7 +205,7 @@ Page {
                         top: undefined
                         right: panel.right
                         horizontalCenter: undefined
-                        bottom: newPasswordField.verticalCenter
+                        bottom: newPasswordField.bottom
                     }
                 },
                 PropertyChanges {

@@ -54,6 +54,9 @@ Page {
         }
     }
 
+    // Otherwise width is changing with a delay, causing visible layout changes
+    onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
+
     Notification {
         id: notification
 
@@ -89,7 +92,10 @@ Page {
             active: opacity > 0
             opacity: (foilModel.foilState === FoilNotesModel.FoilKeyMissing) ? 1 : 0
             sourceComponent: Component {
-                GenerateKeyView { foilModel: page.foilModel }
+                GenerateKeyView {
+                    foilModel: page.foilModel
+                    isLandscape: page.isLandscape
+                }
             }
             Behavior on opacity { FadeAnimation { } }
         }
@@ -100,7 +106,11 @@ Page {
             active: opacity > 0
             opacity: (foilModel.foilState === FoilNotesModel.FoilGeneratingKey ||
                         generatingKeyTimer.running) ? 1 : 0
-            sourceComponent: Component { GeneratingKeyView { } }
+            sourceComponent: Component {
+                GeneratingKeyView {
+                    isLandscape: page.isLandscape
+                }
+            }
             Behavior on opacity { FadeAnimation { } }
         }
 
@@ -111,7 +121,11 @@ Page {
             opacity: (foilModel.foilState === FoilNotesModel.FoilLocked ||
                         foilModel.foilState === FoilNotesModel.FoilLockedTimedOut) ? 1 : 0
             sourceComponent: Component {
-                EnterPasswordView { foilModel: page.foilModel }
+                EnterPasswordView {
+                    foilModel: page.foilModel
+                    isLandscape: page.isLandscape
+                    orientationTransitionRunning: page.orientationTransitionRunning
+                }
             }
             Behavior on opacity { FadeAnimation { } }
         }
@@ -123,7 +137,10 @@ Page {
             opacity: (foilModel.foilState === FoilNotesModel.FoilDecrypting ||
                       decryptingTimer.running) ? 1 : 0
             sourceComponent: Component {
-                DecryptingView { foilModel: page.foilModel  }
+                DecryptingView {
+                    foilModel: page.foilModel
+                    isLandscape: page.isLandscape
+                }
             }
             Behavior on opacity { FadeAnimation { } }
         }
@@ -141,6 +158,7 @@ Page {
                     mainPage: page
                     hints: page.hints
                     foilModel: page.foilModel
+                    isLandscape: page.isLandscape
                     pulleyFlickable: flickable
                     onDecryptNote: page.decryptNote(note)
                     Connections {

@@ -14,7 +14,7 @@ Page {
     property alias actionMenuText: actionMenuItem.text
     property bool secret
 
-    readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
+    readonly property real screenHeight: isLandscape ? Screen.width : Screen.height
     readonly property bool canUndo: "_editor" in textArea && textArea._editor.canUndo
     readonly property bool canRedo: "_editor" in textArea && textArea._editor.canRedo
 
@@ -33,6 +33,9 @@ Page {
             }
         }
     }
+
+    // Otherwise width is changing with a delay, causing visible layout changes
+    onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
 
     function pickColor() {
         pageStack.push("Sailfish.Silica.ColorPickerPage", {

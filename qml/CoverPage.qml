@@ -2,11 +2,13 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "harbour"
+
 CoverBackground {
     id: cover
 
     readonly property int lineCount: Math.round((height - topOffset - coverActionHeight/parent.scale)/label.lineHeight)
-    readonly property int topOffset: appTitle.y + appTitle.height
+    readonly property int topOffset: leftEdge.y + leftEdge.height
     readonly property int coverActionHeight: Theme.itemSizeSmall
 
     signal newNote()
@@ -21,21 +23,12 @@ CoverBackground {
         readonly property real size: Math.floor(3*cover.width/5)
     }
 
-    Repeater {
-        model: lineCount
-        delegate: Rectangle {
-            y: topOffset + (index + 1) * label.lineHeight
-            width: parent.width
-            height: Theme.paddingSmall/4
-            color: Theme.primaryColor
-            opacity: 0.25
-        }
-    }
-
     Rectangle {
+        id: titleBackground
+
         anchors.fill: appTitle
         color: Theme.primaryColor
-        opacity: 0.2
+        opacity: HarbourTheme.opacityFaint
     }
 
     Label {
@@ -48,6 +41,45 @@ CoverBackground {
         //: Application title
         //% "Foil Notes"
         text: qsTrId("foilnotes-app_name")
+    }
+
+    HarbourHighlightIcon {
+        id: leftEdge
+
+        y: titleBackground.height
+        source: "images/edge.svg"
+        sourceSize.height: Theme.paddingMedium
+        highlightColor: titleBackground.color
+        opacity: HarbourTheme.opacityFaint
+        smooth: true
+    }
+
+    Repeater {
+        id: edge
+
+        model: Math.ceil(titleBackground.width/leftEdge.width) - 1
+        delegate: Component {
+            HarbourHighlightIcon {
+                x: (index + 1) * width
+                y: leftEdge.y
+                source: "images/edge.svg"
+                sourceSize.height: leftEdge.height
+                highlightColor: leftEdge.highlightColor
+                opacity: leftEdge.opacity
+                smooth: true
+            }
+        }
+    }
+
+    Repeater {
+        model: lineCount
+        delegate: Rectangle {
+            y: topOffset + (index + 1) * label.lineHeight
+            width: parent.width
+            height: Theme.paddingSmall/4
+            color: Theme.primaryColor
+            opacity: HarbourTheme.opacityLow
+        }
     }
 
     Label {

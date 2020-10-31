@@ -100,20 +100,58 @@ Page {
             Item {
                 id: headerItem
                 width: parent.width
-                height: Theme.itemSizeLarge
+                height: isLandscape ? Theme.itemSizeSmall : Theme.itemSizeLarge
+
+                Rectangle {
+                    id: headerBackground
+
+                    anchors {
+                        top: parent.top
+                        bottom: edge.top
+                    }
+                    width: parent.width
+                    color: page.color
+                    opacity: HarbourTheme.opacityFaint
+                }
+
+                HarbourHighlightIcon {
+                    id: edge
+
+                    anchors.bottom: parent.bottom
+                    source: "images/edge.svg"
+                    sourceSize.height: Theme.paddingMedium
+                    highlightColor: headerBackground.color
+                    opacity: headerBackground.opacity
+                    smooth: true
+                }
+
+                Repeater {
+                    model: Math.ceil(parent.width/edge.width) - 1
+                    delegate: Component {
+                        HarbourHighlightIcon {
+                            x: (index + 1) * width
+                            y: edge.y
+                            source: "images/edge.svg"
+                            sourceSize.height: edge.height
+                            highlightColor: edge.highlightColor
+                            opacity: edge.opacity
+                            smooth: true
+                        }
+                    }
+                }
 
                 Item {
                     id: colorItem
 
-                    height: Theme.itemSizeSmall
-                    width: Theme.itemSizeSmall
+                    width: height
+                    height: parent.height - (isLandscape ? (3 * Theme.paddingMedium) : (2 * Theme.paddingLarge))
                     anchors {
                         right: parent.right
                         rightMargin: Theme.horizontalPageMargin
                         verticalCenter: parent.verticalCenter
                     }
 
-                    // Pick the most different standard color out od these two:
+                    // Pick the most different standard color out of these two:
                     readonly property color pagenrColor1: Theme.primaryColor
                     readonly property color pagenrColor2: Theme.highlightBackgroundColor
                     readonly property real pagenrColorDiff1: HarbourTheme.colorDifference(page.color, pagenrColor1)
@@ -125,7 +163,7 @@ Page {
                         anchors.fill: parent
                         sourceComponent: Item {
                             HarbourHighlightIcon {
-                                source: "images/lock.svg"
+                                source: "images/lock-header.svg"
                                 highlightColor: page.color
                                 sourceSize: Qt.size(colorItem.width, colorItem.height)
                                 anchors.fill: parent
@@ -136,11 +174,11 @@ Page {
                                 color: colorItem.pagenrColor
                                 font.bold: true
                                 maxFontSize: Theme.fontSizeLarge
-                                maxWidth: Math.round(parent.width * 12 / 16) - Theme.paddingSmall
-                                maxHeight: Math.round(parent.height * 9 / 16) - Theme.paddingSmall
+                                maxWidth: Math.round(parent.width * 24 / 29) - 2 * Theme.paddingSmall
+                                maxHeight: Math.round(parent.height * 17 / 29)
                                 anchors {
                                     centerIn: parent
-                                    verticalCenterOffset: Math.round(parent.height * 3 / 16)
+                                    verticalCenterOffset: Math.round(parent.height * 6 / 29)
                                 }
                             }
                         }
@@ -148,9 +186,7 @@ Page {
 
                     Loader {
                         active: !page.secret
-                        height: Theme.itemSizeExtraSmall
-                        width: Theme.itemSizeExtraSmall
-                        anchors.centerIn: parent
+                        anchors.fill: parent
                         sourceComponent: Item {
                             Rectangle {
                                 color: page.color

@@ -104,6 +104,7 @@ Page {
                 id: headerItem
                 width: parent.width
                 height: isLandscape ? Theme.itemSizeSmall : Theme.itemSizeLarge
+                clip: true
 
                 Rectangle {
                     id: headerBackground

@@ -4,7 +4,6 @@ import harbour.foilnotes 1.0
 
 ApplicationWindow {
     id: appWindow
-    allowedOrientations: appAllowedOrientations
 
     property bool appEncryptedPagelSelected
 
@@ -23,7 +22,6 @@ ApplicationWindow {
     readonly property int appLandscapeColumnCount: Math.ceil(_landscapeWidth/_refCellSize)
     readonly property int appPortraitCellSize: Math.floor(_portraitWidth/appPortraitColumnCount)
     readonly property int appLandscapeCellSize: Math.floor(_landscapeWidth/appLandscapeColumnCount)
-    readonly property int appAllowedOrientations: Orientation.All
 
     signal newNoteFromCover()
 
@@ -74,7 +72,7 @@ ApplicationWindow {
         id: encryptedPageComponent
 
         EncryptedPage {
-            allowedOrientations: appAllowedOrientations
+            allowedOrientations: appWindow.allowedOrientations
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             Component.onCompleted: appEncryptedPagelSelected = isCurrentPage
@@ -89,7 +87,7 @@ ApplicationWindow {
         PlaintextPage {
             id: plaintextPage
 
-            allowedOrientations: appAllowedOrientations
+            allowedOrientations: appWindow.allowedOrientations
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             plaintextModel: FoilNotesPlaintextModel

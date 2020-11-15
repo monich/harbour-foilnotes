@@ -9,9 +9,9 @@ SilicaFlickable {
 
     property Page mainPage
     property var hints
+    property var foilUi
     property var foilModel
     property var pulleyFlickable
-    property bool isLandscape
 
     property string filter
     property bool searchMode
@@ -195,9 +195,22 @@ SilicaFlickable {
                 text: qsTrId("foilnotes-menu-change_password")
                 onClicked: {
                     pullDownMenu.menuItemClicked = true
-                    pageStack.push(Qt.resolvedUrl("ChangePasswordPage.qml"), {
+                    pageStack.push(Qt.resolvedUrl("foil-ui/FoilUiChangePasswordPage.qml"), {
                         mainPage: view.mainPage,
-                        foilModel: foilModel
+                        foilUi: view.foilUi,
+                        foilModel: view.foilModel,
+                        //: Password change prompt
+                        //% "Please enter the current and the new password"
+                        promptText: qsTrId("foilnotes-change_password_page-label-enter_passwords"),
+                        //: Placeholder and label for the current password prompt
+                        //% "Current password"
+                        currentPasswordLabel: qsTrId("foilnotes-change_password_page-text_field_label-current_password"),
+                        //: Placeholder and label for the new password prompt
+                        //% "New password"
+                        newPasswordLabel: qsTrId("foilnotes-change_password_page-text_field_label-new_password"),
+                        //: Button label
+                        //% "Change password"
+                        buttonText: qsTrId("foilnotes-change_password_page-button-change_password")
                     })
                 }
             }
@@ -210,7 +223,7 @@ SilicaFlickable {
                     pullDownMenu.menuItemClicked = true
                     pageStack.push(organizePageComponent, {
                         notesModel: foilModel,
-                        allowedOrientations: appAllowedOrientations
+                        allowedOrientations: mainPage.allowedOrientations
                     })
                 }
             }
@@ -224,7 +237,7 @@ SilicaFlickable {
                     pullDownMenu.menuItemClicked = true
                     pageStack.push(selectPageComponent, {
                         notesModel: foilModel,
-                        allowedOrientations: appAllowedOrientations
+                        allowedOrientations: mainPage.allowedOrientations
                     })
                 }
             }
@@ -274,8 +287,9 @@ SilicaFlickable {
             id: grid
 
             anchors.topMargin: flickable.searchAreaHeight
-            columnCount: isLandscape ? appLandscapeColumnCount : appPortraitColumnCount
-            cellSize: isLandscape ? appLandscapeCellSize : appPortraitCellSize
+            columnCount: mainPage.isLandscape ? appLandscapeColumnCount : appPortraitColumnCount
+            cellSize: mainPage.isLandscape ? appLandscapeCellSize : appPortraitCellSize
+            page: mainPage
             filter: view.filter
             model: foilModel
             showSelection: bulkActionRemorse.visible

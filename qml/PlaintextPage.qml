@@ -4,7 +4,7 @@ import harbour.foilnotes 1.0
 import "harbour"
 
 Page {
-    id: page
+    id: thisPage
 
     property var hints
     property var foilModel
@@ -16,7 +16,7 @@ Page {
     readonly property int columnCount: isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
     readonly property int cellSize: isPortrait ? appPortraitCellSize : appLandscapeCellSize
     readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
-        pageStack.find(function (pageOnStack) { return (page === pageOnStack) })
+        pageStack.find(function (pageOnStack) { return (thisPage === pageOnStack) })
 
     function encryptNoteAt(row) {
         if (row >= 0 && foilModel.keyAvailable) {
@@ -85,12 +85,12 @@ Page {
                 onDeleteSelected: {
                     bulkActionRemorse.cancelNicely()
                     leaveSelectionActive = true
-                    page.deleteSelectedNotes(notesModel)
+                    deleteSelectedNotes(notesModel)
                 }
                 //: Hint text
                 //% "Encrypt selected notes"
                 onEncryptHint: selectPage.showHint(qsTrId("foilnotes-hint-encrypt_selected"))
-                onEncryptSelected: page.encryptNotes(notesModel.selectedRows())
+                onEncryptSelected: encryptNotes(notesModel.selectedRows())
             }
         }
     }
@@ -115,7 +115,7 @@ Page {
 
     onSearchModeChanged: {
         if (searchMode) {
-            page.filter = ""
+            filter = ""
             filterModel.setFilterFixedString("")
             filterModel.sourceModel = plaintextModel
             grid.model = filterModel
@@ -125,7 +125,7 @@ Page {
             grid.model = plaintextModel
             grid.animateDisplacement = true
             filterModel.sourceModel = null
-            page.filter = ""
+            filter = ""
         }
         pullDownMenu.updateMenuItems()
     }
@@ -193,7 +193,7 @@ Page {
                     pullDownMenu.menuItemClicked = true
                     pageStack.push(organizePageComponent, {
                         notesModel: plaintextModel,
-                        allowedOrientations: page.allowedOrientations
+                        allowedOrientations: thisPage.allowedOrientations
                     })
                 }
             }
@@ -209,7 +209,7 @@ Page {
                     pullDownMenu.menuItemClicked = true
                     pageStack.push(selectPageComponent, {
                         notesModel: plaintextModel,
-                        allowedOrientations: page.allowedOrientations
+                        allowedOrientations: thisPage.allowedOrientations
                     })
                 }
             }
@@ -249,7 +249,7 @@ Page {
                     forceActiveFocus()
                 }
             }
-            onTextChanged: page.filter = text
+            onTextChanged: filter = text
 
             EnterKey.iconSource: "image://theme/icon-m-enter-close"
             EnterKey.onClicked: focus = false
@@ -261,9 +261,10 @@ Page {
             id: grid
 
             anchors.topMargin: flickable.searchAreaHeight
-            columnCount: page.columnCount
-            cellSize: page.cellSize
-            filter: page.filter
+            page: thisPage
+            columnCount: thisPage.columnCount
+            cellSize: thisPage.cellSize
+            filter: thisPage.filter
             model: plaintextModel
             showSelection: bulkActionRemorse.visible
 
@@ -281,7 +282,7 @@ Page {
                     id: contextMenu
 
                     // The menu extends across the whole gridview horizontally
-                    width: page.width
+                    width: thisPage.width
                     x: parent ? -parent.x : 0
 
                     MenuItem {

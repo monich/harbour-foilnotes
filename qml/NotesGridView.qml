@@ -15,6 +15,7 @@ SilicaGridView {
     property string noteActionMenuText
     signal performNoteAction(var item)
 
+    property Page page
     property int cellSize
     property int columnCount
     property string filter
@@ -34,7 +35,7 @@ SilicaGridView {
         var noteCreated = false
         var notePage = pageStack.push(notePageComponent, {
             color: FoilNotesSettings.pickColor(),
-            allowedOrientations: appAllowedOrientations
+            allowedOrientations: page.allowedOrientations
         }, transition)
         notePage.colorChanged.connect(function() {
             if (noteCreated) {

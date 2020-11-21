@@ -13,8 +13,6 @@ Page {
     readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
     property bool isCurrentPage: true
 
-    onIsCurrentPageChanged: console.log("EncryptedPage", isCurrentPage)
-
     signal decryptNote(var note)
 
     property var foilUi

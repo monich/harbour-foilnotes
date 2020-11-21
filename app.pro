@@ -135,6 +135,7 @@ HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeGenerator.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeImageProvider.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourSystemInfo.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystemState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystem.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourTask.h \
@@ -147,6 +148,7 @@ SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourOrganizeListModel.cpp \
     $${HARBOUR_LIB_SRC}/HarbourQrCodeGenerator.cpp \
     $${HARBOUR_LIB_SRC}/HarbourQrCodeImageProvider.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourSystemInfo.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystemState.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystem.cpp \
     $${HARBOUR_LIB_SRC}/HarbourTask.cpp \

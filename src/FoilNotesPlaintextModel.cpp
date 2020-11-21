@@ -11,8 +11,8 @@
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
+ *      notice, this list of conditions and the following disclaimer
+ *      in the documentation and/or other materials provided with the
  *      distribution.
  *   3. Neither the names of the copyright holders nor the names of its
  *      contributors may be used to endorse or promote products derived
@@ -22,17 +22,22 @@
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #include "FoilNotesPlaintextModel.h"
 
+#include "HarbourSystemInfo.h"
 #include "HarbourDebug.h"
 
 #include <QTimer>
@@ -259,12 +264,22 @@ inline FoilNotesPlaintextModel* FoilNotesPlaintextModel::Private::parentModel()
 
 QString FoilNotesPlaintextModel::Private::databaseDir()
 {
-    QDir dir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-        "/jolla-notes/QML/OfflineStorage/Databases");
-    if (!dir.exists()) {
-        dir.mkpath(".");
+    static QString sDatabasePath;
+    if (sDatabasePath.isEmpty()) {
+        // Original path:
+        // ~/.local/share/jolla-notes/QML/OfflineStorage/Databases
+        // Sailfish OS 4.0.1.69 and later:
+        // ~/.local/share/com.jolla/notes/QML/OfflineStorage/Databases
+        QString top(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+        QDir dir(top + "/" + ((HarbourSystemInfo::osVersionCompareWith("4.0.1.69") >= 0) ?
+            "com.jolla/notes" : "jolla-notes") + "/QML/OfflineStorage/Databases");
+        sDatabasePath = dir.path();
+        HDEBUG("Jolla Notes data directory" << qPrintable(sDatabasePath));
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
     }
-    return dir.path();
+    return sDatabasePath;
 }
 
 QString FoilNotesPlaintextModel::Private::databasePath()

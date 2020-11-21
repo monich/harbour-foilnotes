@@ -5,7 +5,7 @@ import harbour.foilnotes 1.0
 ApplicationWindow {
     id: appWindow
 
-    property bool appEncryptedPagelSelected: true
+    property bool encryptedPageSelected: true
 
     // Reference column width: 960 / 4
     readonly property real _portraitWidth: Math.min(Screen.width, Screen.height)
@@ -14,10 +14,6 @@ ApplicationWindow {
     readonly property int _refCellSize: Math.floor(_portraitWidth/_portraitCount)
 
     // Global properties
-    readonly property string appCurrentText: (appEncryptedPagelSelected &&
-        FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) ?
-        FoilNotesModel.text : FoilNotesPlaintextModel.text
-
     readonly property int appPortraitColumnCount: Math.floor(_portraitWidth/_refCellSize)
     readonly property int appLandscapeColumnCount: Math.ceil(_landscapeWidth/_refCellSize)
     readonly property int appPortraitCellSize: Math.floor(_portraitWidth/appPortraitColumnCount)
@@ -73,7 +69,7 @@ ApplicationWindow {
 
         EncryptedPage {
             allowedOrientations: appWindow.allowedOrientations
-            isCurrentPage: appEncryptedPagelSelected
+            isCurrentPage: encryptedPageSelected
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             onDecryptNote: FoilNotesPlaintextModel.saveNote(note.pagenr, note.color, note.body)
@@ -90,7 +86,7 @@ ApplicationWindow {
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             plaintextModel: FoilNotesPlaintextModel
-            onIsCurrentPageChanged: appEncryptedPagelSelected = !isCurrentPage
+            onIsCurrentPageChanged: encryptedPageSelected = !isCurrentPage
 
             Connections {
                 target: appWindow
@@ -114,6 +110,7 @@ ApplicationWindow {
 
     cover: Component {
         CoverPage {
+            encryptedPageSelected: appWindow.encryptedPageSelected
             onNewNote: appWindow.newNoteFromCover()
         }
     }

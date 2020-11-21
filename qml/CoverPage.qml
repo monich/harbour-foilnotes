@@ -7,9 +7,13 @@ import "harbour"
 CoverBackground {
     id: cover
 
+    property bool encryptedPageSelected
     readonly property int lineCount: Math.round((height - topOffset - coverActionHeight/parent.scale)/label.lineHeight)
     readonly property int topOffset: leftEdge.y + leftEdge.height
     readonly property int coverActionHeight: Theme.itemSizeSmall
+    readonly property string coverText: (encryptedPageSelected &&
+        FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) ?
+        FoilNotesModel.text : FoilNotesPlaintextModel.text
 
     signal newNote()
 
@@ -19,7 +23,7 @@ CoverBackground {
         height: size
         sourceSize.height: size
         anchors.centerIn: parent
-        opacity: (FoilNotesModel.keyAvailable && appEncryptedPagelSelected) ? 0.1 : 0
+        opacity: (FoilNotesModel.keyAvailable && encryptedPageSelected) ? 0.1 : 0
         readonly property real size: Math.floor(3*cover.width/5)
     }
 
@@ -86,7 +90,7 @@ CoverBackground {
         id: label
         x: Theme.paddingSmall/2
         y: topOffset + Theme.paddingSmall/2
-        text: appCurrentText
+        text: coverText
         opacity: 0.6
         font.italic: true
         width: cover.width - Theme.paddingSmall

@@ -8,24 +8,9 @@ CoverBackground {
     id: cover
 
     property bool encryptedPageSelected
-    readonly property int lineCount: Math.round((height - topOffset - coverActionHeight/parent.scale)/label.lineHeight)
-    readonly property int topOffset: leftEdge.y + leftEdge.height
     readonly property int coverActionHeight: Theme.itemSizeSmall
-    readonly property string coverText: (encryptedPageSelected &&
-        FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) ?
-        FoilNotesModel.text : FoilNotesPlaintextModel.text
 
     signal newNote()
-
-    Image {
-        visible: opacity > 0
-        source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
-        height: size
-        sourceSize.height: size
-        anchors.centerIn: parent
-        opacity: (FoilNotesModel.keyAvailable && encryptedPageSelected) ? 0.1 : 0
-        readonly property real size: Math.floor(3*cover.width/5)
-    }
 
     Rectangle {
         id: titleBackground
@@ -37,6 +22,7 @@ CoverBackground {
 
     Label {
         id: appTitle
+
         width: parent.width
         height: implicitHeight + Theme.paddingLarge
         horizontalAlignment: Text.AlignHCenter
@@ -75,31 +61,87 @@ CoverBackground {
         }
     }
 
-    Repeater {
-        model: lineCount
-        delegate: Rectangle {
-            y: topOffset + (index + 1) * label.lineHeight
-            width: parent.width
-            height: Theme.paddingSmall/4
-            color: Theme.primaryColor
-            opacity: HarbourTheme.opacityLow
-        }
-    }
+    Item {
+        id: content
 
-    Label {
-        id: label
-        x: Theme.paddingSmall/2
-        y: topOffset + Theme.paddingSmall/2
-        text: coverText
-        opacity: 0.6
-        font.italic: true
-        width: cover.width - Theme.paddingSmall
-        horizontalAlignment: Text.AlignLeft
-        lineHeightMode: Text.FixedHeight
-        lineHeight: Math.floor(appTitle.implicitHeight + Theme.paddingSmall)
-        wrapMode: Text.Wrap
-        elide: Text.ElideRight
-        maximumLineCount: cover.lineCount
+        readonly property int lineCount: Math.round((height - coverActionHeight/cover.parent.scale)/encryptedLabel.lineHeight)
+        property bool locking
+
+        width: cover.width * 2
+        anchors {
+            top: leftEdge.bottom
+            bottom: parent.bottom
+        }
+
+        x: (encryptedPageSelected && FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) ? 0 : -cover.width
+        Behavior on x {
+            SmoothedAnimation {
+                id: transition
+
+                duration: 200
+            }
+        }
+
+        Binding {
+            target: encryptedLabel
+            property: "text"
+            value: FoilNotesModel.text
+            when: !transition.running && !content.locking
+        }
+
+        Repeater {
+            model: content.lineCount
+            delegate: Rectangle {
+                y: (index + 1) * encryptedLabel.lineHeight
+                width: content.width
+                height: Theme.paddingSmall/4
+                color: Theme.primaryColor
+                opacity: HarbourTheme.opacityLow
+            }
+        }
+
+        Image {
+            readonly property real size: Math.floor(3*cover.width/5)
+            x: (cover.width - width)/2
+            y: (cover.height - height)/2 - parent.y
+            height: size
+            sourceSize.height: size
+            source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
+            opacity: 0.1
+        }
+
+        Label {
+            id: encryptedLabel
+
+            x: Theme.paddingSmall/2
+            y: Theme.paddingSmall/2
+            opacity: 0.6
+            font.italic: true
+            width: cover.width - Theme.paddingSmall
+            horizontalAlignment: Text.AlignLeft
+            lineHeightMode: Text.FixedHeight
+            lineHeight: Math.floor(appTitle.implicitHeight + Theme.paddingSmall)
+            wrapMode: Text.Wrap
+            elide: Text.ElideRight
+            maximumLineCount: content.lineCount
+        }
+
+        Label {
+            id: plainTextLabel
+
+            x: encryptedLabel.x + cover.width
+            y: encryptedLabel.y
+            text: FoilNotesPlaintextModel.text
+            font.italic: true
+            opacity: encryptedLabel.opacity
+            width: encryptedLabel.width
+            horizontalAlignment: Text.AlignLeft
+            lineHeightMode: Text.FixedHeight
+            lineHeight: encryptedLabel.lineHeight
+            wrapMode: Text.Wrap
+            elide: Text.ElideRight
+            maximumLineCount: encryptedLabel.maximumLineCount
+        }
     }
 
     CoverActionList {
@@ -108,8 +150,11 @@ CoverBackground {
             iconSource: FoilNotesModel.keyAvailable ? lockIcon : "image://theme/icon-cover-new"
             onTriggered: {
                 if (FoilNotesModel.keyAvailable) {
+                    // Prevent secret text from disappearing before transition animation has completed
+                    content.locking = true
                     FoilNotesModel.lock(false)
                     pageStack.navigateForward(PageStackAction.Immediate)
+                    content.locking = false
                 } else {
                     cover.newNote()
                 }

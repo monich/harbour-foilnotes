@@ -11,13 +11,9 @@ Page {
     property var hints
     property var foilModel
     readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
+    property bool isCurrentPage: true
 
-    // nextPage is either
-    // a) our attached page; or
-    // b) the page we pushed to the stack
-    readonly property Page nextPage: pageStack.nextPage(thisPage)
-    readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
-        (nextPage && parent && nextPage.parent !== parent.attachedContainer)
+    onIsCurrentPageChanged: console.log("EncryptedPage", isCurrentPage)
 
     signal decryptNote(var note)
 

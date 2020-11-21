@@ -5,7 +5,7 @@ import harbour.foilnotes 1.0
 ApplicationWindow {
     id: appWindow
 
-    property bool appEncryptedPagelSelected
+    property bool appEncryptedPagelSelected: true
 
     // Reference column width: 960 / 4
     readonly property real _portraitWidth: Math.min(Screen.width, Screen.height)
@@ -73,10 +73,9 @@ ApplicationWindow {
 
         EncryptedPage {
             allowedOrientations: appWindow.allowedOrientations
+            isCurrentPage: appEncryptedPagelSelected
             hints: FoilNotesHints
             foilModel: FoilNotesModel
-            Component.onCompleted: appEncryptedPagelSelected = isCurrentPage
-            onIsCurrentPageChanged: appEncryptedPagelSelected = isCurrentPage
             onDecryptNote: FoilNotesPlaintextModel.saveNote(note.pagenr, note.color, note.body)
         }
     }
@@ -91,6 +90,7 @@ ApplicationWindow {
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             plaintextModel: FoilNotesPlaintextModel
+            onIsCurrentPageChanged: appEncryptedPagelSelected = !isCurrentPage
 
             Connections {
                 target: appWindow

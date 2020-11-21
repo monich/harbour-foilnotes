@@ -102,6 +102,7 @@ Page {
     }
 
     onIsCurrentPageChanged: {
+        console.log("PlaintextPage", isCurrentPage)
         if (!isCurrentPage) {
             searchMode = false
         }

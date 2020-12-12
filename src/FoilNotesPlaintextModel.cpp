@@ -415,12 +415,15 @@ void FoilNotesPlaintextModel::Private::syncModel()
     // Add new ones at the end
     if (databaseCount > modelCount) {
         HDEBUG("adding" << (databaseCount - modelCount) << "note(s) to the model");
-         model->beginInsertRows(QModelIndex(), modelCount, databaseCount - 1);
-         while (i < databaseCount) {
-             iModelData.append(iDatabaseData.at(i++));
-         }
-         model->endInsertRows();
+        model->beginInsertRows(QModelIndex(), modelCount, databaseCount - 1);
+        while (i < databaseCount) {
+            iModelData.append(iDatabaseData.at(i++));
+        }
+        model->endInsertRows();
     }
+
+    // Update cover text
+    updateText();
 }
 
 inline int FoilNotesPlaintextModel::Private::rowCount() const

@@ -268,10 +268,10 @@ QString FoilNotesPlaintextModel::Private::databaseDir()
     if (sDatabasePath.isEmpty()) {
         // Original path:
         // ~/.local/share/jolla-notes/QML/OfflineStorage/Databases
-        // Sailfish OS 4.0.1.69 and later:
+        // Sailfish OS 4.0.1 and later:
         // ~/.local/share/com.jolla/notes/QML/OfflineStorage/Databases
         QString top(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
-        QDir dir(top + "/" + ((HarbourSystemInfo::osVersionCompareWith("4.0.1.69") >= 0) ?
+        QDir dir(top + "/" + ((HarbourSystemInfo::osVersionCompareWith("4.0.1") >= 0) ?
             "com.jolla/notes" : "jolla-notes") + "/QML/OfflineStorage/Databases");
         sDatabasePath = dir.path();
         HDEBUG("Jolla Notes data directory" << qPrintable(sDatabasePath));

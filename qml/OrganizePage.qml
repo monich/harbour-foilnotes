@@ -43,6 +43,9 @@ Page {
                 id: pageHeader
 
                 title: page.title
+                //: Page description
+                //% "Press and drag to reorder"
+                description: qsTrId("foilnotes-organize_page-description")
                 Component.onCompleted: grid.pageHeaderHeight = height
                 onHeightChanged: grid.pageHeaderHeight = height
             }
@@ -205,9 +208,6 @@ Page {
             //: Placeholder text
             //% "You do not have any notes."
             text: qsTrId("foilnotes-plaintext_view-placeholder")
-            //: Placeholder hint
-            //% "Open pulley menu to add one."
-            hintText: qsTrId("foilnotes-plaintext_view-placeholder_hint")
         }
     }
 }

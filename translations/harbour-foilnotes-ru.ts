@@ -132,6 +132,11 @@
         <extracomment>Page header</extracomment>
         <translation>Упорядочить секретные записи</translation>
     </message>
+    <message id="foilnotes-organize_page-description">
+        <source>Press and drag to reorder</source>
+        <extracomment>Page description</extracomment>
+        <translation>Жмите на них и таскайте с места на место</translation>
+    </message>
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>
         <extracomment>Page header</extracomment>

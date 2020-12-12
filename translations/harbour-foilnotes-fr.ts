@@ -131,6 +131,11 @@
         <extracomment>Page header</extracomment>
         <translation>Organiser les notes secrètes</translation>
     </message>
+    <message id="foilnotes-organize_page-description">
+        <source>Press and drag to reorder</source>
+        <extracomment>Page description</extracomment>
+        <translation type="unfinished">Appuyez et faites glisser pour réorganiser</translation>
+    </message>
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>
         <extracomment>Page header</extracomment>

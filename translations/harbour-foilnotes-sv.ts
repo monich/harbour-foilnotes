@@ -131,6 +131,11 @@
         <extracomment>Page header</extracomment>
         <translation>Organisera krypterade anteckningar</translation>
     </message>
+    <message id="foilnotes-organize_page-description">
+        <source>Press and drag to reorder</source>
+        <extracomment>Page description</extracomment>
+        <translation type="unfinished">Tryck och dra för att ändra ordningen</translation>
+    </message>
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>
         <extracomment>Page header</extracomment>

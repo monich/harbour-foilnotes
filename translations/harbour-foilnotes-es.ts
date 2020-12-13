@@ -332,5 +332,10 @@
         <extracomment>Hint text</extracomment>
         <translation>Rehacer</translation>
     </message>
+    <message id="foilnotes-organize_page-description">
+        <source>Press and drag to reorder</source>
+        <extracomment>Page description</extracomment>
+        <translation>Pulsa y arrastra para ordenar</translation>
+    </message>
 </context>
 </TS>

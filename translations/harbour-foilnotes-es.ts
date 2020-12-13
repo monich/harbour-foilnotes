@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<TS version="2.1" language="es">
 <context>
     <name></name>
     <message id="foilnotes-app_name">
@@ -130,6 +130,11 @@
         <source>Organize secret notes</source>
         <extracomment>Page header</extracomment>
         <translation>Organizar notas secretas</translation>
+    </message>
+    <message id="foilnotes-organize_page-description">
+        <source>Press and drag to reorder</source>
+        <extracomment>Page description</extracomment>
+        <translation>Pulsa y arrastra para ordenar</translation>
     </message>
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>
@@ -331,11 +336,6 @@
         <source>Redo</source>
         <extracomment>Hint text</extracomment>
         <translation>Rehacer</translation>
-    </message>
-    <message id="foilnotes-organize_page-description">
-        <source>Press and drag to reorder</source>
-        <extracomment>Page description</extracomment>
-        <translation>Pulsa y arrastra para ordenar</translation>
     </message>
 </context>
 </TS>

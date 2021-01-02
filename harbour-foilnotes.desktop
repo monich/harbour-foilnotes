@@ -4,3 +4,7 @@ Name=Foil Notes
 X-Nemo-Application-Type=silica-qt5
 Icon=harbour-foilnotes
 Exec=harbour-foilnotes
+
+[X-HarbourBackup]
+BackupPathList=.local/share/foil/:Documents/FoilNotes/
+BackupConfigList=/apps/harbour-foilnotes/

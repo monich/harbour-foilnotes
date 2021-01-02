@@ -1,6 +1,7 @@
-import QtQuick 2.2
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
+
 import "harbour"
 
 Page {
@@ -335,19 +336,19 @@ Page {
     Loader {
         id: rightSwipeToEncryptedHintLoader
 
-        anchors.fill: parent
-        active: opacity > 0
-        opacity: ((hints.rightSwipeToEncrypted < MaximumHintCount && armed) | running) ? 1 : 0
         property bool armed
-        property bool running
+        anchors.fill: parent
+        // This opacity behavior is just to avoid (fairly harmless but annoying) binding loop for active
+        Behavior on opacity { NumberAnimation { duration: 1 } }
+        opacity: ((hints.rightSwipeToEncrypted < MaximumHintCount && armed) || (item && item.hintRunning)) ? 1 : 0
+        active: opacity > 0
         sourceComponent: Component {
             HarbourHorizontalSwipeHint {
                 //: Right swipe hint text
                 //% "Encrypted pictures are moved there to the left"
                 text: qsTrId("foilnotes-hint-swipe_right_to_encrypted")
                 swipeRight: true
-                hintEnabled: rightSwipeToEncryptedHintLoader.armed
-                onHintRunningChanged: rightSwipeToEncryptedHintLoader.running = hintRunning
+                hintEnabled: true
                 onHintShown: {
                     hints.rightSwipeToEncrypted++
                     rightSwipeToEncryptedHintLoader.armed = false

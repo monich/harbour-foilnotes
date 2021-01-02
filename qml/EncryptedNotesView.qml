@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
@@ -387,21 +387,21 @@ SilicaFlickable {
         id: leftSwipeToPlaintextHintLoader
 
         anchors.fill: parent
+        // This opacity behavior is just to avoid (fairly harmless but annoying) binding loop for active
+        Behavior on opacity { NumberAnimation { duration: 1 } }
+        opacity: ((hints.leftSwipeToPlaintext < MaximumHintCount) ||  (item && item.hintRunning)) ? 1 : 0
         active: opacity > 0
-        opacity: (hints.leftSwipeToPlaintext < MaximumHintCount | running) ? 1 : 0
-        property bool running
         sourceComponent: Component {
             HarbourHorizontalSwipeHint {
                 //: Left swipe hint text
                 //% "Swipe left to access plaintext notes"
                 text: qsTrId("foilnotes-hint-swipe_left_to_plaintext")
-                property bool hintCanBeEnabled: page.isCurrentPage &&
+                property bool hintCanBeEnabled: mainPage.isCurrentPage &&
                     foilModel.foilState === FoilNotesModel.FoilNotesReady &&
                     hints.leftSwipeToPlaintext < MaximumHintCount
                 swipeRight: false
                 hintEnabled: hintCanBeEnabled
                 onHintShown: hints.leftSwipeToPlaintext++
-                onHintRunningChanged: leftSwipeToPlaintextHintLoader.running = hintRunning
             }
         }
     }
@@ -409,19 +409,19 @@ SilicaFlickable {
     Loader {
         id: leftSwipeToDecryptedHintLoader
 
-        anchors.fill: parent
-        active: opacity > 0
-        opacity: ((hints.leftSwipeToDecrypted < MaximumHintCount && armed) | running) ? 1 : 0
         property bool armed
-        property bool running
+        anchors.fill: parent
+        // This opacity behavior is just to avoid (fairly harmless but annoying) binding loop for active
+        Behavior on opacity { NumberAnimation { duration: 1 } }
+        opacity: ((hints.leftSwipeToDecrypted < MaximumHintCount && armed) || (item && item.hintRunning)) ? 1 : 0
+        active: opacity > 0
         sourceComponent: Component {
             HarbourHorizontalSwipeHint {
                 //: Left swipe hint text
                 //% "Decrypted notes are moved back to the right"
                 text: qsTrId("foilnotes-hint-swipe_left_to_decrypted")
-                hintEnabled: true
                 swipeRight: false
-                onHintRunningChanged: leftSwipeToDecryptedHintLoader.running = hintRunning
+                hintEnabled: true
                 onHintShown: {
                     hints.leftSwipeToDecrypted++
                     leftSwipeToDecryptedHintLoader.armed = false

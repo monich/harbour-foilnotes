@@ -179,8 +179,7 @@ Page {
 
             function updateMenuItems() {
                 if (!active) {
-                    organizeMenuItem.visible = grid.count > 0
-                    selectMenuItem.visible = grid.count > 0
+                    selectMenuItem.visible = organizeMenuItem.visible = (!thisPage.searchMode) && grid.count > 1
                 }
             }
 

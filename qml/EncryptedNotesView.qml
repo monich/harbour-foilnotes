@@ -133,9 +133,7 @@ SilicaFlickable {
             filterModel.sourceModel = null
             filter = ""
         }
-        if (!pullDownMenu.active) {
-            pullDownMenu.updateMenuItems()
-        }
+        pullDownMenu.updateMenuItems()
     }
 
     onFilterChanged: filterModel.setFilterFixedString(filter)
@@ -185,8 +183,9 @@ SilicaFlickable {
             }
 
             function updateMenuItems() {
-                organizeMenuItem.visible = !view.searchMode && grid.count > 0
-                selectMenuItem.visible = !view.searchMode && grid.count > 0
+                if (!active) {
+                    selectMenuItem.visible = organizeMenuItem.visible = (!view.searchMode) && grid.count > 1
+                }
             }
 
             MenuItem {
@@ -352,7 +351,7 @@ SilicaFlickable {
                     }
                 }
             }
-            onCountChanged: if (!pullDownMenu.active) pullDownMenu.updateMenuItems()
+            onCountChanged: pullDownMenu.updateMenuItems()
         }
 
         RemorsePopup {

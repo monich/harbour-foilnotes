@@ -167,7 +167,7 @@ SilicaFlickable {
                     if (searchModeBeforeSnap) {
                         searchMode = false
                         searchField.text = ""
-                    } else {
+                    } else if (searchField.opacity > 0) {
                         searchField.focus = true
                         searchMode = true
                     }
@@ -252,7 +252,8 @@ SilicaFlickable {
             }
         }
 
-        readonly property real searchFieldVisibility: searchMode ? 1 : ((pullDownMenu.active && grid.count > 0 && (topMargin > 0) && (contentY + topMargin) < searchField.height) ? (searchField.height - contentY - topMargin) / searchField.height : 0.0)
+        readonly property real searchFieldVisibility: !grid.count ? 0 :  searchMode ? 1 :
+            ((pullDownMenu.active && grid.count > 0 && (topMargin > 0) && (contentY + topMargin) < searchField.height) ? (searchField.height - contentY - topMargin) / searchField.height : 0)
         property real searchAreaHeight: searchFieldVisibility * searchField.height
 
         Behavior on searchAreaHeight { SmoothedAnimation { duration: 200 } }
@@ -264,6 +265,7 @@ SilicaFlickable {
             enabled: searchMode
             width: parent.width - Theme.paddingLarge
             opacity: flickable.searchFieldVisibility
+            visible: opacity > 0
 
             readonly property bool active: activeFocus || text.length > 0
 

@@ -135,7 +135,7 @@
     <message id="foilnotes-organize_page-description">
         <source>Press and drag to reorder</source>
         <extracomment>Page description</extracomment>
-        <translation type="unfinished">Kliknij i przeciągnij z miejsca na miejsce</translation>
+        <translation>Naciśnij i przeciągnij z miejsca na miejsce</translation>
     </message>
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>

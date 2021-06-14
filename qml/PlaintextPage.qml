@@ -246,8 +246,8 @@ Page {
 
             onActiveChanged: if (!active) searchMode = false
             onEnabledChanged: {
+                text = ""
                 if (enabled) {
-                    text = ""
                     forceActiveFocus()
                 }
             }

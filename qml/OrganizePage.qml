@@ -164,7 +164,6 @@ Page {
 
                 onPressAndHold: grid.dragItem = noteDelegate
 
-                readonly property real dragThreshold: page.cellSize/10
                 readonly property bool dragging: grid.dragItem === noteDelegate
 
                 onDraggingChanged: {

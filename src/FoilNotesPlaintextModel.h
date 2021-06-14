@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2020 Jolla Ltd.
- * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2021 Jolla Ltd.
+ * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -40,6 +40,7 @@
 
 class FoilNotesPlaintextModel: public FoilNotesBaseModel {
     Q_OBJECT
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
     Q_PROPERTY(int textIndex READ textIndex WRITE setTextIndex NOTIFY textIndexChanged)
     Q_PROPERTY(QString text READ text NOTIFY textChanged)
 
@@ -60,7 +61,7 @@ public:
 
     // QAbstractItemModel
     QHash<int,QByteArray> roleNames() const Q_DECL_OVERRIDE;
-    int rowCount(const QModelIndex& parent) const Q_DECL_OVERRIDE;
+    int rowCount(const QModelIndex& aParent = QModelIndex()) const Q_DECL_OVERRIDE;
     QVariant data(const QModelIndex& aIndex, int aRole) const Q_DECL_OVERRIDE;
     bool setData(const QModelIndex& aIndex, const QVariant& aValue, int aRole) Q_DECL_OVERRIDE;
     bool moveRows(const QModelIndex &aSrcParent, int aSrcRow, int aCount,
@@ -81,6 +82,7 @@ public Q_SLOTS:
     void onEncryptionDone(int requestId, bool success);
 
 Q_SIGNALS:
+    void countChanged();
     void textIndexChanged();
     void textChanged();
 

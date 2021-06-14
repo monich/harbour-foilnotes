@@ -227,7 +227,7 @@ Page {
             }
         }
 
-        readonly property real searchFieldVisibility: !grid.count ? 0 :  searchMode ? 1 :
+        readonly property real searchFieldVisibility: !plaintextModel.count ? 0 : searchMode ? 1 :
             ((pullDownMenu.active && grid.count > 0 && (topMargin > 0) && (contentY + topMargin) < searchField.height) ? (searchField.height - contentY - topMargin) / searchField.height : 0)
         property real searchAreaHeight: searchFieldVisibility * searchField.height
 

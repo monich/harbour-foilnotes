@@ -133,6 +133,9 @@ Page {
 
     onFilterChanged: filterModel.setFilterFixedString(filter)
 
+    // Otherwise width is changing with a delay, causing visible layout changes
+    onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
+
     SilicaFlickable {
         id: flickable
 
@@ -331,6 +334,22 @@ Page {
             //: Placeholder hint
             //% "Open pulley menu to add one."
             hintText: qsTrId("foilnotes-plaintext_view-placeholder_hint")
+        }
+
+        InfoLabel {
+            // Something like ViewPlaceholder but without a pulley hint
+            opacity: (!grid.count && searchMode) ? 1 : 0
+            visible: opacity > 0
+            verticalAlignment: Text.AlignVCenter
+            anchors {
+                top: parent.top
+                topMargin: flickable.searchAreaHeight
+                bottom: parent.bottom
+            }
+            //: Placeholder text
+            //% "Sorry, couldn't find anything"
+            text: qsTrId("foilnotes-search-placeholder")
+            Behavior on opacity { FadeAnimation { duration: 150 } }
         }
     }
 

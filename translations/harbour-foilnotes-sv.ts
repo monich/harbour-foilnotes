@@ -13,6 +13,11 @@
         <extracomment>Pop-up notification</extracomment>
         <translation>Kopierat till urklipp</translation>
     </message>
+    <message id="foilnotes-search-placeholder">
+        <source>Sorry, couldn&apos;t find anything</source>
+        <extracomment>Placeholder text</extracomment>
+        <translation type="unfinished">Vi kunde tyvärr inte hitta något</translation>
+    </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
         <extracomment>Placeholder text</extracomment>

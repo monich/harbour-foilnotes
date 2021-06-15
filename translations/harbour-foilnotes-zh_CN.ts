@@ -13,6 +13,11 @@
         <extracomment>Pop-up notification</extracomment>
         <translation>复制到剪贴板</translation>
     </message>
+    <message id="foilnotes-search-placeholder">
+        <source>Sorry, couldn&apos;t find anything</source>
+        <extracomment>Placeholder text</extracomment>
+        <translation type="unfinished">对不起，我们找不到任何内容</translation>
+    </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
         <extracomment>Placeholder text</extracomment>

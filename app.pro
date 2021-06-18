@@ -55,6 +55,7 @@ LIBQRENCODE_DIR = $${_PRO_FILE_PWD_}/libqrencode
 LIBS += libqrencode.a -ldl
 
 OTHER_FILES += \
+    LICENSE \
     *.desktop \
     qml/*.qml \
     qml/images/*.svg \
@@ -132,6 +133,7 @@ INCLUDEPATH += \
 HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourBase32.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourDebug.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourProcessState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeGenerator.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeImageProvider.h \
@@ -146,6 +148,7 @@ SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourBase32.cpp \
     $${HARBOUR_LIB_SRC}/HarbourMce.cpp \
     $${HARBOUR_LIB_SRC}/HarbourOrganizeListModel.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourProcessState.cpp \
     $${HARBOUR_LIB_SRC}/HarbourQrCodeGenerator.cpp \
     $${HARBOUR_LIB_SRC}/HarbourQrCodeImageProvider.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystemInfo.cpp \
@@ -181,6 +184,10 @@ for(s, ICON_SIZES) {
     }
     INSTALLS += $${icon_target}
 }
+
+app_icon.files = icons/harbour-foilnotes.svg
+app_icon.path = /usr/share/$${TARGET}/qml/images
+INSTALLS += app_icon
 
 # Desktop file
 equals(PREFIX, "openrepos") {

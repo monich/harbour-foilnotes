@@ -59,9 +59,11 @@ ApplicationWindow {
     readonly property string appDefaultFileName: qsTrId("foilnotes-default_file_name")
 
     Component.onCompleted: {
-        // Let plaintext model know when encryption is finished:
-        FoilNotesModel.encryptionDone.connect(FoilNotesPlaintextModel.onEncryptionDone)
-        pageStack.pushAttached(plaintextPageComponent)
+        if (FoilNotesModel.foilState !== FoilNotesModel.FoilJailed) {
+            // Let plaintext model know when encryption is finished:
+            FoilNotesModel.encryptionDone.connect(FoilNotesPlaintextModel.onEncryptionDone)
+            pageStack.pushAttached(plaintextPageComponent)
+        }
     }
 
     Component {

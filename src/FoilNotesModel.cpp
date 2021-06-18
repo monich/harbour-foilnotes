@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2020 Jolla Ltd.
- * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2021 Jolla Ltd.
+ * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -35,6 +35,7 @@
 
 #include "HarbourDebug.h"
 #include "HarbourTask.h"
+#include "HarbourProcessState.h"
 
 #include "foil_output.h"
 #include "foil_private_key.h"
@@ -899,7 +900,8 @@ FoilNotesModel::Private::Private(FoilNotesModel* aParent) :
             }
         } else {
             HDEBUG(error->message);
-            iFoilState = FoilKeyMissing;
+            iFoilState = HarbourProcessState::isJailedApp() ?
+                FoilJailed : FoilKeyMissing;
         }
         g_error_free(error);
     }

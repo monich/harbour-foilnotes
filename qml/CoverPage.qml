@@ -9,6 +9,7 @@ CoverBackground {
 
     property bool encryptedPageSelected
     readonly property int coverActionHeight: Theme.itemSizeSmall
+    readonly property bool jailed: FoilNotesModel.foilState === FoilNotesModel.FoilJailed
 
     signal newNote()
 
@@ -73,7 +74,7 @@ CoverBackground {
             bottom: parent.bottom
         }
 
-        x: (encryptedPageSelected && FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) ? 0 : -cover.width
+        x: ((encryptedPageSelected && FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) || jailed) ? 0 : -cover.width
         Behavior on x {
             SmoothedAnimation {
                 id: transition
@@ -97,6 +98,8 @@ CoverBackground {
                 height: Theme.paddingSmall/4
                 color: Theme.primaryColor
                 opacity: HarbourTheme.opacityLow
+                smooth: true
+                visible: !jailed
             }
         }
 
@@ -145,6 +148,7 @@ CoverBackground {
     }
 
     CoverActionList {
+        enabled: !jailed
         CoverAction {
             readonly property url lockIcon: Qt.resolvedUrl("images/" + (HarbourTheme.darkOnLight ? "lock-dark.svg" : "lock.svg"))
             iconSource: FoilNotesModel.keyAvailable ? lockIcon : "image://theme/icon-cover-new"

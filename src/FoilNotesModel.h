@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2020 Jolla Ltd.
- * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2021 Jolla Ltd.
+ * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -72,7 +72,8 @@ public:
         FoilLocked,
         FoilLockedTimedOut,
         FoilDecrypting,
-        FoilNotesReady
+        FoilNotesReady,
+        FoilJailed
     };
 
     FoilNotesModel(QObject* aParent = NULL);

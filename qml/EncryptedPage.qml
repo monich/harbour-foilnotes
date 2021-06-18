@@ -326,5 +326,14 @@ Page {
             }
             Behavior on opacity { FadeAnimation { } }
         }
+
+        // JailedView
+        Loader {
+            anchors.fill: parent
+            active: opacity > 0
+            opacity: (foilModel.foilState === FoilNotesModel.FoilJailed) ? 1 : 0
+            sourceComponent: Component { JailedView { } }
+            Behavior on opacity { FadeAnimation { } }
+        }
     }
 }

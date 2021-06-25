@@ -9,7 +9,7 @@ CoverBackground {
 
     property bool encryptedPageSelected
     readonly property int coverActionHeight: Theme.itemSizeSmall
-    readonly property bool jailed: FoilNotesModel.foilState === FoilNotesModel.FoilJailed
+    readonly property bool jailed: HarbourProcessState.jailedApp
 
     signal newNote()
 
@@ -111,6 +111,14 @@ CoverBackground {
             sourceSize.height: size
             source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
             opacity: 0.1
+        }
+
+        HarbourHighlightIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            sourceSize.width: cover.width
+            highlightColor: Theme.secondaryColor
+            visible: jailed
+            source: jailed ? "images/jail.svg" : ""
         }
 
         Label {

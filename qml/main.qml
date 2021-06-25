@@ -6,6 +6,7 @@ ApplicationWindow {
     id: appWindow
 
     property bool encryptedPageSelected: true
+    readonly property bool jailed: HarbourProcessState.jailedApp
 
     // Reference column width: 960 / 4
     readonly property real _portraitWidth: Math.min(Screen.width, Screen.height)
@@ -26,6 +27,11 @@ ApplicationWindow {
 
         interval: FoilNotesSettings.autoLockTime
         onTriggered: FoilNotesModel.lock(true);
+    }
+
+    Connections {
+        target: FoilNotesModel
+        onEncryptionDone: FoilNotesPlaintextModel.onEncryptionDone(requestId, success)
     }
 
     Connections {
@@ -58,14 +64,6 @@ ApplicationWindow {
     //% "note"
     readonly property string appDefaultFileName: qsTrId("foilnotes-default_file_name")
 
-    Component.onCompleted: {
-        if (FoilNotesModel.foilState !== FoilNotesModel.FoilJailed) {
-            // Let plaintext model know when encryption is finished:
-            FoilNotesModel.encryptionDone.connect(FoilNotesPlaintextModel.onEncryptionDone)
-            pageStack.pushAttached(plaintextPageComponent)
-        }
-    }
-
     Component {
         id: encryptedPageComponent
 
@@ -75,6 +73,15 @@ ApplicationWindow {
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             onDecryptNote: FoilNotesPlaintextModel.saveNote(note.pagenr, note.color, note.body)
+            // Attempt to push an attached page in Component.onCompleted results in
+            // [W] PageStack.js:89: Error: Cannot pushAttached while operation is in progress: push
+            // Let's do it the first time when the initial page becomes active
+            onStatusChanged: {
+                if (status === PageStatus.Active && !forwardNavigation) {
+                    // We have no attached page yet
+                    pageStack.pushAttached(plaintextPageComponent)
+                }
+            }
         }
     }
 
@@ -108,7 +115,15 @@ ApplicationWindow {
         }
     }
 
-    initialPage: encryptedPageComponent
+    Component {
+        id: jailPageComponent
+
+        JailPage {
+            allowedOrientations: appWindow.allowedOrientations
+        }
+    }
+
+    initialPage: jailed ? jailPageComponent : encryptedPageComponent
 
     cover: Component {
         CoverPage {

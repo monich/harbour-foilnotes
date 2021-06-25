@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2020 Jolla Ltd.
- * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2021 Jolla Ltd.
+ * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -44,6 +44,7 @@
 
 #include "HarbourDebug.h"
 #include "HarbourOrganizeListModel.h"
+#include "HarbourProcessState.h"
 #include "HarbourSystemState.h"
 #include "HarbourTheme.h"
 
@@ -55,6 +56,7 @@
 
 static void register_types(const char* uri, int v1 = 1, int v2 = 0)
 {
+    qmlRegisterSingletonType<HarbourProcessState>(uri, v1, v2, "HarbourProcessState", HarbourProcessState::createSingleton);
     qmlRegisterSingletonType<HarbourSystemState>(uri, v1, v2, "HarbourSystemState", HarbourSystemState::createSingleton);
     qmlRegisterSingletonType<HarbourTheme>(uri, v1, v2, "HarbourTheme", HarbourTheme::createSingleton);
     qmlRegisterSingletonType<FoilNotesHints>(uri, v1, v2, "FoilNotesHints", FoilNotesHints::createSingleton);

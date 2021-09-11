@@ -126,6 +126,7 @@ SilicaGridView {
 
             width: grid.cellWidth
             height: menuOpen ? grid.cellHeight + grid.contextMenu.height : grid.cellHeight
+            enabled: !grid.contextMenuItem
 
             readonly property bool down: pressed && containsMouse
             readonly property bool selected: grid.showSelection && model.selected

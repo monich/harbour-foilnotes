@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import org.nemomobile.notifications 1.0
 import harbour.foilnotes 1.0
 
 SilicaGridView {
@@ -90,20 +89,6 @@ SilicaGridView {
         }
     }
 
-    Notification {
-        id: clipboardNotification
-
-        //: Pop-up notification
-        //% "Copied to clipboard"
-        previewBody: qsTrId("foilnotes-notification-copied_to_clipboard")
-        expireTimeout: 2000
-        Component.onCompleted: {
-            if ("icon" in clipboardNotification) {
-                clipboardNotification.icon = "icon-s-clipboard"
-            }
-        }
-    }
-
     Component {
         id: notePageComponent
 
@@ -160,7 +145,6 @@ SilicaGridView {
 
             function copyToClipboard() {
                 Clipboard.text = modelText
-                clipboardNotification.publish()
             }
 
             NoteItem {

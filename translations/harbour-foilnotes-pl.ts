@@ -8,11 +8,6 @@
         <extracomment>Application title</extracomment>
         <translation>Foil Notes</translation>
     </message>
-    <message id="foilnotes-notification-copied_to_clipboard">
-        <source>Copied to clipboard</source>
-        <extracomment>Pop-up notification</extracomment>
-        <translation>Skopiowane do schowka</translation>
-    </message>
     <message id="foilnotes-search-placeholder">
         <source>Sorry, couldn&apos;t find anything</source>
         <extracomment>Placeholder text</extracomment>

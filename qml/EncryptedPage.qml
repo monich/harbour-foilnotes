@@ -317,6 +317,11 @@ Page {
                             }
                         }
                     }
+                    Binding {
+                        target: thisPage
+                        property: "forwardNavigation"
+                        value: encryptedNotesView.canNavigate
+                    }
                 }
             }
             onReadyChanged: {

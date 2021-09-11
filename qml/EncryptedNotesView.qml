@@ -16,6 +16,7 @@ SilicaFlickable {
     property string filter
     property bool searchMode
     readonly property bool busy: foilModel.busy || progressTimer.running
+    readonly property bool canNavigate: !grid.contextMenuItem
 
     signal decryptNote(var note)
 
@@ -153,6 +154,8 @@ SilicaFlickable {
 
         PullDownMenu {
             id: pullDownMenu
+
+            enabled: !grid.contextMenuItem
 
             property bool searchModeBeforeSnap
             property bool menuItemClicked

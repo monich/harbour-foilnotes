@@ -7,6 +7,8 @@ import "harbour"
 Page {
     id: thisPage
 
+    backNavigation: !grid.contextMenuItem
+
     property var hints
     property var foilModel
     property var plaintextModel
@@ -151,6 +153,8 @@ Page {
 
         PullDownMenu {
             id: pullDownMenu
+
+            enabled: !grid.contextMenuItem
 
             property bool searchModeBeforeSnap
             property bool menuItemClicked

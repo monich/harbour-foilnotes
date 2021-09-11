@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2020 Jolla Ltd.
- * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2021 Jolla Ltd.
+ * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -11,8 +11,8 @@
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
+ *      notice, this list of conditions and the following disclaimer
+ *      in the documentation and/or other materials provided with the
  *      distribution.
  *   3. Neither the names of the copyright holders nor the names of its
  *      contributors may be used to endorse or promote products derived
@@ -47,6 +47,7 @@ class FoilNotesSettings : public QObject {
     Q_PROPERTY(bool sharedKeyWarning READ sharedKeyWarning WRITE setSharedKeyWarning NOTIFY sharedKeyWarningChanged)
     Q_PROPERTY(bool sharedKeyWarning2 READ sharedKeyWarning2 WRITE setSharedKeyWarning2 NOTIFY sharedKeyWarning2Changed)
     Q_PROPERTY(int autoLockTime READ autoLockTime WRITE setAutoLockTime NOTIFY autoLockTimeChanged)
+    Q_PROPERTY(bool plaintextView READ plaintextView WRITE setPlaintextView NOTIFY plaintextViewChanged)
 
 public:
     explicit FoilNotesSettings(QObject* aParent = Q_NULLPTR);
@@ -68,6 +69,9 @@ public:
     int autoLockTime() const;
     void setAutoLockTime(int aValue);
 
+    bool plaintextView() const;
+    void setPlaintextView(bool aValue);
+
     Q_INVOKABLE int pickColorIndex();
     Q_INVOKABLE QColor pickColor();
 
@@ -76,6 +80,7 @@ Q_SIGNALS:
     void sharedKeyWarningChanged();
     void sharedKeyWarning2Changed();
     void autoLockTimeChanged();
+    void plaintextViewChanged();
 
 private:
     class Private;

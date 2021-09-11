@@ -80,7 +80,15 @@ ApplicationWindow {
                 if (status === PageStatus.Active && !forwardNavigation) {
                     // We have no attached page yet
                     pageStack.pushAttached(plaintextPageComponent)
+                    if (FoilNotesSettings.plaintextView) {
+                        selectPlaintextPage.start()
+                    }
                 }
+            }
+            Timer {
+                id: selectPlaintextPage
+                interval: 0
+                onTriggered: pageStack.navigateForward(PageStackAction.Immediate)
             }
         }
     }
@@ -95,7 +103,10 @@ ApplicationWindow {
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             plaintextModel: FoilNotesPlaintextModel
-            onIsCurrentPageChanged: encryptedPageSelected = !isCurrentPage
+            onIsCurrentPageChanged: {
+                encryptedPageSelected = !isCurrentPage
+                FoilNotesSettings.plaintextView = isCurrentPage
+            }
 
             Connections {
                 target: appWindow

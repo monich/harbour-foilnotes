@@ -11,7 +11,7 @@
     <message id="foilnotes-search-placeholder">
         <source>Sorry, couldn&apos;t find anything</source>
         <extracomment>Placeholder text</extracomment>
-        <translation type="unfinished">Przepraszamy, nic nie znaleziono</translation>
+        <translation>Przepraszamy, nic nie znaleziono</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
@@ -145,7 +145,7 @@
     <message id="foilnotes-notification-generated_key">
         <source>Generated new key</source>
         <extracomment>Pop-up notification</extracomment>
-        <translation>Wygeneruj nowy klucz</translation>
+        <translation>Wygenerowano nowy klucz</translation>
     </message>
     <message id="foilnotes-notification-password_changed">
         <source>Password changed</source>

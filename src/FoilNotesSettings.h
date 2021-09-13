@@ -42,7 +42,8 @@ class QJSEngine;
 
 class FoilNotesSettings : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QStringList availableColors READ availableColors CONSTANT)
+    Q_PROPERTY(QStringList defaultColors READ defaultColors CONSTANT)
+    Q_PROPERTY(QStringList availableColors READ availableColors WRITE setAvailableColors NOTIFY availableColorsChanged)
     Q_PROPERTY(int nextColorIndex READ nextColorIndex WRITE setNextColorIndex NOTIFY nextColorIndexChanged)
     Q_PROPERTY(bool sharedKeyWarning READ sharedKeyWarning WRITE setSharedKeyWarning NOTIFY sharedKeyWarningChanged)
     Q_PROPERTY(bool sharedKeyWarning2 READ sharedKeyWarning2 WRITE setSharedKeyWarning2 NOTIFY sharedKeyWarning2Changed)
@@ -56,7 +57,9 @@ public:
     // Callback for qmlRegisterSingletonType<FoilNotesSettings>
     static QObject* createSingleton(QQmlEngine* aEngine, QJSEngine* aScript);
 
+    const QStringList defaultColors() const;
     QStringList availableColors() const;
+    void setAvailableColors(QStringList aColors);
 
     int nextColorIndex() const;
     void setNextColorIndex(int aValue);
@@ -76,6 +79,7 @@ public:
     Q_INVOKABLE QColor pickColor();
 
 Q_SIGNALS:
+    void availableColorsChanged();
     void nextColorIndexChanged();
     void sharedKeyWarningChanged();
     void sharedKeyWarning2Changed();

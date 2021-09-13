@@ -41,6 +41,7 @@
 #include <QQmlEngine>
 
 #define DCONF_KEY(x)                FOILNOTES_DCONF_ROOT x
+#define KEY_AVAILABLE_COLORS        DCONF_KEY("availableColors")
 #define KEY_NEXT_COLOR_INDEX        DCONF_KEY("nextColorIndex")
 #define KEY_SHARED_KEY_WARNING      DCONF_KEY("sharedKeyWarning")
 #define KEY_SHARED_KEY_WARNING2     DCONF_KEY("sharedKeyWarning2")
@@ -56,19 +57,29 @@
 // FoilNotesSettings::Private
 // ==========================================================================
 
-class FoilNotesSettings::Private {
+class FoilNotesSettings::Private : public QObject
+{
+    Q_OBJECT
     static const char* gAvailableColors[];
 
 public:
     Private(QObject* aParent);
 
+    static QStringList defaultColors();
+    QStringList availableColors() const;
+
+public Q_SLOTS:
+    void onAvailableColorsChanged();
+
 public:
-    QStringList iAvailableColors;
+    MGConfItem* iAvailableColorsConf;
     MGConfItem* iNextColorIndex;
     MGConfItem* iSharedKeyWarning;
     MGConfItem* iSharedKeyWarning2;
     MGConfItem* iAutoLockTime;
     MGConfItem* iPlainTextView;
+    const QStringList iDefaultColors;
+    QStringList iAvailableColors;
     QVariant iDefaultSharedKeyWarning;
     QVariant iDefaultAutoLockTime;
 };
@@ -82,14 +93,19 @@ const char* FoilNotesSettings::Private::gAvailableColors[] = {
 };
 
 FoilNotesSettings::Private::Private(QObject* aParent) :
+    QObject(aParent),
+    iAvailableColorsConf(new MGConfItem(KEY_AVAILABLE_COLORS, aParent)),
     iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent)),
     iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent)),
     iSharedKeyWarning2(new MGConfItem(KEY_SHARED_KEY_WARNING2, aParent)),
     iAutoLockTime(new MGConfItem(KEY_AUTO_LOCK_TIME, aParent)),
     iPlainTextView(new MGConfItem(KEY_PLAINTEXT_VIEW, aParent)),
+    iDefaultColors(defaultColors()),
     iDefaultSharedKeyWarning(DEFAULT_SHARED_KEY_WARNING),
     iDefaultAutoLockTime(DEFAULT_AUTO_LOCK_TIME)
 {
+    QObject::connect(iAvailableColorsConf, SIGNAL(valueChanged()),
+        SLOT(onAvailableColorsChanged()));
     QObject::connect(iNextColorIndex, SIGNAL(valueChanged()),
         aParent, SIGNAL(nextColorIndexChanged()));
     QObject::connect(iSharedKeyWarning, SIGNAL(valueChanged()),
@@ -100,11 +116,31 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
         aParent, SIGNAL(autoLockTimeChanged()));
     QObject::connect(iPlainTextView, SIGNAL(valueChanged()),
         aParent, SIGNAL(plaintextViewChanged()));
+    iAvailableColors = availableColors();
+}
 
+QStringList FoilNotesSettings::Private::defaultColors()
+{
+    QStringList colors;
     const uint n = sizeof(gAvailableColors)/sizeof(gAvailableColors[0]);
-    iAvailableColors.reserve(n);
+    colors.reserve(n);
     for (uint i = 0; i < n; i++) {
-        iAvailableColors.append(QLatin1String(gAvailableColors[i]));
+        colors.append(QLatin1String(gAvailableColors[i]));
+    }
+    return colors;
+}
+
+QStringList FoilNotesSettings::Private::availableColors() const
+{
+    return iAvailableColorsConf->value(iDefaultColors).toStringList();
+}
+
+void FoilNotesSettings::Private::onAvailableColorsChanged()
+{
+    const QStringList newColors(availableColors());
+    if (iAvailableColors != newColors) {
+        iAvailableColors = newColors;
+        Q_EMIT qobject_cast<FoilNotesSettings*>(parent())->availableColorsChanged();
     }
 }
 
@@ -132,12 +168,28 @@ FoilNotesSettings::createSingleton(
     return new FoilNotesSettings();
 }
 
+// defaultColors
+const QStringList
+FoilNotesSettings::defaultColors() const
+{
+    return iPrivate->iDefaultColors;
+}
+
 // availableColors
 
 QStringList
 FoilNotesSettings::availableColors() const
 {
     return iPrivate->iAvailableColors;
+}
+
+void
+FoilNotesSettings::setAvailableColors(QStringList aColors)
+{
+    iPrivate->iAvailableColorsConf->set(aColors);
+    if (iPrivate->iAvailableColors != aColors) {
+        Q_EMIT availableColorsChanged();
+    }
 }
 
 // nextColorIndex
@@ -154,8 +206,7 @@ FoilNotesSettings::setNextColorIndex(
     int aValue)
 {
     HDEBUG(aValue);
-    iPrivate->iNextColorIndex->set(aValue %
-        iPrivate->iAvailableColors.count());
+    iPrivate->iNextColorIndex->set(aValue % iPrivate->iAvailableColors.count());
 }
 
 int
@@ -239,3 +290,5 @@ FoilNotesSettings::setPlaintextView(
     HDEBUG(aValue);
     iPrivate->iPlainTextView->set(aValue);
 }
+
+#include "FoilNotesSettings.moc"

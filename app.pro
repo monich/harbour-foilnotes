@@ -139,6 +139,7 @@ INCLUDEPATH += \
 
 HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourBase32.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourColorEditorModel.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourDebug.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourProcessState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
@@ -153,6 +154,7 @@ HEADERS += \
 
 SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourBase32.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourColorEditorModel.cpp \
     $${HARBOUR_LIB_SRC}/HarbourMce.cpp \
     $${HARBOUR_LIB_SRC}/HarbourOrganizeListModel.cpp \
     $${HARBOUR_LIB_SRC}/HarbourProcessState.cpp \
@@ -165,12 +167,16 @@ SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourTheme.cpp
 
 HARBOUR_QML_COMPONENTS = \
+    $${HARBOUR_LIB_QML}/HarbourColorEditorDialog.qml \
+    $${HARBOUR_LIB_QML}/HarbourColorHueItem.qml \
+    $${HARBOUR_LIB_QML}/HarbourColorPickerDialog.qml \
     $${HARBOUR_LIB_QML}/HarbourFitLabel.qml \
-    $${HARBOUR_LIB_QML}/HarbourHighlightIcon.qml\
-    $${HARBOUR_LIB_QML}/HarbourHintIconButton.qml\
+    $${HARBOUR_LIB_QML}/HarbourHighlightIcon.qml \
+    $${HARBOUR_LIB_QML}/HarbourHintIconButton.qml \
     $${HARBOUR_LIB_QML}/HarbourHorizontalSwipeHint.qml\
     $${HARBOUR_LIB_QML}/HarbourIconTextButton.qml \
     $${HARBOUR_LIB_QML}/HarbourPasswordInputField.qml \
+    $${HARBOUR_LIB_QML}/HarbourPressEffect.qml \
     $${HARBOUR_LIB_QML}/HarbourShakeAnimation.qml
 
 OTHER_FILES += $${HARBOUR_QML_COMPONENTS}

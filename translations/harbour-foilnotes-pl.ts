@@ -350,5 +350,35 @@
         <extracomment>Hint suggesting to run the app from the terminal</extracomment>
         <translation>Jeśli masz włączony tryb developera, możesz uruchomić &lt;b&gt;%1&lt;/b&gt; z terminala. Przepraszam za niedogodności!</translation>
     </message>
+    <message id="color_picker-action-select_color">
+        <source>Select color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation type="unfinished">Wybierz kolor</translation>
+    </message>
+    <message id="color_picker-action-add_color">
+        <source>Add color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation type="unfinished">Dodaj kolor</translation>
+    </message>
+    <message id="color_picker-menu-reset_colors">
+        <source>Reset colors</source>
+        <extracomment>Pulley menu item</extracomment>
+        <translation type="unfinished">Zresetuj kolory</translation>
+    </message>
+    <message id="color_picker-slider-hue">
+        <source>Color</source>
+        <extracomment>Hue slider label</extracomment>
+        <translation type="unfinished">Kolor</translation>
+    </message>
+    <message id="color_picker-slider-brightness">
+        <source>Brightness</source>
+        <extracomment>Brightness slider label</extracomment>
+        <translation type="unfinished">Jasność</translation>
+    </message>
+    <message id="color_picker-text-hex_notation">
+        <source>Hex notation</source>
+        <extracomment>Text field description</extracomment>
+        <translation type="unfinished">Format szesnastkowy</translation>
+    </message>
 </context>
 </TS>

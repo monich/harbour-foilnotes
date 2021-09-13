@@ -347,5 +347,35 @@
         <extracomment>Hint suggesting to run the app from the terminal</extracomment>
         <translation type="unfinished">Si vous avez activé le mode développeur, vous pouvez également essayer d&apos;exécuter foilnotes à partir du terminal. Désolé pour le dérangement!</translation>
     </message>
+    <message id="color_picker-action-select_color">
+        <source>Select color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation>Sélectionner une couleur</translation>
+    </message>
+    <message id="color_picker-action-add_color">
+        <source>Add color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation type="unfinished">Ajouter de la couleur</translation>
+    </message>
+    <message id="color_picker-menu-reset_colors">
+        <source>Reset colors</source>
+        <extracomment>Pulley menu item</extracomment>
+        <translation type="unfinished">Réinitialiser les couleurs</translation>
+    </message>
+    <message id="color_picker-slider-hue">
+        <source>Color</source>
+        <extracomment>Hue slider label</extracomment>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message id="color_picker-slider-brightness">
+        <source>Brightness</source>
+        <extracomment>Brightness slider label</extracomment>
+        <translation type="unfinished">Luminosité</translation>
+    </message>
+    <message id="color_picker-text-hex_notation">
+        <source>Hex notation</source>
+        <extracomment>Text field description</extracomment>
+        <translation type="unfinished">Notation hexadécimale</translation>
+    </message>
 </context>
 </TS>

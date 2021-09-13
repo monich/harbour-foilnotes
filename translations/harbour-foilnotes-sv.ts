@@ -347,5 +347,35 @@
         <extracomment>Hint suggesting to run the app from the terminal</extracomment>
         <translation type="unfinished">Om du har aktiverat utvecklarläge kan du också försöka köra &lt;b&gt;%1&lt;/b&gt; från terminalen. Beklagar olägenheten!</translation>
     </message>
+    <message id="color_picker-action-select_color">
+        <source>Select color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation>Välj färg</translation>
+    </message>
+    <message id="color_picker-action-add_color">
+        <source>Add color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation type="unfinished">Lägg till färg</translation>
+    </message>
+    <message id="color_picker-menu-reset_colors">
+        <source>Reset colors</source>
+        <extracomment>Pulley menu item</extracomment>
+        <translation type="unfinished">Återställ färger</translation>
+    </message>
+    <message id="color_picker-slider-hue">
+        <source>Color</source>
+        <extracomment>Hue slider label</extracomment>
+        <translation type="unfinished">Färg</translation>
+    </message>
+    <message id="color_picker-slider-brightness">
+        <source>Brightness</source>
+        <extracomment>Brightness slider label</extracomment>
+        <translation type="unfinished">Ljusstyrka</translation>
+    </message>
+    <message id="color_picker-text-hex_notation">
+        <source>Hex notation</source>
+        <extracomment>Text field description</extracomment>
+        <translation type="unfinished">Hex-format</translation>
+    </message>
 </context>
 </TS>

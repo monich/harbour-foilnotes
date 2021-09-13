@@ -18,6 +18,8 @@ Page {
     readonly property bool canUndo: "_editor" in textArea && textArea._editor.canUndo
     readonly property bool canRedo: "_editor" in textArea && textArea._editor.canRedo
 
+    property var colorEditorModel
+
     signal saveBody(var body)
     signal deleteNote()
     signal performAction()
@@ -37,12 +39,49 @@ Page {
     // Otherwise width is changing with a delay, causing visible layout changes
     onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
 
+    Component {
+        id: colorEditorModelComponent
+
+        HarbourColorEditorModel {
+            onColorsChanged: FoilNotesSettings.availableColors = colors
+        }
+    }
+
     function pickColor() {
-        pageStack.push("Sailfish.Silica.ColorPickerPage", {
-            colors: FoilNotesSettings.availableColors
-        }).colorClicked.connect(function(color) {
-            page.color = color
-            pageStack.pop()
+        if (!colorEditorModel) {
+            colorEditorModel = colorEditorModelComponent.createObject(page, {
+                colors: FoilNotesSettings.availableColors
+            })
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("harbour/HarbourColorPickerDialog.qml"), {
+            allowedOrientations: page.allowedOrientations,
+            acceptDestinationAction: PageStackAction.Replace,
+            colorModel: colorEditorModel,
+            color: page.color,
+            //: Pulley menu item
+            //% "Reset colors"
+            resetColorsMenuText: qsTrId("color_picker-menu-reset_colors"),
+            //: Dialog title label
+            //% "Select color"
+            acceptText: qsTrId("color_picker-action-select_color"),
+            //: Dialog title label
+            //% "Add color"
+            addColorAcceptText: qsTrId("color_picker-action-add_color"),
+            //: Hue slider label
+            //% "Color"
+            addColorHueSliderText: qsTrId("color_picker-slider-hue"),
+            //: Brightness slider label
+            //% "Brightness"
+            addColorBrightnessSliderText: qsTrId("color_picker-slider-brightness"),
+            //: Text field description
+            //% "Hex notation"
+            addColorHexNotationText: qsTrId("color_picker-text-hex_notation")
+        })
+        dialog.resetColors.connect(function() {
+            colorEditorModel.colors = FoilNotesSettings.defaultColors
+        })
+        dialog.accepted.connect(function() {
+            page.color = dialog.color
         })
     }
 

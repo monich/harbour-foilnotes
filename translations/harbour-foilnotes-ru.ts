@@ -350,5 +350,35 @@
         <extracomment>Hint suggesting to run the app from the terminal</extracomment>
         <translation>А если у вас включен режим разработчика, то кажется вам повезло - вы можете запустить &lt;b&gt;%1&lt;/b&gt; из терминала. Это, конечно, неудобно, но таким вот способом система как бы защищает вашу безопасность.</translation>
     </message>
+    <message id="color_picker-action-select_color">
+        <source>Select color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation>Выбрать цвет</translation>
+    </message>
+    <message id="color_picker-action-add_color">
+        <source>Add color</source>
+        <extracomment>Dialog title label</extracomment>
+        <translation>Добавить цвет</translation>
+    </message>
+    <message id="color_picker-menu-reset_colors">
+        <source>Reset colors</source>
+        <extracomment>Pulley menu item</extracomment>
+        <translation>Сбросить цвета</translation>
+    </message>
+    <message id="color_picker-slider-hue">
+        <source>Color</source>
+        <extracomment>Hue slider label</extracomment>
+        <translation>Цвет</translation>
+    </message>
+    <message id="color_picker-slider-brightness">
+        <source>Brightness</source>
+        <extracomment>Brightness slider label</extracomment>
+        <translation>Яркость</translation>
+    </message>
+    <message id="color_picker-text-hex_notation">
+        <source>Hex notation</source>
+        <extracomment>Text field description</extracomment>
+        <translation>Текстовый формат</translation>
+    </message>
 </context>
 </TS>

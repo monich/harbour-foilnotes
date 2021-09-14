@@ -284,7 +284,7 @@
     <message id="foilnotes-remorse-decrypting">
         <source>Decrypting</source>
         <extracomment>Decrypting note in 5 seconds</extracomment>
-        <translation>Decrypting</translation>
+        <translation>Odszyfrowywanie</translation>
     </message>
     <message id="foilnotes-remorse-decrypting_selected" numerus="yes">
         <source>Decrypting %0 selected notes</source>
@@ -353,32 +353,32 @@
     <message id="color_picker-action-select_color">
         <source>Select color</source>
         <extracomment>Dialog title label</extracomment>
-        <translation type="unfinished">Wybierz kolor</translation>
+        <translation>Wybierz kolor</translation>
     </message>
     <message id="color_picker-action-add_color">
         <source>Add color</source>
         <extracomment>Dialog title label</extracomment>
-        <translation type="unfinished">Dodaj kolor</translation>
+        <translation>Dodaj kolor</translation>
     </message>
     <message id="color_picker-menu-reset_colors">
         <source>Reset colors</source>
         <extracomment>Pulley menu item</extracomment>
-        <translation type="unfinished">Zresetuj kolory</translation>
+        <translation>Zresetuj kolory</translation>
     </message>
     <message id="color_picker-slider-hue">
         <source>Color</source>
         <extracomment>Hue slider label</extracomment>
-        <translation type="unfinished">Kolor</translation>
+        <translation>Kolor</translation>
     </message>
     <message id="color_picker-slider-brightness">
         <source>Brightness</source>
         <extracomment>Brightness slider label</extracomment>
-        <translation type="unfinished">Jasność</translation>
+        <translation>Jasność</translation>
     </message>
     <message id="color_picker-text-hex_notation">
         <source>Hex notation</source>
         <extracomment>Text field description</extracomment>
-        <translation type="unfinished">Format szesnastkowy</translation>
+        <translation>Format szesnastkowy</translation>
     </message>
 </context>
 </TS>

@@ -12,15 +12,17 @@ CONFIG += sailfishapp link_pkgconfig
 PKGCONFIG += sailfishapp mlite5 glib-2.0 gobject-2.0
 QT += qml quick sql
 
-openssl_static {
-  LIBS += $$[QT_INSTALL_LIBS]/libcrypto.a $$[QT_INSTALL_LIBS]/libssl.a
-  PKGCONFIG += zlib
-} else {
-  PKGCONFIG += libcrypto
-}
-
-QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-psabi
+QMAKE_CXXFLAGS += -Wno-unused-parameter
 QMAKE_CFLAGS += -Wno-unused-parameter
+
+system("pkg-config openssl --atleast-version=1.1") {
+    message("Linking OpenSSL dynamically")
+    PKGCONFIG += libcrypto
+} else {
+    message("Linking OpenSSL statically")
+    LIBS += $$[QT_INSTALL_LIBS]/libcrypto.a
+    PKGCONFIG += zlib
+}
 
 app_settings {
     # This path is hardcoded in jolla-settings

@@ -845,6 +845,7 @@ void FoilNotesPlaintextModel::deleteNotes(QList<int> aRows)
 {
     if (!aRows.isEmpty()) {
         qSort(aRows);
+        HDEBUG(aRows);
         bool selectionChanged = false;
         int deleted = 0;
         int lastRowToRemove = -1;
@@ -858,28 +859,28 @@ void FoilNotesPlaintextModel::deleteNotes(QList<int> aRows)
                     iPrivate->iSelected--;
                     selectionChanged = true;
                 }
-                HDEBUG(data->pagenr());
-                iPrivate->iModelData.removeAt(i);
+                HDEBUG("deleting" << data->pagenr());
+                iPrivate->iModelData.removeAt(pos);
                 deleted++;
                 if (lastRowToRemove < 0) {
-                    lastRowToRemove = firstRowToRemove = i;
-                } else {
-                    HASSERT((firstRowToRemove - 1) == i);
+                    lastRowToRemove = firstRowToRemove = pos;
+                } else if (pos == (firstRowToRemove - 1)) {
                     firstRowToRemove--;
+                } else {
+                    HDEBUG("removed" << firstRowToRemove << ".." << lastRowToRemove);
+                    beginRemoveRows(QModelIndex(), firstRowToRemove, lastRowToRemove);
+                    firstRowToRemove = lastRowToRemove = pos;
+                    endRemoveRows();
                 }
-            } else if (firstRowToRemove >= 0) {
-                HDEBUG(firstRowToRemove << lastRowToRemove);
-                beginRemoveRows(QModelIndex(), firstRowToRemove, lastRowToRemove);
-                firstRowToRemove = lastRowToRemove = -1;
-                endRemoveRows();
             }
         }
         if (firstRowToRemove >= 0) {
-            HDEBUG(firstRowToRemove << lastRowToRemove);
+            HDEBUG("removed" << firstRowToRemove << ".." << lastRowToRemove);
             beginRemoveRows(QModelIndex(), firstRowToRemove, lastRowToRemove);
             endRemoveRows();
         }
         if (deleted > 0) {
+            iPrivate->updatePageNr(aRows.at(0));
             if (selectionChanged) {
                 Q_EMIT selectedChanged();
             }

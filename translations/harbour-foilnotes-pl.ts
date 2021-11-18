@@ -11,22 +11,22 @@
     <message id="foilnotes-search-placeholder">
         <source>Sorry, couldn&apos;t find anything</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Przepraszamy, nic nie znaleziono</translation>
+        <translation>Przepraszamy, nic nie znaleziono.</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Nie masz żadnych notatek</translation>
+        <translation>Nie masz żadnych notatek.</translation>
     </message>
     <message id="foilnotes-encrypted_view-placeholder">
         <source>You do not have any encrypted notes</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Nie masz żadnych zaszyfrowanych notatek</translation>
+        <translation>Nie masz żadnych zaszyfrowanych notatek.</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder_hint">
         <source>Open pulley menu to add one.</source>
         <extracomment>Placeholder hint</extracomment>
-        <translation>Otwórz menu wysuwane aby dodać notatkę. </translation>
+        <translation>Otwórz menu wysuwane aby dodać notatkę.</translation>
     </message>
     <message id="foilnotes-menu-new_note">
         <source>New note</source>
@@ -37,6 +37,11 @@
         <source>New secret note</source>
         <extracomment>Create a new secret note ready for editing</extracomment>
         <translation>Nowa sekretna notatka</translation>
+    </message>
+    <message id="foilnotes-menu-nfc_share">
+        <source>Share via NFC</source>
+        <extracomment>Share current note via NFC</extracomment>
+        <translation type="unfinished">Udostępnij przez NFC</translation>
     </message>
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
@@ -151,6 +156,11 @@
         <source>Password changed</source>
         <extracomment>Pop-up notification</extracomment>
         <translation>Hasło zmienione</translation>
+    </message>
+    <message id="foilnotes-notification-nfc_note_received">
+        <source>Note received via NFC</source>
+        <extracomment>Pop-up notification</extracomment>
+        <translation type="unfinished">Notatka przyszła przez NFC</translation>
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
@@ -379,6 +389,16 @@
         <source>Hex notation</source>
         <extracomment>Text field description</extracomment>
         <translation>Format szesnastkowy</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-nfc_off">
+        <source>NFC is off</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation type="unfinished">NFC jest wyłączone.</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-ready">
+        <source>Touch another NFC capable device with Foil Notes running full screen.</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation type="unfinished">Przyłóż czujnik NFC do innego urządzenia z Foil Notes otwartą na pełnym ekranie.</translation>
     </message>
 </context>
 </TS>

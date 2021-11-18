@@ -13,3 +13,9 @@
 [submodule "foil-ui"]
 	path = foil-ui
 	url = https://github.com/monich/foil-ui.git
+[submodule "libgnfcdc"]
+	path = libgnfcdc
+	url = https://github.com/monich/libgnfcdc.git
+[submodule "libqnfcdc"]
+	path = libqnfcdc
+	url = https://github.com/monich/libqnfcdc.git

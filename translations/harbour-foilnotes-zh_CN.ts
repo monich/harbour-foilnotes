@@ -38,6 +38,11 @@
         <extracomment>Create a new secret note ready for editing</extracomment>
         <translation>新秘密笔记</translation>
     </message>
+    <message id="foilnotes-menu-nfc_share">
+        <source>Share via NFC</source>
+        <extracomment>Share current note via NFC</extracomment>
+        <translation type="unfinished">通过 NFC 分享</translation>
+    </message>
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
         <extracomment>Show QR code for the current note</extracomment>
@@ -149,6 +154,11 @@
         <source>Password changed</source>
         <extracomment>Pop-up notification</extracomment>
         <translation>密码已更改</translation>
+    </message>
+    <message id="foilnotes-notification-nfc_note_received">
+        <source>Note received via NFC</source>
+        <extracomment>Pop-up notification</extracomment>
+        <translation type="unfinished">笔记来自 NFC</translation>
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
@@ -373,6 +383,16 @@
         <source>Hex notation</source>
         <extracomment>Text field description</extracomment>
         <translation type="unfinished">十六进制表示法</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-nfc_off">
+        <source>NFC is off</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation type="unfinished">NFC 关闭</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-ready">
+        <source>Touch another NFC capable device with Foil Notes running full screen.</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation type="unfinished">在 Foil Notes 全屏运行时触摸另一个支持 NFC 的设备</translation>
     </message>
 </context>
 </TS>

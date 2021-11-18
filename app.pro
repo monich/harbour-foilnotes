@@ -9,8 +9,17 @@ openrepos {
 
 TARGET = $${PREFIX}-$${NAME}
 CONFIG += sailfishapp link_pkgconfig
-PKGCONFIG += sailfishapp mlite5 glib-2.0 gobject-2.0
+PKGCONFIG += sailfishapp mlite5 glib-2.0 gobject-2.0 gio-unix-2.0
 QT += qml quick sql
+
+isEmpty(VERSION) {
+    VERSION = 1.0.27
+}
+
+V1 = $$system(echo $$VERSION | cut -f1 -d.)
+V2 = $$system(echo $$VERSION | cut -f2 -d.)
+V3 = $$system(echo $$VERSION | cut -f3 -d.)
+DEFINES += VERSION_MAJOR=$$V1 VERSION_MINOR=$$V2 VERSION_MICRO=$$V3
 
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 QMAKE_CFLAGS += -Wno-unused-parameter
@@ -43,7 +52,8 @@ HARBOUR_LIB_SRC = $${HARBOUR_LIB_DIR}/src
 HARBOUR_LIB_QML = $${HARBOUR_LIB_DIR}/qml
 
 LIBGLIBUTIL_DIR = $${_PRO_FILE_PWD_}/libglibutil
-LIBGLIBUTIL_INCLUDE = $${LIBGLIBUTIL_DIR}/include
+LIBGNFCDC_DIR = $${_PRO_FILE_PWD_}/libgnfcdc
+LIBQNFCDC_DIR = $${_PRO_FILE_PWD_}/libqnfcdc
 
 FOIL_DIR = $${_PRO_FILE_PWD_}/foil
 LIBFOIL_DIR = $${FOIL_DIR}/libfoil
@@ -72,7 +82,6 @@ INCLUDEPATH += \
     $${LIBFOIL_SRC} \
     $${LIBFOIL_INCLUDE} \
     $${LIBFOILMSG_INCLUDE} \
-    $${LIBGLIBUTIL_INCLUDE} \
     $${LIBQRENCODE_DIR}
 
 HEADERS += \
@@ -81,6 +90,10 @@ HEADERS += \
     src/FoilNotesDefs.h \
     src/FoilNotesHints.h \
     src/FoilNotesModel.h \
+    src/FoilNotesNfcShare.h \
+    src/FoilNotesNfcShareClient.h \
+    src/FoilNotesNfcShareService.h \
+    src/FoilNotesNfcShareProtocol.h \
     src/FoilNotesPlaintextModel.h \
     src/FoilNotesSearchModel.h \
     src/FoilNotesSettings.h
@@ -90,6 +103,9 @@ SOURCES += \
     src/FoilNotesBaseModel.cpp \
     src/FoilNotesHints.cpp \
     src/FoilNotesModel.cpp \
+    src/FoilNotesNfcShareClient.cpp \
+    src/FoilNotesNfcShareService.cpp \
+    src/FoilNotesNfcShareProtocol.cpp \
     src/FoilNotesPlaintextModel.cpp \
     src/FoilNotesSearchModel.cpp \
     src/FoilNotesSettings.cpp \
@@ -98,13 +114,108 @@ SOURCES += \
 SOURCES += \
     $${LIBFOIL_SRC}/*.c \
     $${LIBFOIL_SRC}/openssl/*.c \
-    $${LIBFOILMSG_SRC}/*.c \
-    $${LIBGLIBUTIL_DIR}/src/*.c
+    $${LIBFOILMSG_SRC}/*.c
 
 HEADERS += \
     $${LIBFOIL_INCLUDE}/*.h \
     $${LIBFOILMSG_INCLUDE}/*.h \
+
+# NFC stuff
+
+# libqnfcdc
+
+LIBQNFCDC_INCLUDE = $${LIBQNFCDC_DIR}/include
+LIBQNFCDC_SRC = $${LIBQNFCDC_DIR}/src
+
+INCLUDEPATH += \
+    $${LIBQNFCDC_INCLUDE}
+
+HEADERS += \
+    $${LIBQNFCDC_INCLUDE}/NfcAdapter.h \
+    $${LIBQNFCDC_INCLUDE}/NfcMode.h \
+    $${LIBQNFCDC_INCLUDE}/NfcSystem.h \
+    $${LIBQNFCDC_INCLUDE}/NfcPeer.h
+
+SOURCES += \
+    $${LIBQNFCDC_SRC}/NfcAdapter.cpp \
+    $${LIBQNFCDC_SRC}/NfcMode.cpp \
+    $${LIBQNFCDC_SRC}/NfcSystem.cpp \
+    $${LIBQNFCDC_SRC}/NfcPeer.cpp
+
+# libglibutil
+
+LIBGLIBUTIL_SRC = $${LIBGLIBUTIL_DIR}/src
+LIBGLIBUTIL_INCLUDE = $${LIBGLIBUTIL_DIR}/include
+
+INCLUDEPATH += \
+    $${LIBGLIBUTIL_INCLUDE}
+
+HEADERS += \
     $${LIBGLIBUTIL_INCLUDE}/*.h
+
+SOURCES += \
+    $${LIBGLIBUTIL_DIR}/src/*.c
+
+# libgnfcdc
+
+LIBGNFCDC_INCLUDE = $${LIBGNFCDC_DIR}/include
+LIBGNFCDC_SRC = $${LIBGNFCDC_DIR}/src
+LIBGNFCDC_SPEC = $${LIBGNFCDC_DIR}/spec
+
+INCLUDEPATH += \
+    $${LIBGNFCDC_INCLUDE}
+
+HEADERS += \
+    $${LIBGNFCDC_INCLUDE}/*.h \
+    $${LIBGNFCDC_SRC}/*.h
+
+SOURCES += \
+    $${LIBGNFCDC_SRC}/*.c
+
+OTHER_FILES += \
+    $${LIBGNFCDC_SPEC}/*.xml
+
+defineTest(generateStub) {
+    xml = $${LIBGNFCDC_SPEC}/org.sailfishos.nfc.$${1}.xml
+    cmd = gdbus-codegen --generate-c-code org.sailfishos.nfc.$${1} $${xml}
+
+    gen_h = org.sailfishos.nfc.$${1}.h
+    gen_c = org.sailfishos.nfc.$${1}.c
+    target_h = org_sailfishos_nfc_$${1}_h
+    target_c = org_sailfishos_nfc_$${1}_c
+
+    $${target_h}.target = $${gen_h}
+    $${target_h}.depends = $${xml}
+    $${target_h}.commands = $${cmd}
+    export($${target_h}.target)
+    export($${target_h}.depends)
+    export($${target_h}.commands)
+
+    GENERATED_HEADERS += $${gen_h}
+    PRE_TARGETDEPS += $${gen_h}
+    QMAKE_EXTRA_TARGETS += $${target_h}
+
+    $${target_c}.target = $${gen_c}
+    $${target_c}.depends = $${gen_h}
+    export($${target_c}.target)
+    export($${target_c}.depends)
+
+    GENERATED_SOURCES += $${gen_c}
+    QMAKE_EXTRA_TARGETS += $${target_c}
+    PRE_TARGETDEPS += $${gen_c}
+
+    export(QMAKE_EXTRA_TARGETS)
+    export(GENERATED_SOURCES)
+    export(PRE_TARGETDEPS)
+}
+
+generateStub(Adapter)
+generateStub(Daemon)
+generateStub(IsoDep)
+generateStub(LocalService)
+generateStub(Settings)
+generateStub(Peer)
+generateStub(Tag)
 
 # foil-ui
 

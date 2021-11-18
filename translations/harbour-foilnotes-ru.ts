@@ -11,7 +11,7 @@
     <message id="foilnotes-search-placeholder">
         <source>Sorry, couldn&apos;t find anything</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Извините, ничего не нашлось</translation>
+        <translation>Извините, ничего не нашлось.</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
@@ -21,22 +21,27 @@
     <message id="foilnotes-plaintext_view-placeholder_hint">
         <source>Open pulley menu to add one.</source>
         <extracomment>Placeholder hint</extracomment>
-        <translation>Используйте меню, чтобы создать новую запись.</translation>
+        <translation>Используйте меню, чтобы создать новую заметку.</translation>
     </message>
     <message id="foilnotes-encrypted_view-placeholder">
         <source>You do not have any encrypted notes</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Ни одной записи не зашифровано</translation>
+        <translation>Ни одной заметки не зашифровано</translation>
     </message>
     <message id="foilnotes-menu-new_note">
         <source>New note</source>
         <extracomment>Create a new note ready for editing</extracomment>
-        <translation>Добавить запись</translation>
+        <translation>Добавить заметку</translation>
     </message>
     <message id="foilnotes-menu-new_secret_note">
         <source>New secret note</source>
         <extracomment>Create a new secret note ready for editing</extracomment>
-        <translation>Добавить секретную запись</translation>
+        <translation>Добавить секретную заметку</translation>
+    </message>
+    <message id="foilnotes-menu-nfc_share">
+        <source>Share via NFC</source>
+        <extracomment>Share current note via NFC</extracomment>
+        <translation>Поделиться через NFC</translation>
     </message>
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
@@ -51,7 +56,7 @@
     <message id="foilnotes-menu-delete_note">
         <source>Delete note</source>
         <extracomment>Delete this note from note page</extracomment>
-        <translation>Удалить запись</translation>
+        <translation>Удалить заметку</translation>
     </message>
     <message id="foilnotes-menu-encrypt">
         <source>Encrypt</source>
@@ -81,7 +86,7 @@
     <message id="foilnotes-remorse-deleting">
         <source>Deleting</source>
         <extracomment>Remorse item text, will delete note when timer expires</extracomment>
-        <translation>Запись будет удалена</translation>
+        <translation>Заметка будет удалена</translation>
     </message>
     <message id="foilnotes-default_file_name">
         <source>note</source>
@@ -101,7 +106,7 @@
     <message id="foilnotes-menu-select">
         <source>Select</source>
         <extracomment>Pulley menu item</extracomment>
-        <translation>Выбрать записи</translation>
+        <translation>Выбрать заметки</translation>
     </message>
     <message id="foilnotes-menu-select_all">
         <source>Select all</source>
@@ -117,20 +122,20 @@
         <source>Deleting %0 selected notes</source>
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
-            <numerusform>%0 запись будет удалена</numerusform>
-            <numerusform>%0 записи будут удалены</numerusform>
-            <numerusform>%0 записей будут удалены</numerusform>
+            <numerusform>%0 заметка будет удалена</numerusform>
+            <numerusform>%0 заметки будут удалены</numerusform>
+            <numerusform>%0 заметок будут удалены</numerusform>
         </translation>
     </message>
     <message id="foilnotes-organize_page-plaintext_header">
         <source>Organize notes</source>
         <extracomment>Page header</extracomment>
-        <translation>Упорядочить записи</translation>
+        <translation>Упорядочить заметки</translation>
     </message>
     <message id="foilnotes-organize_page-secret_header">
         <source>Organize secret notes</source>
         <extracomment>Page header</extracomment>
-        <translation>Упорядочить секретные записи</translation>
+        <translation>Упорядочить секретные заметки</translation>
     </message>
     <message id="foilnotes-organize_page-description">
         <source>Press and drag to reorder</source>
@@ -140,7 +145,7 @@
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>
         <extracomment>Page header</extracomment>
-        <translation>Выберите записи</translation>
+        <translation>Выберите заметки</translation>
     </message>
     <message id="foilnotes-notification-generated_key">
         <source>Generated new key</source>
@@ -151,6 +156,11 @@
         <source>Password changed</source>
         <extracomment>Pop-up notification</extracomment>
         <translation>Пароль сменён</translation>
+    </message>
+    <message id="foilnotes-notification-nfc_note_received">
+        <source>Note received via NFC</source>
+        <extracomment>Pop-up notification</extracomment>
+        <translation>Вам что-то пришло через NFC</translation>
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
@@ -264,7 +274,7 @@
     <message id="foilnotes-confirm_password_page-description">
         <source>Make sure you don&apos;t forget your password. It&apos;s impossible to either recover it or to access the encrypted notes without knowing it. Better take it seriously.</source>
         <extracomment>Password confirmation description</extracomment>
-        <translation>Если вы забудете пароль, восстановить его будет невозможно и таким образом доступ к зашифрованным записям будет утерян. Так что лучше отнеситесь к этому серьёзно.</translation>
+        <translation>Если вы забудете пароль, восстановить его будет невозможно и таким образом доступ к зашифрованным заметкам будет утерян. Так что лучше отнеситесь к этому серьёзно.</translation>
     </message>
     <message id="foilnotes-confirm_password_page-text_field_placeholder-new_password">
         <source>New password again</source>
@@ -290,9 +300,9 @@
         <source>Decrypting %0 selected notes</source>
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
-            <numerusform>Расшифровка %0 записи</numerusform>
-            <numerusform>Расшифровка %0 записей</numerusform>
-            <numerusform>Расшифровка %0 записей</numerusform>
+            <numerusform>Расшифровка %0 заметки</numerusform>
+            <numerusform>Расшифровка %0 заметок</numerusform>
+            <numerusform>Расшифровка %0 заметок</numerusform>
         </translation>
     </message>
     <message id="foilnotes-foil_apps_warning">
@@ -303,32 +313,32 @@
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>
         <extracomment>Hint text</extracomment>
-        <translation>Удалить выбранные записи</translation>
+        <translation>Удалить выбранные заметки</translation>
     </message>
     <message id="foilnotes-hint-encrypt_selected">
         <source>Encrypt selected notes</source>
         <extracomment>Hint text</extracomment>
-        <translation>Зашифровать выбранные записи</translation>
+        <translation>Зашифровать выбранные заметки</translation>
     </message>
     <message id="foilnotes-hint-decrypt_selected">
         <source>Decrypt selected notes</source>
         <extracomment>Hint text</extracomment>
-        <translation>Расшифровать выбранные записи</translation>
+        <translation>Расшифровать выбранные заметки</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
         <extracomment>Left swipe hint text</extracomment>
-        <translation>Там справа незашифрованные записи</translation>
+        <translation>Там справа незашифрованные заметки</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
         <source>Encrypted pictures are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
-        <translation>Зашифрованные записи попадают туда, налево</translation>
+        <translation>Зашифрованные заметки попадают туда, налево</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_decrypted">
         <source>Decrypted notes are moved back to the right</source>
         <extracomment>Left swipe hint text</extracomment>
-        <translation>Расшифрованные записи попадают обратно направо</translation>
+        <translation>Расшифрованные заметки попадают обратно направо</translation>
     </message>
     <message id="foilnotes-hint-undo">
         <source>Undo</source>
@@ -379,6 +389,16 @@
         <source>Hex notation</source>
         <extracomment>Text field description</extracomment>
         <translation>Текстовый формат</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-nfc_off">
+        <source>NFC is off</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation>Извините, но кажется NFC выключен.</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-ready">
+        <source>Touch another NFC capable device with Foil Notes running full screen.</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation>Прикоснитесь NFC сенсором к другому устройству, на котором приложение Foil Notes открыто на весь экран. Возможно, произойдёт чудо!</translation>
     </message>
 </context>
 </TS>

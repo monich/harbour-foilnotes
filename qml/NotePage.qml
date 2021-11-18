@@ -112,6 +112,23 @@ Page {
                 onClicked: page.performAction()
             }
             MenuItem {
+                id: nfcShareMenuItem
+
+                //: Share current note via NFC
+                //% "Share via NFC"
+                text: qsTrId("foilnotes-menu-nfc_share")
+                visible: NfcSystem.present && NfcSystem.enabled
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("NfcSharePage.qml"), {
+                        allowedOrientations: page.allowedOrientations,
+                        noteColor: page.color,
+                        noteText: page.body
+                    })
+                }
+            }
+            MenuItem {
+                id: qrCodeMenuItem
+
                 //: Show QR code for the current note
                 //% "Show QR code"
                 text: qsTrId("foilnotes-menu-show_qrcode")
@@ -126,6 +143,8 @@ Page {
                 //% "Select color"
                 text: qsTrId("foilnotes-menu-select_color")
                 onClicked: page.pickColor()
+                // Don't show more than 4 menu items in landscape
+                visible: isPortrait || !actionMenuItem.visible || !nfcShareMenuItem.visible || !qrCodeMenuItem.visible
             }
             MenuItem {
                 //: Delete this note from note page

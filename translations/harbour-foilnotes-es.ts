@@ -38,6 +38,11 @@
         <extracomment>Create a new secret note ready for editing</extracomment>
         <translation>Nueva nota secreta</translation>
     </message>
+    <message id="foilnotes-menu-nfc_share">
+        <source>Share via NFC</source>
+        <extracomment>Share current note via NFC</extracomment>
+        <translation type="unfinished">Compartir a través de NFC</translation>
+    </message>
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
         <extracomment>Show QR code for the current note</extracomment>
@@ -150,6 +155,11 @@
         <source>Password changed</source>
         <extracomment>Pop-up notification</extracomment>
         <translation>Contraseña cambiada</translation>
+    </message>
+    <message id="foilnotes-notification-nfc_note_received">
+        <source>Note received via NFC</source>
+        <extracomment>Pop-up notification</extracomment>
+        <translation type="unfinished">La nota llegó a través de NFC</translation>
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
@@ -376,6 +386,16 @@
         <source>Hex notation</source>
         <extracomment>Text field description</extracomment>
         <translation type="unfinished">Notación hexadecimal</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-nfc_off">
+        <source>NFC is off</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation type="unfinished">NFC está apagado.</translation>
+    </message>
+    <message id="foilnotes-nfc_share-info-ready">
+        <source>Touch another NFC capable device with Foil Notes running full screen.</source>
+        <extracomment>Full screen info label</extracomment>
+        <translation type="unfinished">Toque otro dispositivo compatible con NFC con Foil Notes en pantalla completa.</translation>
     </message>
 </context>
 </TS>

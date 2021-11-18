@@ -34,10 +34,17 @@
 #include "FoilNotesDefs.h"
 #include "FoilNotesHints.h"
 #include "FoilNotesModel.h"
+#include "FoilNotesNfcShareClient.h"
+#include "FoilNotesNfcShareService.h"
 #include "FoilNotesPlaintextModel.h"
 #include "FoilNotesSearchModel.h"
 #include "FoilNotesSettings.h"
 #include "FoilNotes.h"
+
+#include "NfcAdapter.h"
+#include "NfcMode.h"
+#include "NfcSystem.h"
+#include "NfcPeer.h"
 
 #include "HarbourQrCodeGenerator.h"
 #include "HarbourQrCodeImageProvider.h"
@@ -64,8 +71,16 @@ static void register_types(const char* uri, int v1 = 1, int v2 = 0)
     qmlRegisterSingletonType<FoilNotesSettings>(uri, v1, v2, "FoilNotesSettings", FoilNotesSettings::createSingleton);
     qmlRegisterSingletonType<FoilNotes>(uri, v1, v2, "FoilNotes", FoilNotes::createSingleton);
     qmlRegisterSingletonType<FoilNotesModel>(uri, v1, v2, "FoilNotesModel", FoilNotesModel::createSingleton);
+    qmlRegisterSingletonType<FoilNotesNfcShareService>(uri, v1, v2, "FoilNotesNfcShareService", FoilNotesNfcShareService::createSingleton);
     qmlRegisterSingletonType<FoilNotesPlaintextModel>(uri, v1, v2, "FoilNotesPlaintextModel", FoilNotesPlaintextModel::createSingleton);
+    qmlRegisterType<FoilNotesNfcShareClient>(uri, v1, v2, "FoilNotesNfcShareClient");
     qmlRegisterType<FoilNotesSearchModel>(uri, v1, v2, "FoilNotesSearchModel");
+
+    qmlRegisterSingletonType<NfcAdapter>(uri, v1, v2, "NfcAdapter", NfcAdapter::createSingleton);
+    qmlRegisterSingletonType<NfcSystem>(uri, v1, v2, "NfcSystem", NfcSystem::createSingleton);
+    qmlRegisterType<NfcMode>(uri, v1, v2, "NfcMode");
+    qmlRegisterType<NfcPeer>(uri, v1, v2, "NfcPeer");
+
     qmlRegisterType<HarbourColorEditorModel>(uri, v1, v2, "HarbourColorEditorModel");
     qmlRegisterType<HarbourOrganizeListModel>(uri, v1, v2, "HarbourOrganizeListModel");
     qmlRegisterType<HarbourQrCodeGenerator>(uri, v1, v2, "HarbourQrCodeGenerator");

@@ -30,6 +30,26 @@ SilicaGridView {
         contextMenuItem.modelIndex - (contextMenuItem.modelIndex % columnCount) + columnCount : 0
     readonly property int expandHeight: contextMenu ? contextMenu.height : 0
 
+    function openNote(index,pagenr,color,body,transition) {
+        model.textIndex = index
+        currentIndex = index
+        var notePage = pageStack.push(notePageComponent, {
+            pagenr: pagenr,
+            color: color,
+            body: body,
+            secret: secret,
+            allowedOrientations: allowedOrientations,
+            actionMenuText: noteActionMenuText
+        }, transition)
+        notePage.colorChanged.connect(function() { model.setColorAt(index,notePage.color) })
+        notePage.saveBody.connect(function(body) { model.setBodyAt(index,body) })
+        notePage.deleteNote.connect(function() {
+            currentItem.deleteNote()
+            pageStack.pop()
+        })
+        notePage.performAction.connect(function() { grid.performNoteAction(currentItem) })
+    }
+
     function newNote(model,transition) {
         var noteCreated = false
         var notePage = pageStack.push(notePageComponent, {
@@ -165,24 +185,7 @@ SilicaGridView {
 
             onClicked: {
                 if (!model.busy) {
-                    // Make sure delegate doesn't get destroyed
-                    grid.model.textIndex = modelIndex
-                    grid.currentIndex = modelIndex
-                    var notePage = pageStack.push(notePageComponent, {
-                        pagenr: model.pagenr,
-                        color: model.color,
-                        body: modelText,
-                        secret: grid.secret,
-                        allowedOrientations: page.allowedOrientations,
-                        actionMenuText: noteActionMenuText
-                    })
-                    notePage.colorChanged.connect(function() { model.color = notePage.color })
-                    notePage.saveBody.connect(function(body) { model.body = body })
-                    notePage.deleteNote.connect(function() {
-                        noteDelegate.deleteNote()
-                        pageStack.pop()
-                    })
-                    notePage.performAction.connect(function() { grid.performNoteAction(noteDelegate) })
+                    openNote(modelIndex, model.pagenr, model.color, modelText, PageStackAction.Animated)
                 }
             }
 

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import org.nemomobile.notifications 1.0
 import harbour.foilnotes 1.0
 
 ApplicationWindow {
@@ -20,7 +21,27 @@ ApplicationWindow {
     readonly property int appPortraitCellSize: Math.floor(_portraitWidth/appPortraitColumnCount)
     readonly property int appLandscapeCellSize: Math.floor(_landscapeWidth/appLandscapeColumnCount)
 
+    //: Placeholder name for note filename
+    //% "note"
+    readonly property string appDefaultFileName: qsTrId("foilnotes-default_file_name")
+
     signal newNoteFromCover()
+
+    function popAll() {
+        var firstPage = pageStack.currentPage
+        var prevPage = pageStack.previousPage(firstPage)
+        while (prevPage) {
+            firstPage = prevPage
+            prevPage = pageStack.previousPage(prevPage)
+        }
+        pageStack.pop(firstPage, PageStackAction.Immediate)
+    }
+
+    Binding {
+        target: FoilNotesNfcShareService
+        property: "active"
+        value: !jailed && NfcSystem.version >= NfcSystem.Version_1_1_0 && Qt.application.active
+    }
 
     Timer {
         id: lockTimer
@@ -59,10 +80,6 @@ ApplicationWindow {
             }
         }
     }
-
-    //: Placeholder name for note filename
-    //% "note"
-    readonly property string appDefaultFileName: qsTrId("foilnotes-default_file_name")
 
     Component {
         id: encryptedPageComponent
@@ -103,6 +120,7 @@ ApplicationWindow {
             hints: FoilNotesHints
             foilModel: FoilNotesModel
             plaintextModel: FoilNotesPlaintextModel
+
             onIsCurrentPageChanged: {
                 encryptedPageSelected = !isCurrentPage
                 FoilNotesSettings.plaintextView = isCurrentPage
@@ -111,16 +129,35 @@ ApplicationWindow {
             Connections {
                 target: appWindow
                 onNewNoteFromCover: {
-                    var firstPage = pageStack.currentPage
-                    var prevPage = pageStack.previousPage(firstPage)
-                    while (prevPage) {
-                        firstPage = prevPage
-                        prevPage = pageStack.previousPage(prevPage)
-                    }
-                    pageStack.pop(firstPage, PageStackAction.Immediate)
+                    popAll()
                     pageStack.navigateForward(PageStackAction.Immediate)
                     plaintextPage.newNoteFromCover()
                     activate()
+                }
+            }
+
+            Notification {
+                id: nfcNoteNotification
+
+                expireTimeout: 2000
+                //: Pop-up notification
+                //% "Note received via NFC"
+                previewBody: qsTrId("foilnotes-notification-nfc_note_received")
+                Component.onCompleted: {
+                    if ('icon' in nfcNoteNotification) {
+                        nfcNoteNotification.icon = "icon-m-nfc"
+                    }
+                }
+            }
+
+            Connections {
+                target: FoilNotesNfcShareService
+                onNewNote: {
+                    popAll()
+                    pageStack.navigateForward(PageStackAction.Immediate)
+                    FoilNotesPlaintextModel.addNote(color, body)
+                    plaintextPage.openNote(0, 1, color, body, PageStackAction.Immediate)
+                    nfcNoteNotification.publish()
                 }
             }
         }

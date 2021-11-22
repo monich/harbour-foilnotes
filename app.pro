@@ -13,7 +13,7 @@ PKGCONFIG += sailfishapp mlite5 glib-2.0 gobject-2.0 gio-unix-2.0
 QT += qml quick sql
 
 isEmpty(VERSION) {
-    VERSION = 1.0.27
+    VERSION = 1.0.28
 }
 
 V1 = $$system(echo $$VERSION | cut -f1 -d.)

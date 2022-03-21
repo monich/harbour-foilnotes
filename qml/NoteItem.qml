@@ -41,7 +41,7 @@ Item {
         color: "transparent"
         smooth: true
         visible: opacity > 0
-        opacity: selected ? HarbourTheme.opacityHigh : 0
+        opacity: selected ? FoilNotes.opacityHigh : 0
         Behavior on opacity { FadeAnimation { duration: fadeDiration } }
     }
 
@@ -128,7 +128,7 @@ Item {
             right: parent.right
             rightMargin: Theme.paddingMedium
         }
-        opacity: HarbourTheme.opacityLow
+        opacity: FoilNotes.opacityLow
         color: highlighted ? Theme.highlightColor : Theme.primaryColor
         font {
             family: Theme.fontFamily
@@ -161,7 +161,7 @@ Item {
         z: noteItem.z + 1
         anchors.fill: parent
         active: opacity > 0
-        opacity: selected ? (highlighted ? HarbourTheme.opacityLow : 1 ): 0
+        opacity: selected ? (highlighted ? FoilNotes.opacityLow : 1 ): 0
         Behavior on opacity { FadeAnimation { duration: fadeDiration } }
         sourceComponent: Component {
             Item {

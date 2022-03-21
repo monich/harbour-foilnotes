@@ -10,6 +10,7 @@ CoverBackground {
     property bool encryptedPageSelected
     readonly property int coverActionHeight: Theme.itemSizeSmall
     readonly property bool jailed: HarbourProcessState.jailedApp
+    readonly property bool darkOnLight: ('colorScheme' in Theme) && Theme.colorScheme === 1
 
     signal newNote()
 
@@ -18,7 +19,7 @@ CoverBackground {
 
         anchors.fill: appTitle
         color: Theme.primaryColor
-        opacity: HarbourTheme.opacityFaint
+        opacity: FoilNotes.opacityFaint
     }
 
     Label {
@@ -41,7 +42,7 @@ CoverBackground {
         source: "images/edge.svg"
         sourceSize.height: Theme.paddingMedium
         highlightColor: titleBackground.color
-        opacity: HarbourTheme.opacityFaint
+        opacity: FoilNotes.opacityFaint
         smooth: true
     }
 
@@ -97,7 +98,7 @@ CoverBackground {
                 width: content.width
                 height: Theme.paddingSmall/4
                 color: Theme.primaryColor
-                opacity: HarbourTheme.opacityLow
+                opacity: FoilNotes.opacityLow
                 smooth: true
                 visible: !jailed
             }
@@ -109,7 +110,7 @@ CoverBackground {
             y: (cover.height - height)/2 - parent.y
             height: size
             sourceSize.height: size
-            source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
+            source: darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
             opacity: 0.1
         }
 
@@ -158,7 +159,7 @@ CoverBackground {
     CoverActionList {
         enabled: !jailed
         CoverAction {
-            readonly property url lockIcon: Qt.resolvedUrl("images/" + (HarbourTheme.darkOnLight ? "lock-dark.svg" : "lock.svg"))
+            readonly property url lockIcon: Qt.resolvedUrl("images/" + (darkOnLight ? "lock-dark.svg" : "lock.svg"))
             iconSource: FoilNotesModel.keyAvailable ? lockIcon : "image://theme/icon-cover-new"
             onTriggered: {
                 if (FoilNotesModel.keyAvailable) {

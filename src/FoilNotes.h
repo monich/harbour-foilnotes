@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2022 Jolla Ltd.
+ * Copyright (C) 2018-2022 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -36,6 +36,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QColor>
 
 class QQmlEngine;
 class QJSEngine;
@@ -44,6 +45,10 @@ class QJSEngine;
 class FoilNotes : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool otherFoilAppsInstalled READ otherFoilAppsInstalled NOTIFY otherFoilAppsInstalledChanged)
+    Q_PROPERTY(qreal opacityFaint READ opacityFaint CONSTANT)
+    Q_PROPERTY(qreal opacityLow READ opacityLow CONSTANT)
+    Q_PROPERTY(qreal opacityHigh READ opacityHigh CONSTANT)
+    Q_PROPERTY(qreal opacityOverlay READ opacityOverlay CONSTANT)
 
 public:
     explicit FoilNotes(QObject* aParent = Q_NULLPTR);
@@ -52,8 +57,14 @@ public:
     static QObject* createSingleton(QQmlEngine* aEngine, QJSEngine* aScript);
 
     Q_INVOKABLE static QString generateFileName(QString aText);
+    Q_INVOKABLE static qreal colorDifference(const QColor& aColor1, const QColor& aColor2);
 
     bool otherFoilAppsInstalled() const;
+
+    static qreal opacityFaint() { return 0.2; }
+    static qreal opacityLow() { return 0.4; }
+    static qreal opacityHigh() { return 0.6; }
+    static qreal opacityOverlay() { return 0.8; }
 
 Q_SIGNALS:
     void otherFoilAppsInstalledChanged();

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018-2020 Jolla Ltd.
- * Copyright (C) 2018-2020 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2022 Jolla Ltd.
+ * Copyright (C) 2018-2022 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -155,6 +155,14 @@ QString FoilNotes::generateFileName(QString aText)
 bool FoilNotes::otherFoilAppsInstalled() const
 {
     return iPrivate->iOtherFoilAppsInstalled;
+}
+
+qreal FoilNotes::colorDifference(const QColor& aColor1, const QColor& aColor2)
+{
+    const qreal dr = aColor1.red() - aColor2.red();
+    const qreal dg = aColor1.green() - aColor2.green();
+    const qreal db = aColor1.blue() - aColor2.blue();
+    return dr * dr + dg * dg + db * db;
 }
 
 #include "FoilNotes.moc"

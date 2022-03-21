@@ -11,6 +11,7 @@ Page {
     property var hints
     property var foilModel
     readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
+    readonly property bool darkOnLight: ('colorScheme' in Theme) && Theme.colorScheme === 1
     property bool isCurrentPage: true
 
     signal decryptNote(var note)
@@ -28,10 +29,10 @@ Page {
         id: foilUiComponent
 
         QtObject {
-            readonly property real opacityFaint: HarbourTheme.opacityFaint
-            readonly property real opacityLow: HarbourTheme.opacityLow
-            readonly property real opacityHigh: HarbourTheme.opacityHigh
-            readonly property real opacityOverlay: HarbourTheme.opacityOverlay
+            readonly property real opacityFaint: FoilNotes.opacityFaint
+            readonly property real opacityLow: FoilNotes.opacityLow
+            readonly property real opacityHigh: FoilNotes.opacityHigh
+            readonly property real opacityOverlay: FoilNotes.opacityOverlay
 
             readonly property var settings: FoilNotesSettings
             readonly property bool otherFoilAppsInstalled: FoilNotes.otherFoilAppsInstalled
@@ -207,11 +208,11 @@ Page {
 
             width: Theme.itemSizeHuge
             height: width
-            color: Theme.rgba(Theme.primaryColor, HarbourTheme.opacityFaint * HarbourTheme.opacityLow)
+            color: Theme.rgba(Theme.primaryColor, FoilNotes.opacityFaint * FoilNotes.opacityLow)
             radius: width/2
 
             Image {
-                source: HarbourTheme.darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
+                source: darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
                 height: Math.floor(circle.height * 5 / 8)
                 sourceSize.height: height
                 anchors.centerIn: circle

@@ -173,7 +173,7 @@ Page {
                     }
                     width: parent.width
                     color: page.color
-                    opacity: HarbourTheme.opacityFaint
+                    opacity: FoilNotes.opacityFaint
                 }
 
                 HarbourHighlightIcon {
@@ -216,8 +216,8 @@ Page {
                     // Pick the most different standard color out of these two:
                     readonly property color pagenrColor1: Theme.primaryColor
                     readonly property color pagenrColor2: Theme.highlightBackgroundColor
-                    readonly property real pagenrColorDiff1: HarbourTheme.colorDifference(page.color, pagenrColor1)
-                    readonly property real pagenrColorDiff2: HarbourTheme.colorDifference(page.color, pagenrColor2)
+                    readonly property real pagenrColorDiff1: FoilNotes.colorDifference(page.color, pagenrColor1)
+                    readonly property real pagenrColorDiff2: FoilNotes.colorDifference(page.color, pagenrColor2)
                     readonly property color pagenrColor: (pagenrColorDiff2 > pagenrColorDiff2) ? pagenrColor2 : pagenrColor1
 
                     Loader {

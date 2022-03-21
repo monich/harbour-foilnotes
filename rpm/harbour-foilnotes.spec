@@ -24,6 +24,25 @@ BuildRequires:  qt5-qttools-linguist
 %description
 Notes encryption application.
 
+%if "%{?vendor}" == "chum"
+Categories:
+ - Utility
+Icon: https://raw.githubusercontent.com/monich/harbour-foilnotes/master/icons/harbour-foilnotes.svg
+Screenshots:
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-001.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-002.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-003.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-004.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-005.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-006.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-007.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-008.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-009.png
+- https://home.monich.net/chum/harbour-foilnotes/screenshots/screenshot-010.png
+Url:
+  Homepage: https://openrepos.net/content/slava/foil-notes
+%endif
+
 %prep
 %setup -q -n %{name}-%{version}
 

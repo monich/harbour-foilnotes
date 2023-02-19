@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2023 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -11,8 +11,8 @@
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
+ *      notice, this list of conditions and the following disclaimer
+ *      in the documentation and/or other materials provided with the
  *      distribution.
  *   3. Neither the names of the copyright holders nor the names of its
  *      contributors may be used to endorse or promote products derived
@@ -36,12 +36,7 @@
 
 #include <qnamespace.h>
 
-#ifdef OPENREPOS
-#  define FOILNOTES_APP_NAME        "openrepos-foilnotes"
-#else
-#  define FOILNOTES_APP_NAME        "harbour-foilnotes"
-#endif
-
+#define FOILNOTES_APP_NAME          "harbour-foilnotes"
 #define FOILNOTES_QML_IMPORT        "harbour.foilnotes"
 #define FOILNOTES_DCONF_ROOT        "/apps/" FOILNOTES_APP_NAME "/"
 

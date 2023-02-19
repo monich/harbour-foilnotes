@@ -394,5 +394,20 @@
         <extracomment>Full screen info label</extracomment>
         <translation type="unfinished">在 Foil Notes 全屏运行时触摸另一个支持 NFC 的设备</translation>
     </message>
+    <message id="foilnotes-settings_page-header-version">
+        <source>Version %1</source>
+        <extracomment>Settings page header description (app version)</extracomment>
+        <translation type="unfinished">版本 %1</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock-text">
+        <source>Automatic locking</source>
+        <extracomment>Text switch label</extracomment>
+        <translation type="unfinished">自动锁定</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock-description">
+        <source>Require to enter Foil password after unlocking the screen.</source>
+        <extracomment>Text switch description</extracomment>
+        <translation type="unfinished">解锁屏幕后需要输入Foil密码。</translation>
+    </message>
 </context>
 </TS>

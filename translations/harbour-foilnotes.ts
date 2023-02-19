@@ -397,5 +397,20 @@
         <extracomment>Full screen info label</extracomment>
         <translation>Touch another NFC capable device with Foil Notes running full screen.</translation>
     </message>
+    <message id="foilnotes-settings_page-header-version">
+        <source>Version %1</source>
+        <extracomment>Settings page header description (app version)</extracomment>
+        <translation>Version %1</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock-text">
+        <source>Automatic locking</source>
+        <extracomment>Text switch label</extracomment>
+        <translation>Automatic locking</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock-description">
+        <source>Require to enter Foil password after unlocking the screen.</source>
+        <extracomment>Text switch description</extracomment>
+        <translation>Require to enter Foil password after unlocking the screen.</translation>
+    </message>
 </context>
 </TS>

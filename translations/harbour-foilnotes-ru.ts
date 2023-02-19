@@ -400,5 +400,20 @@
         <extracomment>Full screen info label</extracomment>
         <translation>Прикоснитесь NFC сенсором к другому устройству, на котором приложение Foil Notes открыто на весь экран. Возможно, произойдёт чудо!</translation>
     </message>
+    <message id="foilnotes-settings_page-header-version">
+        <source>Version %1</source>
+        <extracomment>Settings page header description (app version)</extracomment>
+        <translation>Версия %1</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock-text">
+        <source>Automatic locking</source>
+        <extracomment>Text switch label</extracomment>
+        <translation>Автоматическая блокировка</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock-description">
+        <source>Require to enter Foil password after unlocking the screen.</source>
+        <extracomment>Text switch description</extracomment>
+        <translation>Требовать ввода пароля после разблокировки экрана.</translation>
+    </message>
 </context>
 </TS>

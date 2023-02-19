@@ -1,0 +1,14 @@
+{
+    "translation_catalog" : "harbour-foilnotes",
+    "entries": [
+        {
+            "path": "applications/harbour-foilnotes.desktop",
+            "title": "Foil Auth",
+            "type": "page",
+            "icon": "harbour-foilnotes",
+            "params": {
+                "source": "/usr/share/harbour-foilnotes/qml/settings/settings.qml"
+            }
+        }
+    ]
+}

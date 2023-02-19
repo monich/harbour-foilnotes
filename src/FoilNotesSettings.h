@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2021 Jolla Ltd.
- * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2023 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -40,13 +40,15 @@
 class QQmlEngine;
 class QJSEngine;
 
-class FoilNotesSettings : public QObject {
+class FoilNotesSettings : public QObject
+{
     Q_OBJECT
     Q_PROPERTY(QStringList defaultColors READ defaultColors CONSTANT)
     Q_PROPERTY(QStringList availableColors READ availableColors WRITE setAvailableColors NOTIFY availableColorsChanged)
     Q_PROPERTY(int nextColorIndex READ nextColorIndex WRITE setNextColorIndex NOTIFY nextColorIndexChanged)
     Q_PROPERTY(bool sharedKeyWarning READ sharedKeyWarning WRITE setSharedKeyWarning NOTIFY sharedKeyWarningChanged)
     Q_PROPERTY(bool sharedKeyWarning2 READ sharedKeyWarning2 WRITE setSharedKeyWarning2 NOTIFY sharedKeyWarning2Changed)
+    Q_PROPERTY(bool autoLock READ autoLock WRITE setAutoLock NOTIFY autoLockChanged)
     Q_PROPERTY(int autoLockTime READ autoLockTime WRITE setAutoLockTime NOTIFY autoLockTimeChanged)
     Q_PROPERTY(bool plaintextView READ plaintextView WRITE setPlaintextView NOTIFY plaintextViewChanged)
 
@@ -55,25 +57,28 @@ public:
     ~FoilNotesSettings();
 
     // Callback for qmlRegisterSingletonType<FoilNotesSettings>
-    static QObject* createSingleton(QQmlEngine* aEngine, QJSEngine* aScript);
+    static QObject* createSingleton(QQmlEngine*, QJSEngine*);
 
     const QStringList defaultColors() const;
     QStringList availableColors() const;
-    void setAvailableColors(QStringList aColors);
+    void setAvailableColors(QStringList);
 
     int nextColorIndex() const;
-    void setNextColorIndex(int aValue);
+    void setNextColorIndex(int);
 
     bool sharedKeyWarning() const;
     bool sharedKeyWarning2() const;
-    void setSharedKeyWarning(bool aValue);
-    void setSharedKeyWarning2(bool aValue);
+    void setSharedKeyWarning(bool);
+    void setSharedKeyWarning2(bool);
+
+    bool autoLock() const;
+    void setAutoLock(bool);
 
     int autoLockTime() const;
-    void setAutoLockTime(int aValue);
+    void setAutoLockTime(int);
 
     bool plaintextView() const;
-    void setPlaintextView(bool aValue);
+    void setPlaintextView(bool);
 
     Q_INVOKABLE int pickColorIndex();
     Q_INVOKABLE QColor pickColor();
@@ -83,6 +88,7 @@ Q_SIGNALS:
     void nextColorIndexChanged();
     void sharedKeyWarningChanged();
     void sharedKeyWarning2Changed();
+    void autoLockChanged();
     void autoLockTimeChanged();
     void plaintextViewChanged();
 

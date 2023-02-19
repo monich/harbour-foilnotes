@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018-2021 Jolla Ltd.
- * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2023 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -45,11 +45,13 @@
 #define KEY_NEXT_COLOR_INDEX        DCONF_KEY("nextColorIndex")
 #define KEY_SHARED_KEY_WARNING      DCONF_KEY("sharedKeyWarning")
 #define KEY_SHARED_KEY_WARNING2     DCONF_KEY("sharedKeyWarning2")
+#define KEY_AUTO_LOCK               DCONF_KEY("autoLock")
 #define KEY_AUTO_LOCK_TIME          DCONF_KEY("autoLockTime")
 #define KEY_PLAINTEXT_VIEW          DCONF_KEY("plaintextView")
 
 #define DEFAULT_NEXT_COLOR_INDEX    0
 #define DEFAULT_SHARED_KEY_WARNING  true
+#define DEFAULT_AUTO_LOCK           true
 #define DEFAULT_AUTO_LOCK_TIME      15000
 #define DEFAULT_PLAINTEXT_VIEW      false
 
@@ -76,6 +78,7 @@ public:
     MGConfItem* iNextColorIndex;
     MGConfItem* iSharedKeyWarning;
     MGConfItem* iSharedKeyWarning2;
+    MGConfItem* iAutoLock;
     MGConfItem* iAutoLockTime;
     MGConfItem* iPlainTextView;
     const QStringList iDefaultColors;
@@ -98,6 +101,7 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
     iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent)),
     iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent)),
     iSharedKeyWarning2(new MGConfItem(KEY_SHARED_KEY_WARNING2, aParent)),
+    iAutoLock(new MGConfItem(KEY_AUTO_LOCK, aParent)),
     iAutoLockTime(new MGConfItem(KEY_AUTO_LOCK_TIME, aParent)),
     iPlainTextView(new MGConfItem(KEY_PLAINTEXT_VIEW, aParent)),
     iDefaultColors(defaultColors()),
@@ -112,6 +116,8 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
         aParent, SIGNAL(sharedKeyWarningChanged()));
     QObject::connect(iSharedKeyWarning2, SIGNAL(valueChanged()),
         aParent, SIGNAL(sharedKeyWarning2Changed()));
+    QObject::connect(iAutoLock, SIGNAL(valueChanged()),
+        aParent, SIGNAL(autoLockChanged()));
     QObject::connect(iAutoLockTime, SIGNAL(valueChanged()),
         aParent, SIGNAL(autoLockTimeChanged()));
     QObject::connect(iPlainTextView, SIGNAL(valueChanged()),
@@ -119,7 +125,8 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
     iAvailableColors = availableColors();
 }
 
-QStringList FoilNotesSettings::Private::defaultColors()
+QStringList
+FoilNotesSettings::Private::defaultColors()
 {
     QStringList colors;
     const uint n = sizeof(gAvailableColors)/sizeof(gAvailableColors[0]);
@@ -130,12 +137,14 @@ QStringList FoilNotesSettings::Private::defaultColors()
     return colors;
 }
 
-QStringList FoilNotesSettings::Private::availableColors() const
+QStringList
+FoilNotesSettings::Private::availableColors() const
 {
     return iAvailableColorsConf->value(iDefaultColors).toStringList();
 }
 
-void FoilNotesSettings::Private::onAvailableColorsChanged()
+void
+FoilNotesSettings::Private::onAvailableColorsChanged()
 {
     const QStringList newColors(availableColors());
     if (iAvailableColors != newColors) {
@@ -162,8 +171,8 @@ FoilNotesSettings::~FoilNotesSettings()
 // Callback for qmlRegisterSingletonType<FoilNotesSettings>
 QObject*
 FoilNotesSettings::createSingleton(
-    QQmlEngine* aEngine,
-    QJSEngine* aScript)
+    QQmlEngine*,
+    QJSEngine*)
 {
     return new FoilNotesSettings();
 }
@@ -184,7 +193,8 @@ FoilNotesSettings::availableColors() const
 }
 
 void
-FoilNotesSettings::setAvailableColors(QStringList aColors)
+FoilNotesSettings::setAvailableColors(
+    QStringList aColors)
 {
     iPrivate->iAvailableColorsConf->set(aColors);
     if (iPrivate->iAvailableColors != aColors) {
@@ -254,6 +264,22 @@ FoilNotesSettings::setSharedKeyWarning2(
 {
     HDEBUG(aValue);
     iPrivate->iSharedKeyWarning2->set(aValue);
+}
+
+// autoLock
+
+bool
+FoilNotesSettings::autoLock() const
+{
+    return iPrivate->iAutoLock->value(DEFAULT_AUTO_LOCK).toBool();
+}
+
+void
+FoilNotesSettings::setAutoLock(
+    bool aValue)
+{
+    HDEBUG(aValue);
+    iPrivate->iAutoLock->set(aValue);
 }
 
 // autoLockTime

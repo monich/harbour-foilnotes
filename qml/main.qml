@@ -169,7 +169,7 @@ ApplicationWindow {
                     popAll()
                     pageStack.navigateForward(PageStackAction.Immediate)
                     FoilNotesPlaintextModel.addNote(color, body)
-                    plaintextPage.openNote(0, 1, color, body, PageStackAction.Immediate)
+                    plaintextPage.openFirstNote(color, body, PageStackAction.Immediate)
                     nfcNoteNotification.publish()
                 }
             }

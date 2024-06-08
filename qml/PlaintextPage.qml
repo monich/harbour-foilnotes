@@ -21,8 +21,8 @@ Page {
     readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
         pageStack.find(function (pageOnStack) { return (thisPage === pageOnStack) })
 
-    function openNote(index, pagenr, color, body, transition) {
-        grid.openNote(index, pagenr, color, body, transition)
+    function openFirstNote(color, body, transition) {
+        grid.openFirstNote(color, body, transition)
     }
 
     function encryptNoteAt(row) {

@@ -30,19 +30,23 @@ SilicaGridView {
         contextMenuItem.modelIndex - (contextMenuItem.modelIndex % columnCount) + columnCount : 0
     readonly property int expandHeight: contextMenu ? contextMenu.height : 0
 
-    function openNote(index,pagenr,color,body,transition) {
-        model.textIndex = index
-        currentIndex = index
+    function openFirstNote(color,body,transition) {
+        _openNote(function() {return 0}, function() {return 1},color,body,transition)
+    }
+
+    function _openNote(indexFn,pagenrFn,color,body,transition) {
+        model.textIndex = indexFn()
         var notePage = pageStack.push(notePageComponent, {
-            pagenr: pagenr,
+            pagenr: pagenrFn(),
             color: color,
             body: body,
             secret: secret,
             allowedOrientations: allowedOrientations,
             actionMenuText: noteActionMenuText
         }, transition)
-        notePage.colorChanged.connect(function() { model.setColorAt(index,notePage.color) })
-        notePage.saveBody.connect(function(body) { model.setBodyAt(index,body) })
+        notePage.pagenr = Qt.binding(pagenrFn)
+        notePage.colorChanged.connect(function() { model.setColorAt(indexFn(), notePage.color) })
+        notePage.saveBody.connect(function(body) { model.setBodyAt(indexFn(),body) })
         notePage.deleteNote.connect(function() {
             currentItem.deleteNote()
             pageStack.pop()
@@ -81,7 +85,6 @@ SilicaGridView {
                 if (notePage.body.length > 0) {
                     model.setBodyAt(0, notePage.body)
                     grid.positionViewAtBeginning()
-                    grid.currentIndex = 0
                     grid.currentItem.deleteNote()
                 } else {
                     model.deleteNoteAt(0)
@@ -89,7 +92,6 @@ SilicaGridView {
             } else if (notePage.body.length > 0) {
                 model.addNote(notePage.color, body)
                 grid.positionViewAtBeginning()
-                grid.currentIndex = 0
                 grid.currentItem.deleteNote()
             }
             pageStack.pop()
@@ -185,7 +187,8 @@ SilicaGridView {
 
             onClicked: {
                 if (!model.busy) {
-                    openNote(modelIndex, model.pagenr, model.color, modelText, PageStackAction.Animated)
+                    _openNote(function() { return modelIndex }, function() { return model.pagenr },
+                        model.color, modelText, PageStackAction.Animated)
                 }
             }
 

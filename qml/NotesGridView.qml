@@ -36,6 +36,7 @@ SilicaGridView {
 
     function _openNote(indexFn,pagenrFn,color,body,transition) {
         model.textIndex = indexFn()
+        currentIndex = model.textIndex
         var notePage = pageStack.push(notePageComponent, {
             pagenr: pagenrFn(),
             color: color,

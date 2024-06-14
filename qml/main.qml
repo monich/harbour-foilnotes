@@ -37,17 +37,28 @@ ApplicationWindow {
         pageStack.pop(firstPage, PageStackAction.Immediate)
     }
 
-    Binding {
-        target: FoilNotesNfcShareService
-        property: "active"
-        value: !jailed && NfcSystem.version >= NfcSystem.Version_1_1_0 && Qt.application.active
+    function resetAutoLock() {
+        lockTimer.stop()
+        if (FoilNotesSettings.autoLock && HarbourSystemState.locked) {
+            lockTimer.start()
+        }
     }
 
     Timer {
         id: lockTimer
 
         interval: FoilNotesSettings.autoLockTime
-        onTriggered: FoilNotesModel.lock(true);
+        onTriggered: FoilNotesModel.lock(false);
+    }
+
+    Connections {
+        target: HarbourSystemState
+        onLockedChanged: resetAutoLock()
+    }
+
+    Connections {
+        target: FoilNotesSettings
+        onAutoLockChanged: resetAutoLock()
     }
 
     Connections {
@@ -55,43 +66,10 @@ ApplicationWindow {
         onEncryptionDone: FoilNotesPlaintextModel.onEncryptionDone(requestId, success)
     }
 
-    Connections {
-        target: HarbourSystemState
-        property bool wasDimmed
-
-        onDisplayStatusChanged: {
-            if (HarbourSystemState.displayStatus === HarbourSystemState.MCE_DISPLAY_DIM) {
-                wasDimmed = true
-            } else if (target.displayStatus === HarbourSystemState.MCE_DISPLAY_ON) {
-                wasDimmed = false
-            }
-        }
-
-        onLockedChanged: {
-            lockTimer.stop()
-            if (FoilNotesSettings.autoLock && HarbourSystemState.locked) {
-                if (wasDimmed) {
-                    // Give the user some time to wake wake up the screen
-                    // and prevent encrypted pictures from being locked
-                    lockTimer.start()
-                } else {
-                    FoilNotesModel.lock(false);
-                }
-            }
-        }
-    }
-
-    Connections {
-        target: FoilNotesSettings
-
-        onAutoLockChanged: {
-            lockTimer.stop()
-            // It's so unlikely that settings change when the device is locked
-            // But it's possible!
-            if (FoilNotesSettings.autoLock && HarbourSystemState.locked) {
-                FoilAuthModel.lock(false);
-            }
-        }
+    Binding {
+        target: FoilNotesNfcShareService
+        property: "active"
+        value: !jailed && NfcSystem.version >= NfcSystem.Version_1_1_0 && Qt.application.active
     }
 
     Component {

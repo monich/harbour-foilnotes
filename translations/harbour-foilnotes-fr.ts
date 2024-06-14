@@ -408,9 +408,35 @@
         <translation type="unfinished">Verrouillage automatique</translation>
     </message>
     <message id="foilnotes-settings_page-autolock-description">
-        <source>Require to enter Foil password after unlocking the screen.</source>
+        <source>Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen.</source>
         <extracomment>Text switch description</extracomment>
-        <translation type="unfinished">Nécessite d&apos;entrer le mot de passe Foil après avoir déverrouillé l&apos;écran.</translation>
+        <translation type="unfinished">Verrouiller automatiquement les notes lorsque l&apos;écran est verrouillé et demander d&apos;entrer saisir le mot de passe Foil après avoir déverrouillé l&apos;écran.</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-label">
+        <source>Locking delay</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">Délai de verrouillage</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-no_delay">
+        <source>No delay</source>
+        <extracomment>Slider value (no delay)</extracomment>
+        <translation type="unfinished">Sans délais</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-min" numerus="yes">
+        <source>%1 min</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 min</numerusform>
+            <numerusform>%1 min</numerusform>
+        </translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
+        <source>%1 sec</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 sec</numerusform>
+            <numerusform>%1 sec</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

@@ -411,9 +411,37 @@
         <translation>Автоматическая блокировка</translation>
     </message>
     <message id="foilnotes-settings_page-autolock-description">
-        <source>Require to enter Foil password after unlocking the screen.</source>
+        <source>Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen.</source>
         <extracomment>Text switch description</extracomment>
-        <translation>Требовать ввода пароля после разблокировки экрана.</translation>
+        <translation>Блокировать заметки когда блокируется экран и требовать ввода пароля после разблокировки экрана.</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-label">
+        <source>Locking delay</source>
+        <extracomment>Slider label</extracomment>
+        <translation>Задержка блокировки</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-no_delay">
+        <source>No delay</source>
+        <extracomment>Slider value (no delay)</extracomment>
+        <translation>Немедленно</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-min" numerus="yes">
+        <source>%1 min</source>
+        <extracomment>Slider value</extracomment>
+        <translation>
+            <numerusform>%1 мин</numerusform>
+            <numerusform>%1 мин</numerusform>
+            <numerusform>%1 мин</numerusform>
+        </translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
+        <source>%1 sec</source>
+        <extracomment>Slider value</extracomment>
+        <translation>
+            <numerusform>%1 сек</numerusform>
+            <numerusform>%1 сек</numerusform>
+            <numerusform>%1 сек</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

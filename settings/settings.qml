@@ -13,10 +13,11 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: content.height
+        contentHeight: content.height + content.padding
 
         Column {
             id: content
+
             width: parent.width
 
             PageHeader {
@@ -49,7 +50,7 @@ Page {
                 //% "Automatic locking"
                 text: qsTrId("foilnotes-settings_page-autolock-text")
                 //: Text switch description
-                //% "Require to enter Foil password after unlocking the screen."
+                //% "Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen."
                 description: qsTrId("foilnotes-settings_page-autolock-description")
                 automaticCheck: false
                 checked: autoLockConfig.value
@@ -60,6 +61,43 @@ Page {
 
                     key: _rootPath + "autoLock"
                     defaultValue: true
+                }
+            }
+
+            Slider {
+                readonly property int min: value /60
+                readonly property int sec: value  % 60
+
+                visible: opacity > 0
+                opacity: autoLockConfig.value ? 1.0 : 0.0
+                width: parent.width
+                minimumValue: 0
+                maximumValue: 300
+                value: autoLockTimeConfig.value / 1000
+                stepSize: 5
+                //: Slider label
+                //% "Locking delay"
+                label: qsTrId("foilnotes-settings_page-autolock_delay-label")
+                valueText: !value ?
+                    //: Slider value (no delay)
+                    //% "No delay"
+                    qsTrId("foilnotes-settings_page-autolock_delay-value-no_delay") :
+                    //: Slider value
+                    //% "%1 sec"
+                    !min ? qsTrId("foilnotes-settings_page-autolock_delay-value-sec",value).arg(sec) :
+                    //: Slider value
+                    //% "%1 min"
+                    !sec ? qsTrId("foilnotes-settings_page-autolock_delay-value-min",value).arg(min) :
+                    qsTrId("foilnotes-settings_page-autolock_delay-value-min",value).arg(min) + " " +
+                    qsTrId("foilnotes-settings_page-autolock_delay-value-sec",value).arg(sec)
+                onSliderValueChanged: autoLockTimeConfig.value = value * 1000
+                Behavior on opacity { FadeAnimation { } }
+
+                ConfigurationValue {
+                    id: autoLockTimeConfig
+
+                    key: _rootPath + "autoLockTime"
+                    defaultValue: 15000
                 }
             }
         }

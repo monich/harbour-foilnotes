@@ -408,9 +408,35 @@
         <translation>Automatisk låsning</translation>
     </message>
     <message id="foilnotes-settings_page-autolock-description">
-        <source>Require to enter Foil password after unlocking the screen.</source>
+        <source>Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen.</source>
         <extracomment>Text switch description</extracomment>
-        <translation>Kräv Foil-lösenord efter att skärmen låsts upp.</translation>
+        <translation type="unfinished">Lås automatiskt anteckningar när skärmen är låst och uppmanas att ange Foil-lösenord efter att skärmen har låsts upp.</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-label">
+        <source>Locking delay</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">Låsningsfördröjning</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-no_delay">
+        <source>No delay</source>
+        <extracomment>Slider value (no delay)</extracomment>
+        <translation type="unfinished">Ingen försening</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-min" numerus="yes">
+        <source>%1 min</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 min</numerusform>
+            <numerusform>%1 min</numerusform>
+        </translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
+        <source>%1 sec</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 sek</numerusform>
+            <numerusform>%1 sek</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

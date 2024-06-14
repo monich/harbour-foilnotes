@@ -405,9 +405,33 @@
         <translation type="unfinished">自动锁定</translation>
     </message>
     <message id="foilnotes-settings_page-autolock-description">
-        <source>Require to enter Foil password after unlocking the screen.</source>
+        <source>Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen.</source>
         <extracomment>Text switch description</extracomment>
-        <translation type="unfinished">解锁屏幕后需要输入Foil密码。</translation>
+        <translation type="unfinished">屏幕锁定时自动锁定笔记，屏幕解锁后提示输入 Foil 密码。</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-label">
+        <source>Locking delay</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">锁定延迟</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-no_delay">
+        <source>No delay</source>
+        <extracomment>Slider value (no delay)</extracomment>
+        <translation type="unfinished">无延迟</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-min" numerus="yes">
+        <source>%1 min</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 分钟</numerusform>
+        </translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
+        <source>%1 sec</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 秒</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

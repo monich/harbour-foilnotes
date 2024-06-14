@@ -411,9 +411,37 @@
         <translation>Automatyczne blokowanie</translation>
     </message>
     <message id="foilnotes-settings_page-autolock-description">
-        <source>Require to enter Foil password after unlocking the screen.</source>
+        <source>Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen.</source>
         <extracomment>Text switch description</extracomment>
-        <translation>Wymagaj podania Foil hasła po odblokowaniu ekranu.</translation>
+        <translation type="unfinished">Blokuj notatki, gdy ekran jest zablokowany, i wymagaj Foil hasła po odblokowaniu ekranu.</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-label">
+        <source>Locking delay</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">Opóźnienie blokady</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-no_delay">
+        <source>No delay</source>
+        <extracomment>Slider value (no delay)</extracomment>
+        <translation type="unfinished">Natychmiast</translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-min" numerus="yes">
+        <source>%1 min</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 min</numerusform>
+            <numerusform>%1 min</numerusform>
+            <numerusform>%1 min</numerusform>
+        </translation>
+    </message>
+    <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
+        <source>%1 sec</source>
+        <extracomment>Slider value</extracomment>
+        <translation type="unfinished">
+            <numerusform>%1 sek</numerusform>
+            <numerusform>%1 sek</numerusform>
+            <numerusform>%1 sek</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

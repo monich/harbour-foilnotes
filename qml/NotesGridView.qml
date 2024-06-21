@@ -70,6 +70,7 @@ SilicaGridView {
             if (noteCreated) {
                 if (body.length > 0) {
                     model.setBodyAt(0, body)
+                    model.setColorAt(0, notePage.color)
                 } else {
                     model.textIndex = -1
                     model.deleteNoteAt(0)
@@ -78,6 +79,7 @@ SilicaGridView {
             } else if (body.length > 0) {
                 model.addNote(notePage.color, body)
                 model.textIndex = 0
+                currentIndex = 0
                 noteCreated = true
             }
         })
@@ -85,16 +87,20 @@ SilicaGridView {
             if (noteCreated) {
                 if (notePage.body.length > 0) {
                     model.setBodyAt(0, notePage.body)
+                    model.setColorAt(0, notePage.color)
                     grid.positionViewAtBeginning()
                     grid.currentItem.deleteNote()
                 } else {
                     model.deleteNoteAt(0)
                 }
             } else if (notePage.body.length > 0) {
-                model.addNote(notePage.color, body)
+                model.addNote(notePage.color, notePage.body)
+                currentIndex = 0
                 grid.positionViewAtBeginning()
                 grid.currentItem.deleteNote()
             }
+            // Reset the dirty flag to prevent save on pop
+            notePage.dirty = false
             pageStack.pop()
         })
     }

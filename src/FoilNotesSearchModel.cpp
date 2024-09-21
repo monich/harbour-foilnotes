@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2018-2024 Slava Monich <slava@monich.com>
  * Copyright (C) 2018-2019 Jolla Ltd.
- * Copyright (C) 2018-2019 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,27 +8,33 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #include "FoilNotesSearchModel.h"
@@ -40,19 +46,21 @@
 // FoilNotesSearchModel::Private
 // ==========================================================================
 
-class FoilNotesSearchModel::Private : public QObject {
+class FoilNotesSearchModel::Private :
+    public QObject
+{
     Q_OBJECT
 
 public:
     static const char PROP_TEXT_INDEX[];
 
-    Private(FoilNotesSearchModel* aParent);
+    Private(FoilNotesSearchModel*);
 
-    static int findRole(QAbstractItemModel* aModel, QString aRole);
+    static int findRole(QAbstractItemModel*, QString);
 
     FoilNotesSearchModel* parentModel();
-    int mapToSource(int aRow) const;
-    int mapFromSource(int aRow) const;
+    int mapToSource(int) const;
+    int mapFromSource(int) const;
 
     void updateFilterRole();
 
@@ -66,18 +74,23 @@ public:
 
 const char FoilNotesSearchModel::Private::PROP_TEXT_INDEX[] = "textIndex";
 
-FoilNotesSearchModel::Private::Private(FoilNotesSearchModel* aParent) :
+FoilNotesSearchModel::Private::Private(
+    FoilNotesSearchModel* aParent) :
     QObject(aParent),
     iTextIndex(-1)
 {
 }
 
-inline FoilNotesSearchModel* FoilNotesSearchModel::Private::parentModel()
+inline FoilNotesSearchModel*
+FoilNotesSearchModel::Private::parentModel()
 {
     return qobject_cast<FoilNotesSearchModel*>(parent());
 }
 
-int FoilNotesSearchModel::Private::findRole(QAbstractItemModel* aModel, QString aRole)
+int
+FoilNotesSearchModel::Private::findRole(
+    QAbstractItemModel* aModel,
+    QString aRole)
 {
     if (aModel && !aRole.isEmpty()) {
         const QByteArray roleName(aRole.toUtf8());
@@ -96,14 +109,16 @@ int FoilNotesSearchModel::Private::findRole(QAbstractItemModel* aModel, QString 
     return -1;
 }
 
-void FoilNotesSearchModel::Private::updateFilterRole()
+void
+FoilNotesSearchModel::Private::updateFilterRole()
 {
     QSortFilterProxyModel* model = parentModel();
     const int role = findRole(model->sourceModel(), iFilterRole);
     model->setFilterRole((role >= 0) ? role : Qt::DisplayRole);
 }
 
-void FoilNotesSearchModel::Private::updateTextIndex()
+void
+FoilNotesSearchModel::Private::updateTextIndex()
 {
     FoilNotesSearchModel* model = parentModel();
     QAbstractItemModel* source = model->sourceModel();
@@ -130,7 +145,8 @@ void FoilNotesSearchModel::Private::updateTextIndex()
 
 #define SUPER QSortFilterProxyModel
 
-FoilNotesSearchModel::FoilNotesSearchModel(QObject* aParent) :
+FoilNotesSearchModel::FoilNotesSearchModel(
+    QObject* aParent) :
     SUPER(aParent),
     iPrivate(new Private(this))
 {
@@ -143,12 +159,16 @@ FoilNotesSearchModel::~FoilNotesSearchModel()
     delete iPrivate;
 }
 
-void FoilNotesSearchModel::setSourceModelObject(QObject* aModel)
+void
+FoilNotesSearchModel::setSourceModelObject(
+    QObject* aModel)
 {
     setSourceModel(qobject_cast<QAbstractItemModel*>(aModel));
 }
 
-void FoilNotesSearchModel::setSourceModel(QAbstractItemModel* aModel)
+void
+FoilNotesSearchModel::setSourceModel(
+    QAbstractItemModel* aModel)
 {
     QAbstractItemModel* source = sourceModel();
     if (source != aModel) {
@@ -170,12 +190,15 @@ void FoilNotesSearchModel::setSourceModel(QAbstractItemModel* aModel)
     }
 }
 
-QString FoilNotesSearchModel::filterRoleName() const
+QString
+FoilNotesSearchModel::filterRoleName() const
 {
     return iPrivate->iFilterRole;
 }
 
-void FoilNotesSearchModel::setFilterRoleName(QString aRoleName)
+void
+FoilNotesSearchModel::setFilterRoleName(
+    QString aRoleName)
 {
     if (iPrivate->iFilterRole != aRoleName) {
         iPrivate->iFilterRole = aRoleName;
@@ -184,12 +207,15 @@ void FoilNotesSearchModel::setFilterRoleName(QString aRoleName)
     }
 }
 
-int FoilNotesSearchModel::textIndex() const
+int
+FoilNotesSearchModel::textIndex() const
 {
     return iPrivate->iTextIndex;
 }
 
-void FoilNotesSearchModel::setTextIndex(int aIndex)
+void
+FoilNotesSearchModel::setTextIndex(
+    int aIndex)
 {
     QObject* source = sourceModel();
     if (source) {
@@ -200,19 +226,9 @@ void FoilNotesSearchModel::setTextIndex(int aIndex)
     }
 }
 
-void FoilNotesSearchModel::deleteNoteAt(int aRow)
-{
-    HDEBUG(aRow);
-    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
-    if (source) {
-        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
-        if (sourceIndex.isValid()) {
-            source->deleteNoteAt(sourceIndex.row());
-        }
-    }
-}
-
-QVariantMap FoilNotesSearchModel::get(int aRow) const
+QVariantMap
+FoilNotesSearchModel::get(
+    int aRow) const
 {
     HDEBUG(aRow);
     FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
@@ -225,7 +241,9 @@ QVariantMap FoilNotesSearchModel::get(int aRow) const
     return QVariantMap();
 }
 
-int FoilNotesSearchModel::sourceRow(int aRow) const
+int
+FoilNotesSearchModel::sourceRow(
+    int aRow) const
 {
     FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
     if (source) {
@@ -236,6 +254,62 @@ int FoilNotesSearchModel::sourceRow(int aRow) const
         }
     }
     return -1;
+}
+
+void
+FoilNotesSearchModel::addNote(
+    QColor aColor,
+    QString aBody)
+{
+    HDEBUG(aColor << aBody);
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        source->addNote(aColor, aBody);
+    }
+}
+
+void
+FoilNotesSearchModel::setBodyAt(
+    int aRow,
+    QString aBody)
+{
+    HDEBUG(aRow << aBody);
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
+        if (sourceIndex.isValid()) {
+            source->setBodyAt(sourceIndex.row(), aBody);
+        }
+    }
+}
+
+void
+FoilNotesSearchModel::setColorAt(
+    int aRow,
+    QColor aColor)
+{
+    HDEBUG(aRow << aColor);
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
+        if (sourceIndex.isValid()) {
+            source->setColorAt(sourceIndex.row(), aColor);
+        }
+    }
+}
+
+void
+FoilNotesSearchModel::deleteNoteAt(
+    int aRow)
+{
+    HDEBUG(aRow);
+    FoilNotesBaseModel* source = qobject_cast<FoilNotesBaseModel*>(sourceModel());
+    if (source) {
+        QModelIndex sourceIndex = mapToSource(index(aRow, 0));
+        if (sourceIndex.isValid()) {
+            source->deleteNoteAt(sourceIndex.row());
+        }
+    }
 }
 
 #include "FoilNotesSearchModel.moc"

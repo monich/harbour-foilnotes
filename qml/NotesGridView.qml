@@ -146,6 +146,7 @@ SilicaGridView {
             readonly property bool selected: grid.showSelection && model.selected
             readonly property bool highlighted: down || menuOpen || selected
             readonly property int modelIndex: model.index
+            readonly property int modelPageNr: model.pagenr
             readonly property string modelText: model.body
             readonly property bool menuOpen: grid.contextMenuItem === noteDelegate
             readonly property real contentYOffset: index >= grid.minOffsetIndex ? grid.expandHeight : 0.0
@@ -194,7 +195,7 @@ SilicaGridView {
 
             onClicked: {
                 if (!model.busy) {
-                    _openNote(function() { return modelIndex }, function() { return model.pagenr },
+                    _openNote(function() { return modelIndex }, function() { return modelPageNr },
                         model.color, modelText, PageStackAction.Animated)
                 }
             }

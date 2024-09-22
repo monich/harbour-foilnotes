@@ -28,7 +28,7 @@ Page {
                 description: applicationName ?
                     //: Settings page header description (app version)
                     //% "Version %1"
-                    qsTrId("foilnotes-settings_page-header-version").arg("1.1.4") : ""
+                    qsTrId("foilnotes-settings_page-header-version").arg("1.1.5") : ""
 
                 Image {
                     id: appIcon

@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "Utils.js" as Utils
 import "harbour"
 
 Item {
@@ -82,10 +83,7 @@ Item {
             lineHeightMode: Text.FixedHeight
             lineHeight: font.pixelSize + Theme.paddingSmall
             wrapMode: Text.Wrap
-            font {
-                family: Theme.fontFamily
-                pixelSize: Theme.fontSizeSmall
-            }
+            font.pixelSize: Utils.fontPixelSize(FoilNotesSettings.gridFontSize, Theme.fontSizeSmall)
             color: highlighted ? Theme.highlightColor : Theme.primaryColor
             maximumLineCount: maxPaintedLines + 1
             readonly property real bottomMargin: Theme.paddingLarge + colorRect.height

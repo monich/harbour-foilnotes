@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "Utils.js" as Utils
 import "harbour"
 
 Page {
@@ -280,10 +281,7 @@ Page {
 
             TextArea {
                 id: textArea
-                font {
-                    family: Theme.fontFamily
-                    pixelSize: Theme.fontSizeMedium
-                }
+                font.pixelSize: Utils.fontPixelSize(FoilNotesSettings.editorFontSize, Theme.fontSizeMedium)
                 width: parent.width
                 height: Math.max(noteview.height - headerItem.height, implicitHeight)
                 //: Placeholder text for new notes. At this point there is nothing else on the screen.

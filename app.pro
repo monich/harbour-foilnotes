@@ -75,6 +75,7 @@ LIBS += libqrencode.a -ldl
 OTHER_FILES += \
     LICENSE \
     *.desktop \
+    qml/*.js \
     qml/*.qml \
     qml/images/*.svg \
     icons/*.svg \

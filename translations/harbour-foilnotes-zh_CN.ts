@@ -399,6 +399,26 @@
         <extracomment>Settings page header description (app version)</extracomment>
         <translation type="unfinished">版本 %1</translation>
     </message>
+    <message id="foilnotes-settings_page-section-appearance">
+        <source>Appearance</source>
+        <extracomment>Section label</extracomment>
+        <translation type="unfinished">外貌</translation>
+    </message>
+    <message id="foilnotes-settings_page-grid_font_size-label">
+        <source>Grid text size</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">网格文字大小</translation>
+    </message>
+    <message id="foilnotes-settings_page-editor_font_size-label">
+        <source>Editor text size</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">编辑器文字大小</translation>
+    </message>
+    <message id="foilnotes-settings_page-section-security">
+        <source>Security</source>
+        <extracomment>Section label</extracomment>
+        <translation type="unfinished">安全性</translation>
+    </message>
     <message id="foilnotes-settings_page-autolock-text">
         <source>Automatic locking</source>
         <extracomment>Text switch label</extracomment>

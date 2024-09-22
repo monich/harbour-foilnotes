@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2018-2024 Slava Monich <slava@monich.com>
  * Copyright (C) 2018-2021 Jolla Ltd.
- * Copyright (C) 2018-2023 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,27 +8,33 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer
- *      in the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #include "FoilNotesSettings.h"
@@ -38,28 +44,31 @@
 
 #include <MGConfItem>
 
-#include <QQmlEngine>
-
 #define DCONF_KEY(x)                FOILNOTES_DCONF_ROOT x
 #define KEY_AVAILABLE_COLORS        DCONF_KEY("availableColors")
 #define KEY_NEXT_COLOR_INDEX        DCONF_KEY("nextColorIndex")
 #define KEY_SHARED_KEY_WARNING      DCONF_KEY("sharedKeyWarning")
 #define KEY_SHARED_KEY_WARNING2     DCONF_KEY("sharedKeyWarning2")
+#define KEY_PLAINTEXT_VIEW          DCONF_KEY("plaintextView")
+#define KEY_GRID_FONT_SIZE          DCONF_KEY("gridFontSize")
+#define KEY_EDITOR_FINT_SIZE        DCONF_KEY("editorFontSize")
 #define KEY_AUTO_LOCK               DCONF_KEY("autoLock")
 #define KEY_AUTO_LOCK_TIME          DCONF_KEY("autoLockTime")
-#define KEY_PLAINTEXT_VIEW          DCONF_KEY("plaintextView")
 
 #define DEFAULT_NEXT_COLOR_INDEX    0
 #define DEFAULT_SHARED_KEY_WARNING  true
+#define DEFAULT_PLAINTEXT_VIEW      false
+#define DEFAULT_GRID_FONT_SIZE      QStringLiteral("small")
+#define DEFAULT_EDITOR_FONT_SIZE    QStringLiteral("medium")
 #define DEFAULT_AUTO_LOCK           true
 #define DEFAULT_AUTO_LOCK_TIME      15000
-#define DEFAULT_PLAINTEXT_VIEW      false
 
 // ==========================================================================
 // FoilNotesSettings::Private
 // ==========================================================================
 
-class FoilNotesSettings::Private : public QObject
+class FoilNotesSettings::Private :
+    public QObject
 {
     Q_OBJECT
     static const char* gAvailableColors[];
@@ -78,9 +87,11 @@ public:
     MGConfItem* iNextColorIndex;
     MGConfItem* iSharedKeyWarning;
     MGConfItem* iSharedKeyWarning2;
+    MGConfItem* iPlainTextView;
+    MGConfItem* iGridFontSize;
+    MGConfItem* iEditorFontSize;
     MGConfItem* iAutoLock;
     MGConfItem* iAutoLockTime;
-    MGConfItem* iPlainTextView;
     const QStringList iDefaultColors;
     QStringList iAvailableColors;
     QVariant iDefaultSharedKeyWarning;
@@ -101,9 +112,11 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
     iNextColorIndex(new MGConfItem(KEY_NEXT_COLOR_INDEX, aParent)),
     iSharedKeyWarning(new MGConfItem(KEY_SHARED_KEY_WARNING, aParent)),
     iSharedKeyWarning2(new MGConfItem(KEY_SHARED_KEY_WARNING2, aParent)),
+    iPlainTextView(new MGConfItem(KEY_PLAINTEXT_VIEW, aParent)),
+    iGridFontSize(new MGConfItem(KEY_GRID_FONT_SIZE, aParent)),
+    iEditorFontSize(new MGConfItem(KEY_EDITOR_FINT_SIZE, aParent)),
     iAutoLock(new MGConfItem(KEY_AUTO_LOCK, aParent)),
     iAutoLockTime(new MGConfItem(KEY_AUTO_LOCK_TIME, aParent)),
-    iPlainTextView(new MGConfItem(KEY_PLAINTEXT_VIEW, aParent)),
     iDefaultColors(defaultColors()),
     iDefaultSharedKeyWarning(DEFAULT_SHARED_KEY_WARNING),
     iDefaultAutoLockTime(DEFAULT_AUTO_LOCK_TIME)
@@ -116,12 +129,16 @@ FoilNotesSettings::Private::Private(QObject* aParent) :
         aParent, SIGNAL(sharedKeyWarningChanged()));
     QObject::connect(iSharedKeyWarning2, SIGNAL(valueChanged()),
         aParent, SIGNAL(sharedKeyWarning2Changed()));
+    QObject::connect(iPlainTextView, SIGNAL(valueChanged()),
+        aParent, SIGNAL(plaintextViewChanged()));
+    QObject::connect(iGridFontSize, SIGNAL(valueChanged()),
+        aParent, SIGNAL(gridFontSizeChanged()));
+    QObject::connect(iEditorFontSize, SIGNAL(valueChanged()),
+        aParent, SIGNAL(editorFontSizeChanged()));
     QObject::connect(iAutoLock, SIGNAL(valueChanged()),
         aParent, SIGNAL(autoLockChanged()));
     QObject::connect(iAutoLockTime, SIGNAL(valueChanged()),
         aParent, SIGNAL(autoLockTimeChanged()));
-    QObject::connect(iPlainTextView, SIGNAL(valueChanged()),
-        aParent, SIGNAL(plaintextViewChanged()));
     iAvailableColors = availableColors();
 }
 
@@ -266,41 +283,6 @@ FoilNotesSettings::setSharedKeyWarning2(
     iPrivate->iSharedKeyWarning2->set(aValue);
 }
 
-// autoLock
-
-bool
-FoilNotesSettings::autoLock() const
-{
-    return iPrivate->iAutoLock->value(DEFAULT_AUTO_LOCK).toBool();
-}
-
-void
-FoilNotesSettings::setAutoLock(
-    bool aValue)
-{
-    HDEBUG(aValue);
-    iPrivate->iAutoLock->set(aValue);
-}
-
-// autoLockTime
-
-int
-FoilNotesSettings::autoLockTime() const
-{
-    QVariant val(iPrivate->iAutoLockTime->value(iPrivate->iDefaultAutoLockTime));
-    bool ok;
-    const int ival(val.toInt(&ok));
-    return (ok && ival >= 0) ? ival : DEFAULT_AUTO_LOCK_TIME;
-}
-
-void
-FoilNotesSettings::setAutoLockTime(
-    int aValue)
-{
-    HDEBUG(aValue);
-    iPrivate->iAutoLockTime->set(aValue);
-}
-
 // plaintextView
 
 bool
@@ -315,6 +297,41 @@ FoilNotesSettings::setPlaintextView(
 {
     HDEBUG(aValue);
     iPrivate->iPlainTextView->set(aValue);
+}
+
+// gridFontSize
+
+QString
+FoilNotesSettings::gridFontSize() const
+{
+    return iPrivate->iGridFontSize->value(DEFAULT_GRID_FONT_SIZE).toString();
+}
+
+// editorFontSize
+
+QString
+FoilNotesSettings::editorFontSize() const
+{
+    return iPrivate->iEditorFontSize->value(DEFAULT_EDITOR_FONT_SIZE).toString();
+}
+
+// autoLock
+
+bool
+FoilNotesSettings::autoLock() const
+{
+    return iPrivate->iAutoLock->value(DEFAULT_AUTO_LOCK).toBool();
+}
+
+// autoLockTime
+
+int
+FoilNotesSettings::autoLockTime() const
+{
+    QVariant val(iPrivate->iAutoLockTime->value(iPrivate->iDefaultAutoLockTime));
+    bool ok;
+    const int ival(val.toInt(&ok));
+    return (ok && ival >= 0) ? ival : DEFAULT_AUTO_LOCK_TIME;
 }
 
 #include "FoilNotesSettings.moc"

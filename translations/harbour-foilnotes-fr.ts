@@ -402,6 +402,26 @@
         <extracomment>Settings page header description (app version)</extracomment>
         <translation type="unfinished">Version %1</translation>
     </message>
+    <message id="foilnotes-settings_page-section-appearance">
+        <source>Appearance</source>
+        <extracomment>Section label</extracomment>
+        <translation type="unfinished">Apparence</translation>
+    </message>
+    <message id="foilnotes-settings_page-grid_font_size-label">
+        <source>Grid text size</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">Liste des notes</translation>
+    </message>
+    <message id="foilnotes-settings_page-editor_font_size-label">
+        <source>Editor text size</source>
+        <extracomment>Slider label</extracomment>
+        <translation type="unfinished">Texte de la note</translation>
+    </message>
+    <message id="foilnotes-settings_page-section-security">
+        <source>Security</source>
+        <extracomment>Section label</extracomment>
+        <translation type="unfinished">Sécurité</translation>
+    </message>
     <message id="foilnotes-settings_page-autolock-text">
         <source>Automatic locking</source>
         <extracomment>Text switch label</extracomment>

@@ -405,6 +405,26 @@
         <extracomment>Settings page header description (app version)</extracomment>
         <translation>Версия %1</translation>
     </message>
+    <message id="foilnotes-settings_page-section-appearance">
+        <source>Appearance</source>
+        <extracomment>Section label</extracomment>
+        <translation>Внешний вид</translation>
+    </message>
+    <message id="foilnotes-settings_page-grid_font_size-label">
+        <source>Grid text size</source>
+        <extracomment>Slider label</extracomment>
+        <translation>Список заметок</translation>
+    </message>
+    <message id="foilnotes-settings_page-editor_font_size-label">
+        <source>Editor text size</source>
+        <extracomment>Slider label</extracomment>
+        <translation>Tекст заметки</translation>
+    </message>
+    <message id="foilnotes-settings_page-section-security">
+        <source>Security</source>
+        <extracomment>Section label</extracomment>
+        <translation>Безопасность</translation>
+    </message>
     <message id="foilnotes-settings_page-autolock-text">
         <source>Automatic locking</source>
         <extracomment>Text switch label</extracomment>

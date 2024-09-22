@@ -45,6 +45,34 @@ Page {
                 }
             }
 
+            SectionHeader {
+                //: Section label
+                //% "Appearance"
+                text: qsTrId("foilnotes-settings_page-section-appearance")
+            }
+
+            FontSizeSlider {
+                //: Slider label
+                //% "Grid text size"
+                label: qsTrId("foilnotes-settings_page-grid_font_size-label")
+                configKey: _rootPath + "gridFontSize"
+                defaultValue: "small"
+            }
+
+            FontSizeSlider {
+                //: Slider label
+                //% "Editor text size"
+                label: qsTrId("foilnotes-settings_page-editor_font_size-label")
+                configKey: _rootPath + "editorFontSize"
+                defaultValue: "medium"
+            }
+
+            SectionHeader {
+                //: Section label
+                //% "Security"
+                text: qsTrId("foilnotes-settings_page-section-security")
+            }
+
             TextSwitch {
                 //: Text switch label
                 //% "Automatic locking"

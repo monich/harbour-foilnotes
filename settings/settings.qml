@@ -93,8 +93,8 @@ Page {
             }
 
             Slider {
-                readonly property int min: value /60
-                readonly property int sec: value  % 60
+                readonly property int min: value / 60
+                readonly property int sec: value % 60
 
                 visible: opacity > 0
                 opacity: autoLockConfig.value ? 1.0 : 0.0

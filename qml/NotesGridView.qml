@@ -72,7 +72,6 @@ SilicaGridView {
                     model.setBodyAt(0, body)
                     model.setColorAt(0, notePage.color)
                 } else {
-                    model.textIndex = -1
                     model.deleteNoteAt(0)
                     noteCreated = false
                 }

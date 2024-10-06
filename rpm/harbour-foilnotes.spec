@@ -9,6 +9,7 @@ Source0:        %{name}-%{version}.tar.gz
 Requires:       sailfishsilica-qt5
 Requires:       qt5-qtsvg-plugin-imageformat-svg
 BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(keepalive)
 BuildRequires:  pkgconfig(libcrypto)
 BuildRequires:  pkgconfig(sailfishapp)
 BuildRequires:  pkgconfig(Qt5Quick)

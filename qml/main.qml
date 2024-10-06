@@ -39,12 +39,13 @@ ApplicationWindow {
 
     function resetAutoLock() {
         lockTimer.stop()
-        if (FoilNotesSettings.autoLock && HarbourSystemState.locked) {
+        if (FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady &&
+            FoilNotesSettings.autoLock && HarbourSystemState.locked) {
             lockTimer.start()
         }
     }
 
-    Timer {
+    HarbourWakeupTimer {
         id: lockTimer
 
         interval: FoilNotesSettings.autoLockTime
@@ -64,6 +65,7 @@ ApplicationWindow {
     Connections {
         target: FoilNotesModel
         onEncryptionDone: FoilNotesPlaintextModel.onEncryptionDone(requestId, success)
+        onFoilStateChanged: resetAutoLock()
     }
 
     Binding {

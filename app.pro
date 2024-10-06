@@ -8,7 +8,7 @@ openrepos {
 
 TARGET = $${PREFIX}-$${NAME}
 CONFIG += sailfishapp link_pkgconfig
-PKGCONFIG += sailfishapp mlite5 glib-2.0 gobject-2.0 gio-unix-2.0
+PKGCONFIG += sailfishapp mlite5 keepalive glib-2.0 gobject-2.0 gio-unix-2.0
 QT += qml quick sql
 
 isEmpty(VERSION) {
@@ -261,6 +261,7 @@ HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystemInfo.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystemState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourTask.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourWakeupTimer.h \
     $${HARBOUR_LIB_SRC}/HarbourMce.h
 
 SOURCES += \
@@ -273,7 +274,8 @@ SOURCES += \
     $${HARBOUR_LIB_SRC}/HarbourQrCodeImageProvider.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystemInfo.cpp \
     $${HARBOUR_LIB_SRC}/HarbourSystemState.cpp \
-    $${HARBOUR_LIB_SRC}/HarbourTask.cpp
+    $${HARBOUR_LIB_SRC}/HarbourTask.cpp \
+    $${HARBOUR_LIB_SRC}/HarbourWakeupTimer.cpp
 
 HARBOUR_QML_COMPONENTS = \
     $${HARBOUR_LIB_QML}/HarbourColorEditorDialog.qml \

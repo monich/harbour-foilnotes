@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2018-2024 Slava Monich <slava@monich.com>
  * Copyright (C) 2018-2022 Jolla Ltd.
- * Copyright (C) 2018-2022 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,27 +8,33 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer
- *      in the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #include "FoilNotesDefs.h"
@@ -54,6 +60,7 @@
 #include "HarbourOrganizeListModel.h"
 #include "HarbourProcessState.h"
 #include "HarbourSystemState.h"
+#include "HarbourWakeupTimer.h"
 
 #include <sailfishapp.h>
 #include <gutil_log.h>
@@ -63,25 +70,32 @@
 
 static void register_types(const char* uri, int v1 = 1, int v2 = 0)
 {
-    qmlRegisterSingletonType<HarbourProcessState>(uri, v1, v2, "HarbourProcessState", HarbourProcessState::createSingleton);
-    qmlRegisterSingletonType<HarbourSystemState>(uri, v1, v2, "HarbourSystemState", HarbourSystemState::createSingleton);
-    qmlRegisterSingletonType<FoilNotesHints>(uri, v1, v2, "FoilNotesHints", FoilNotesHints::createSingleton);
-    qmlRegisterSingletonType<FoilNotesSettings>(uri, v1, v2, "FoilNotesSettings", FoilNotesSettings::createSingleton);
-    qmlRegisterSingletonType<FoilNotes>(uri, v1, v2, "FoilNotes", FoilNotes::createSingleton);
-    qmlRegisterSingletonType<FoilNotesModel>(uri, v1, v2, "FoilNotesModel", FoilNotesModel::createSingleton);
-    qmlRegisterSingletonType<FoilNotesNfcShareService>(uri, v1, v2, "FoilNotesNfcShareService", FoilNotesNfcShareService::createSingleton);
-    qmlRegisterSingletonType<FoilNotesPlaintextModel>(uri, v1, v2, "FoilNotesPlaintextModel", FoilNotesPlaintextModel::createSingleton);
-    qmlRegisterType<FoilNotesNfcShareClient>(uri, v1, v2, "FoilNotesNfcShareClient");
-    qmlRegisterType<FoilNotesSearchModel>(uri, v1, v2, "FoilNotesSearchModel");
+#define REGISTER_TYPE(uri, v1, v2, Class) \
+    qmlRegisterType<Class>(uri, v1, v2, #Class)
+#define REGISTER_SINGLETON_TYPE(uri, v1, v2, Class) \
+    qmlRegisterSingletonType<Class>(uri, v1, v2, #Class, \
+    Class::createSingleton)
 
-    qmlRegisterSingletonType<NfcAdapter>(uri, v1, v2, "NfcAdapter", NfcAdapter::createSingleton);
-    qmlRegisterSingletonType<NfcSystem>(uri, v1, v2, "NfcSystem", NfcSystem::createSingleton);
-    qmlRegisterType<NfcMode>(uri, v1, v2, "NfcMode");
-    qmlRegisterType<NfcPeer>(uri, v1, v2, "NfcPeer");
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, HarbourProcessState);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, HarbourSystemState);
+    REGISTER_TYPE(uri, v1, v2, HarbourColorEditorModel);
+    REGISTER_TYPE(uri, v1, v2, HarbourOrganizeListModel);
+    REGISTER_TYPE(uri, v1, v2, HarbourQrCodeGenerator);
+    REGISTER_TYPE(uri, v1, v2, HarbourWakeupTimer);
 
-    qmlRegisterType<HarbourColorEditorModel>(uri, v1, v2, "HarbourColorEditorModel");
-    qmlRegisterType<HarbourOrganizeListModel>(uri, v1, v2, "HarbourOrganizeListModel");
-    qmlRegisterType<HarbourQrCodeGenerator>(uri, v1, v2, "HarbourQrCodeGenerator");
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, NfcAdapter);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, NfcSystem);
+    REGISTER_TYPE(uri, v1, v2, NfcMode);
+    REGISTER_TYPE(uri, v1, v2, NfcPeer);
+
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, FoilNotesHints);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, FoilNotesSettings);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, FoilNotes);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, FoilNotesModel);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, FoilNotesNfcShareService);
+    REGISTER_SINGLETON_TYPE(uri, v1, v2, FoilNotesPlaintextModel);
+    REGISTER_TYPE(uri, v1, v2, FoilNotesNfcShareClient);
+    REGISTER_TYPE(uri, v1, v2, FoilNotesSearchModel);
 }
 
 int main(int argc, char *argv[])

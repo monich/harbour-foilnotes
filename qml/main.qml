@@ -39,8 +39,7 @@ ApplicationWindow {
 
     function resetAutoLock() {
         lockTimer.stop()
-        if (FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady &&
-            FoilNotesSettings.autoLock && HarbourSystemState.locked) {
+        if (FoilNotesModel.keyAvailable && FoilNotesSettings.autoLock && HarbourSystemState.locked) {
             lockTimer.start()
         }
     }

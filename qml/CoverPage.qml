@@ -8,11 +8,11 @@ CoverBackground {
     id: cover
 
     property bool encryptedPageSelected
-    readonly property int coverActionHeight: Theme.itemSizeSmall
-    readonly property bool jailed: HarbourProcessState.jailedApp
-    readonly property bool darkOnLight: ('colorScheme' in Theme) && Theme.colorScheme === 1
 
     signal newNote()
+
+    readonly property bool _jailed: HarbourProcessState.jailedApp
+    readonly property bool _darkOnLight: ('colorScheme' in Theme) && Theme.colorScheme === 1
 
     Rectangle {
         id: titleBackground
@@ -66,7 +66,8 @@ CoverBackground {
     Item {
         id: content
 
-        readonly property int lineCount: Math.round((height - coverActionHeight/cover.parent.scale)/encryptedLabel.lineHeight)
+        readonly property real lineHeight: Math.floor(appTitle.implicitHeight + Theme.paddingSmall)
+        readonly property int lineCount: Math.floor(height/lineHeight)
         property bool locking
 
         width: cover.width * 2
@@ -75,7 +76,7 @@ CoverBackground {
             bottom: parent.bottom
         }
 
-        x: ((encryptedPageSelected && FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) || jailed) ? 0 : -cover.width
+        x: ((encryptedPageSelected && FoilNotesModel.foilState === FoilNotesModel.FoilNotesReady) || _jailed) ? 0 : -cover.width
         Behavior on x {
             SmoothedAnimation {
                 id: transition
@@ -94,13 +95,13 @@ CoverBackground {
         Repeater {
             model: content.lineCount
             delegate: Rectangle {
-                y: (index + 1) * encryptedLabel.lineHeight
+                y: (index + 1) * content.lineHeight
                 width: content.width
                 height: Theme.paddingSmall/4
                 color: Theme.primaryColor
                 opacity: FoilNotes.opacityLow
                 smooth: true
-                visible: !jailed
+                visible: !_jailed
             }
         }
 
@@ -110,7 +111,7 @@ CoverBackground {
             y: (cover.height - height)/2 - parent.y
             height: size
             sourceSize.height: size
-            source: darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
+            source: _darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
             opacity: 0.1
         }
 
@@ -118,8 +119,8 @@ CoverBackground {
             anchors.verticalCenter: parent.verticalCenter
             sourceSize.width: cover.width
             highlightColor: Theme.secondaryColor
-            visible: jailed
-            source: jailed ? "images/jail.svg" : ""
+            visible: _jailed
+            source: _jailed ? "images/jail.svg" : ""
         }
 
         Label {
@@ -132,7 +133,7 @@ CoverBackground {
             width: cover.width - Theme.paddingSmall
             horizontalAlignment: Text.AlignLeft
             lineHeightMode: Text.FixedHeight
-            lineHeight: Math.floor(appTitle.implicitHeight + Theme.paddingSmall)
+            lineHeight: content.lineHeight
             wrapMode: Text.Wrap
             elide: Text.ElideRight
             maximumLineCount: content.lineCount
@@ -149,17 +150,28 @@ CoverBackground {
             width: encryptedLabel.width
             horizontalAlignment: Text.AlignLeft
             lineHeightMode: Text.FixedHeight
-            lineHeight: encryptedLabel.lineHeight
+            lineHeight: content.lineHeight
             wrapMode: Text.Wrap
             elide: Text.ElideRight
             maximumLineCount: encryptedLabel.maximumLineCount
         }
     }
 
+    OpacityRampEffect {
+        // round it up to multiple of the line height, so that the opacity
+        // doesn't start changing in the middle of the line
+        readonly property real opacityRampHeight: Math.ceil(coverActionArea.height/cover.parent.scale/content.lineHeight) * content.lineHeight
+
+        sourceItem: content
+        direction: OpacityRamp.TopToBottom
+        offset: 1 - opacityRampHeight/content.height
+        slope: content.height/opacityRampHeight
+    }
+
     CoverActionList {
-        enabled: !jailed
+        enabled: !_jailed
         CoverAction {
-            readonly property url lockIcon: Qt.resolvedUrl("images/" + (darkOnLight ? "lock-dark.svg" : "lock.svg"))
+            readonly property url lockIcon: Qt.resolvedUrl("images/" + (_darkOnLight ? "lock-dark.svg" : "lock.svg"))
             iconSource: FoilNotesModel.keyAvailable ? lockIcon : "image://theme/icon-cover-new"
             onTriggered: {
                 if (FoilNotesModel.keyAvailable) {

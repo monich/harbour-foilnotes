@@ -6,8 +6,8 @@ SilicaGridView {
     id: grid
 
     anchors.fill: parent
-    cellHeight: cellSize
-    cellWidth: cellSize
+    cellHeight: _cellSize
+    cellWidth: _cellSize
     clip: true
 
     // Custom note action
@@ -15,7 +15,6 @@ SilicaGridView {
     signal performNoteAction(var item)
 
     property Page page
-    property int cellSize
     property int columnCount
     property string filter
     property bool showSelection
@@ -23,12 +22,13 @@ SilicaGridView {
     property bool animateDisplacement: true
     property int removeAnimationDuration: 0
     property Component contextMenuComponent
-    property Item contextMenu
-    readonly property Item contextMenuItem: contextMenu ? contextMenu.parent : null
-    readonly property int cellsPerRow: Math.floor(width/cellWidth)
-    readonly property int minOffsetIndex: contextMenuItem ?
+    readonly property Item contextMenuItem: _contextMenu ? _contextMenu.parent : null
+
+    property Item _contextMenu
+    readonly property int _expandHeight: _contextMenu ? _contextMenu.height : 0
+    readonly property int _cellSize: Math.floor(width / columnCount)
+    readonly property int _minOffsetIndex: contextMenuItem ?
         contextMenuItem.modelIndex - (contextMenuItem.modelIndex % columnCount) + columnCount : 0
-    readonly property int expandHeight: contextMenu ? contextMenu.height : 0
 
     function openFirstNote(color,body,transition) {
         _openNote(function() {return 0}, function() {return 1},color,body,transition)
@@ -105,15 +105,15 @@ SilicaGridView {
     }
 
     function showContextMenu(item) {
-        if (!contextMenu) {
-            contextMenu = contextMenuComponent.createObject(page)
+        if (!_contextMenu) {
+            _contextMenu = contextMenuComponent.createObject(page)
         }
         // ContextMenu::show is deprecated in Silica 0.25.6 (Dec 2017)
         // and produces an annoying warning
-        if ("open" in contextMenu) {
-            contextMenu.open(item)
+        if ("open" in _contextMenu) {
+            _contextMenu.open(item)
         } else {
-            contextMenu.show(item)
+            _contextMenu.show(item)
         }
     }
 
@@ -138,7 +138,7 @@ SilicaGridView {
             id: noteDelegate
 
             width: grid.cellWidth
-            height: menuOpen ? grid.cellHeight + grid.contextMenu.height : grid.cellHeight
+            height: menuOpen ? grid.cellHeight + grid._contextMenu.height : grid.cellHeight
             enabled: !grid.contextMenuItem
 
             readonly property bool down: pressed && containsMouse
@@ -148,7 +148,7 @@ SilicaGridView {
             readonly property int modelPageNr: model.pagenr
             readonly property string modelText: model.body
             readonly property bool menuOpen: grid.contextMenuItem === noteDelegate
-            readonly property real contentYOffset: index >= grid.minOffsetIndex ? grid.expandHeight : 0.0
+            readonly property real contentYOffset: index >= grid._minOffsetIndex ? grid._expandHeight : 0.0
 
             function deleteNote() {
                 grid.positionViewAtIndex(noteDelegate.modelIndex, GridView.Visible)

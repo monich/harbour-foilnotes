@@ -291,8 +291,7 @@ SilicaFlickable {
             id: grid
 
             anchors.topMargin: flickable.searchAreaHeight
-            columnCount: mainPage.isLandscape ? appLandscapeColumnCount : appPortraitColumnCount
-            cellSize: mainPage.isLandscape ? appLandscapeCellSize : appPortraitCellSize
+            columnCount: mainPage.isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
             page: mainPage
             filter: view.filter
             model: foilModel

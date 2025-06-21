@@ -10,19 +10,18 @@ Page {
 
     property var hints
     property var foilModel
-    readonly property real screenHeight: isPortrait ? Screen.height : Screen.width
-    readonly property bool darkOnLight: ('colorScheme' in Theme) && Theme.colorScheme === 1
     property bool isCurrentPage: true
 
     signal decryptNote(var note)
 
-    property var foilUi
+    readonly property bool _darkOnLight: ('colorScheme' in Theme) && Theme.colorScheme === 1
+    property var _foilUi
 
     function getFoilUi() {
-        if (!foilUi) {
-            foilUi = foilUiComponent.createObject(thisPage)
+        if (!_foilUi) {
+            _foilUi = foilUiComponent.createObject(thisPage)
         }
-        return foilUi
+        return _foilUi
     }
 
     Component {
@@ -174,8 +173,17 @@ Page {
         }
     }
 
-    // Otherwise width is changing with a delay, causing visible layout changes
-    onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
+    onIsLandscapeChanged: {
+        // In the older versions of Silica, the width was changing with a
+        // delay, causing visible and unpleasant layout changes. When the
+        // support for cutout was introduced, this hack started to break
+        // the landscape layout (with cutout enabled, the width of the page
+        // in landscape is smaller than the screen height) and at the same
+        // time, the unpleasant rotation effects seems to have gone away.
+        if (!('hasCutouts' in Screen)) {
+            width = isLandscape ? Screen.height : Screen.width
+        }
+    }
 
     Notification {
         id: notification
@@ -212,7 +220,7 @@ Page {
             radius: width/2
 
             Image {
-                source: darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
+                source: _darkOnLight ? "images/fancy-lock-dark.svg" : "images/fancy-lock.svg"
                 height: Math.floor(circle.height * 5 / 8)
                 sourceSize.height: height
                 anchors.centerIn: circle

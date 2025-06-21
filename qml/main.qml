@@ -9,17 +9,13 @@ ApplicationWindow {
     property bool encryptedPageSelected: true
     readonly property bool jailed: HarbourProcessState.jailedApp
 
-    // Reference column width: 960 / 4
+    readonly property int _refCellSize: Theme.pixelRatio * 240 // That's what jolla-notes does
     readonly property real _portraitWidth: Math.min(Screen.width, Screen.height)
     readonly property real _landscapeWidth: Math.max(Screen.width, Screen.height)
-    readonly property int _portraitCount: Math.floor(_portraitWidth/(Theme.pixelRatio * 240))
-    readonly property int _refCellSize: Math.floor(_portraitWidth/_portraitCount)
 
     // Global properties
     readonly property int appPortraitColumnCount: Math.floor(_portraitWidth/_refCellSize)
-    readonly property int appLandscapeColumnCount: Math.ceil(_landscapeWidth/_refCellSize)
-    readonly property int appPortraitCellSize: Math.floor(_portraitWidth/appPortraitColumnCount)
-    readonly property int appLandscapeCellSize: Math.floor(_landscapeWidth/appLandscapeColumnCount)
+    readonly property int appLandscapeColumnCount: Math.floor(_landscapeWidth/_refCellSize)
 
     //: Placeholder name for note filename
     //% "note"

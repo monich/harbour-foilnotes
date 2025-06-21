@@ -9,8 +9,8 @@ Page {
     property string title
     property bool secret
 
-    readonly property int columnCount: isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
-    readonly property int cellSize: isPortrait ? appPortraitCellSize : appLandscapeCellSize
+    readonly property int _columnCount: isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
+    readonly property int _cellSize: Math.floor(width / _columnCount)
 
     SilicaFlickable {
         id: flickable
@@ -20,8 +20,8 @@ Page {
         SilicaGridView {
             id: grid
 
-            cellHeight: page.cellSize
-            cellWidth: page.cellSize
+            cellHeight:_cellSize
+            cellWidth: _cellSize
             anchors.fill: parent
             interactive: !dragItem
             clip: true

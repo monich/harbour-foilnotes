@@ -12,14 +12,12 @@ Page {
     property var hints
     property var foilModel
     property var plaintextModel
+    readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
+        pageStack.find(function (pageOnStack) { return (thisPage === pageOnStack) })
 
     property string filter
     property bool searchMode: false
-
-    readonly property int columnCount: isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
-    readonly property int cellSize: isPortrait ? appPortraitCellSize : appLandscapeCellSize
-    readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
-        pageStack.find(function (pageOnStack) { return (thisPage === pageOnStack) })
+    readonly property int _columnCount: isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
 
     function openFirstNote(color, body, transition) {
         grid.openFirstNote(color, body, transition)
@@ -84,6 +82,7 @@ Page {
 
             PlaintextSelectPanel {
                 id: selectPanel
+
                 active: notesModel.selected > 0
                 canEncrypt: foilModel.keyAvailable
                 //: Hint text
@@ -139,8 +138,17 @@ Page {
 
     onFilterChanged: filterModel.setFilterFixedString(filter)
 
-    // Otherwise width is changing with a delay, causing visible layout changes
-    onIsLandscapeChanged: width = isLandscape ? Screen.height : Screen.width
+    onIsLandscapeChanged: {
+        // In the older versions of Silica, the width was changing with a
+        // delay, causing visible and unpleasant layout changes. When the
+        // support for cutout was introduced, this hack started to break
+        // the landscape layout (with cutout enabled, the width of the page
+        // in landscape is smaller than the screen height) and at the same
+        // time, the unpleasant rotation effects seems to have gone away.
+        if (!('hasCutouts' in Screen)) {
+            width = isLandscape ? Screen.height : Screen.width
+        }
+    }
 
     SilicaFlickable {
         id: flickable
@@ -275,8 +283,7 @@ Page {
 
             anchors.topMargin: flickable.searchAreaHeight
             page: thisPage
-            columnCount: thisPage.columnCount
-            cellSize: thisPage.cellSize
+            columnCount: _columnCount
             filter: thisPage.filter
             model: plaintextModel
             showSelection: bulkActionRemorse.visible

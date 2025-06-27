@@ -15,15 +15,15 @@ Page {
     property alias actionMenuText: actionMenuItem.text
     property bool secret
 
-    readonly property real screenHeight: isLandscape ? Screen.width : Screen.height
-    readonly property bool canUndo: "_editor" in textArea && textArea._editor.canUndo
-    readonly property bool canRedo: "_editor" in textArea && textArea._editor.canRedo
-
-    property var colorEditorModel
-
     signal saveBody(var body)
     signal deleteNote()
     signal performAction()
+
+    readonly property real _landscapeWidth: Screen.height - (('topCutout' in Screen) ? Screen.topCutout.height : 0)
+    readonly property real _screenHeight: isLandscape ? Screen.width : Screen.height
+    readonly property bool _canUndo: "_editor" in textArea && textArea._editor.canUndo
+    readonly property bool _canRedo: "_editor" in textArea && textArea._editor.canRedo
+    property var _colorEditorModel
 
     onStatusChanged: {
         if (status === PageStatus.Inactive) {
@@ -37,17 +37,9 @@ Page {
         }
     }
 
-    onIsLandscapeChanged: {
-        // In the older versions of Silica, the width was changing with a
-        // delay, causing visible and unpleasant layout changes. When the
-        // support for cutout was introduced, this hack started to break
-        // the landscape layout (with cutout enabled, the width of the page
-        // in landscape is smaller than the screen height) and at the same
-        // time, the unpleasant rotation effects seems to have gone away.
-        if (!('hasCutouts' in Screen)) {
-            width = isLandscape ? Screen.height : Screen.width
-        }
-    }
+    // Otherwise width is changing with a delay, causing visible layout changes
+    // when on-screen keyboard is active and taking part of the screen.
+    onIsLandscapeChanged: width = isLandscape ? _landscapeWidth : Screen.width
 
     Component {
         id: colorEditorModelComponent
@@ -58,15 +50,15 @@ Page {
     }
 
     function pickColor() {
-        if (!colorEditorModel) {
-            colorEditorModel = colorEditorModelComponent.createObject(page, {
+        if (!_colorEditorModel) {
+            _colorEditorModel = colorEditorModelComponent.createObject(page, {
                 colors: FoilNotesSettings.availableColors
             })
         }
         var dialog = pageStack.push(Qt.resolvedUrl("harbour/HarbourColorPickerDialog.qml"), {
             allowedOrientations: page.allowedOrientations,
             acceptDestinationAction: PageStackAction.Replace,
-            colorModel: colorEditorModel,
+            colorModel: _colorEditorModel,
             color: page.color,
             //: Pulley menu item
             //% "Reset colors"
@@ -88,7 +80,7 @@ Page {
             addColorHexNotationText: qsTrId("color_picker-text-hex_notation")
         })
         dialog.resetColors.connect(function() {
-            colorEditorModel.colors = FoilNotesSettings.defaultColors
+            _colorEditorModel.colors = FoilNotesSettings.defaultColors
         })
         dialog.accepted.connect(function() {
             page.color = dialog.color
@@ -342,11 +334,11 @@ Page {
     }
 
     Loader {
-        opacity: page.canUndo ? 1 : 0
+        opacity: _canUndo ? 1 : 0
         active: opacity > 0
         anchors {
             top: parent.top
-            topMargin: page.screenHeight - height - Theme.paddingLarge
+            topMargin: _screenHeight - height - Theme.paddingLarge
             left: parent.left
             leftMargin: Theme.horizontalPageMargin
         }
@@ -378,11 +370,11 @@ Page {
     }
 
     Loader {
-        opacity: page.canRedo ? 1 : 0
+        opacity: _canRedo ? 1 : 0
         active: opacity > 0
         anchors {
             top: parent.top
-            topMargin: page.screenHeight - height - Theme.paddingLarge
+            topMargin: page._screenHeight - height - Theme.paddingLarge
             right: parent.right
             rightMargin: Theme.horizontalPageMargin
         }

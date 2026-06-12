@@ -6,6 +6,8 @@ import harbour.foilnotes 1.0
 ApplicationWindow {
     id: appWindow
 
+    allowedOrientations: Orientation.Portrait | Orientation.LandscapeMask
+
     property bool encryptedPageSelected: true
     readonly property bool jailed: HarbourProcessState.jailedApp
 

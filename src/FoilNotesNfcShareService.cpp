@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2021-2026 Slava Monich <slava@monich.com>
  * Copyright (C) 2021 Jolla Ltd.
- * Copyright (C) 2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,27 +8,33 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #include "nfcdc_peer_service.h"
@@ -41,7 +47,8 @@
 
 #define FOILNOTES_NFCSHARE_DBUSPATH "/foilnotes/share"
 
-class FoilNotesNfcShareService::Private {
+class FoilNotesNfcShareService::Private
+{
     class Protocol;
     friend class Protocol;
 
@@ -79,9 +86,11 @@ public:
 // FoilNotesNfcShareService::Private::Protocol
 // ==========================================================================
 
-class FoilNotesNfcShareService::Private::Protocol: public FoilNotesNfcShareProtocol {
+class FoilNotesNfcShareService::Private::Protocol :
+    public FoilNotesNfcShareProtocol
+{
 public:
-    Protocol(NfcServiceConnection* aConnection, FoilNotesNfcShareService* aParent);
+    Protocol(NfcServiceConnection*, FoilNotesNfcShareService*);
     ~Protocol();
 
     void handleHelloEvent(ProtocolVersion, const AppVersion*) Q_DECL_OVERRIDE;
@@ -92,20 +101,22 @@ public:
     NfcServiceConnection* iConnection;
 };
 
-FoilNotesNfcShareService::Private::Protocol::Protocol(NfcServiceConnection* aConnection,
+FoilNotesNfcShareService::Private::Protocol::Protocol(
+    NfcServiceConnection* aConnection,
     FoilNotesNfcShareService* aParent) :
     FoilNotesNfcShareProtocol(aConnection->fd),
     iParent(aParent),
     iConnection(nfc_service_connection_accept(aConnection))
-{
-}
+{}
 
 FoilNotesNfcShareService::Private::Protocol::~Protocol()
 {
     nfc_service_connection_unref(iConnection);
 }
 
-void FoilNotesNfcShareService::Private::Protocol::handleHelloEvent(ProtocolVersion aProtocol,
+void
+FoilNotesNfcShareService::Private::Protocol::handleHelloEvent(
+    ProtocolVersion aProtocol,
     const AppVersion* aApp)
 {
     HDEBUG("Protocol" << aProtocol << "app" << aApp->v1 << aApp->v2 << aApp->v3);
@@ -113,14 +124,22 @@ void FoilNotesNfcShareService::Private::Protocol::handleHelloEvent(ProtocolVersi
     FoilNotesNfcShareProtocol::handleHelloEvent(aProtocol, aApp);
 }
 
-void FoilNotesNfcShareService::Private::Protocol::handleIncomingRequest(RequestCode aCode,
-    uint aReqId, const uchar* aData, uint aLength)
+void
+FoilNotesNfcShareService::Private::Protocol::handleIncomingRequest(
+    RequestCode aCode,
+    uint aReqId,
+    const uchar* aData,
+    uint aLength)
 {
     HDEBUG("Incoming request" << aCode << "id" << aReqId << "length" << aLength);
-    const char* sep = (char*) memchr(aData, 0, aLength);
+    const char* data = (char*) aData;
+    const char* sep = (char*) memchr(data, 0, aLength);
+
     if (sep) {
-        const QString colorString(QString::fromLatin1((char*)aData));
-        const QString text(QString::fromUtf8(sep + 1));
+        const uint colorLen = sep - data;
+        const QString colorString(QString::fromLatin1(data, colorLen));
+        const QString text(QString::fromUtf8(sep + 1, aLength - colorLen - 1));
+
         HDEBUG("Color" << colorString);
         HDEBUG("Text" << text);
         Q_EMIT iParent->newNote(QColor(colorString), text);
@@ -132,7 +151,8 @@ void FoilNotesNfcShareService::Private::Protocol::handleIncomingRequest(RequestC
 // FoilNotesNfcShareService::Private
 // ==========================================================================
 
-FoilNotesNfcShareService::Private::Private(FoilNotesNfcShareService* aParent) :
+FoilNotesNfcShareService::Private::Private(
+    FoilNotesNfcShareService* aParent) :
     iParent(aParent),
     iConnection(Q_NULLPTR),
     iService(Q_NULLPTR)
@@ -147,7 +167,9 @@ FoilNotesNfcShareService::Private::~Private()
     nfc_peer_service_unref(iService);
 }
 
-void FoilNotesNfcShareService::Private::setActive(bool aActive)
+void
+FoilNotesNfcShareService::Private::setActive(
+    bool aActive)
 {
     if (aActive) {
          if (!iService) {
@@ -183,15 +205,19 @@ void FoilNotesNfcShareService::Private::name##CB(NfcPeerService*, type aArg, voi
 
 FOILNOTES_NFCSHARE_SERVICE_CALLBACK_IMPL(propertyChange, NFC_PEER_SERVICE_PROPERTY)
 FOILNOTES_NFCSHARE_SERVICE_CALLBACK_IMPL(connectionHandler, NfcServiceConnection*)
-FOILNOTES_NFCSHARE_SERVICE_CALLBACK_IMPL(peerLeft,const char*)
+FOILNOTES_NFCSHARE_SERVICE_CALLBACK_IMPL(peerLeft, const char*)
 
-void FoilNotesNfcShareService::Private::propertyChange(NFC_PEER_SERVICE_PROPERTY)
+void
+FoilNotesNfcShareService::Private::propertyChange(
+    NFC_PEER_SERVICE_PROPERTY)
 {
     HDEBUG("NFC service SAP" << iService->sap);
     Q_EMIT iParent->registeredChanged();
 }
 
-void FoilNotesNfcShareService::Private::connectionHandler(NfcServiceConnection* aConnection)
+void
+FoilNotesNfcShareService::Private::connectionHandler(
+    NfcServiceConnection* aConnection)
 {
     HDEBUG("Accepting connection from" << aConnection->rsap);
     const bool wasStarted = (iConnection && iConnection->started());
@@ -202,11 +228,14 @@ void FoilNotesNfcShareService::Private::connectionHandler(NfcServiceConnection* 
     }
 }
 
-void FoilNotesNfcShareService::Private::peerLeft(const char* aPath)
+void
+FoilNotesNfcShareService::Private::peerLeft(
+    const char* aPath)
 {
     HDEBUG("Peer" << aPath << "left");
     if (iConnection) {
         const bool wasStarted = (iConnection && iConnection->started());
+
         delete iConnection;
         iConnection = Q_NULLPTR;
         if (wasStarted) {
@@ -219,39 +248,47 @@ void FoilNotesNfcShareService::Private::peerLeft(const char* aPath)
 // FoilNotesNfcShareService
 // ==========================================================================
 
-FoilNotesNfcShareService::FoilNotesNfcShareService(QObject* aParent) :
+FoilNotesNfcShareService::FoilNotesNfcShareService(
+    QObject* aParent) :
     QObject(aParent),
     iPrivate(new Private(this))
-{
-}
+{}
 
 FoilNotesNfcShareService::~FoilNotesNfcShareService()
 {
     delete iPrivate;
 }
 
-QObject* FoilNotesNfcShareService::createSingleton(QQmlEngine*, QJSEngine*)
+QObject*
+FoilNotesNfcShareService::createSingleton(
+    QQmlEngine*,
+    QJSEngine*)
 {
-    return new FoilNotesNfcShareService;
+    return new FoilNotesNfcShareService();
 }
 
-bool FoilNotesNfcShareService::active() const
+bool
+FoilNotesNfcShareService::active() const
 {
     return iPrivate->iService != Q_NULLPTR;
 }
 
-void FoilNotesNfcShareService::setActive(bool aActive)
+void
+FoilNotesNfcShareService::setActive(
+    bool aActive)
 {
     HDEBUG(aActive);
     iPrivate->setActive(aActive);
 }
 
-bool FoilNotesNfcShareService::registered() const
+bool
+FoilNotesNfcShareService::registered() const
 {
     return iPrivate->iService && iPrivate->iService->sap != 0;
 }
 
-bool FoilNotesNfcShareService::connected() const
+bool
+FoilNotesNfcShareService::connected() const
 {
     return iPrivate->iConnection && iPrivate->iConnection->started();
 }

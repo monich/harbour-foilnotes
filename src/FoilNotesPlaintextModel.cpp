@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2018-2026 Slava Monich <slava@monich.com>
  * Copyright (C) 2018-2021 Jolla Ltd.
- * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,15 +8,17 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer
- *      in the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -37,41 +39,53 @@
 
 #include "FoilNotesPlaintextModel.h"
 
-#include "HarbourSystemInfo.h"
 #include "HarbourDebug.h"
+#include "HarbourParentSignalQueueObject.h"
+#include "HarbourSystemInfo.h"
 
-#include <QTimer>
-#include <QAtomicInt>
-#include <QColor>
-#include <QStandardPaths>
-#include <QCryptographicHash>
-#include <QFileSystemWatcher>
+#include <QtCore/QAtomicInt>
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileSystemWatcher>
+#include <QtCore/QStandardPaths>
+#include <QtCore/QTimer>
 
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlField>
-#include <QSqlQuery>
-#include <QSqlRecord>
+#include <QtGui/QColor>
+
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlField>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
+
+// s(SignalName,signalName)
+#define MODEL_SIGNALS(s) \
+    s(Selected,selected) \
+    s(Count,count) \
+    s(TextIndex,textIndex) \
+    s(Text,text)
 
 // ==========================================================================
 // FoilNotesPlaintextModel::ModelData
 // ==========================================================================
 
-class FoilNotesPlaintextModel::ModelData {
+class FoilNotesPlaintextModel::ModelData
+{
 public:
     typedef QList<ModelData> List;
 
     ModelData();
-    ModelData(int aPageNr, QColor aColor, QString aBody);
-    ModelData(const ModelData& aData);
+    ModelData(int, const QColor&, const QString&);
+    ModelData(const ModelData&);
 
-    ModelData& operator=(const ModelData& aData);
+    ModelData& operator=(const ModelData&);
     QString body() const { return iNote.iBody; }
     QColor color() const { return iNote.iColor; }
     uint pagenr() const { return iNote.iPageNr; }
     bool isBusy() const { return iEncReqId != 0; }
 
-    bool equals(const ModelData& aData) const;
+    bool equals(const ModelData&) const;
     bool operator==(const ModelData& aData) const { return equals(aData); }
     bool operator!=(const ModelData& aData) const { return !equals(aData); }
 
@@ -87,14 +101,18 @@ FoilNotesPlaintextModel::ModelData::ModelData() :
 {
 }
 
-FoilNotesPlaintextModel::ModelData::ModelData(int aPageNr, QColor aColor, QString aBody) :
+FoilNotesPlaintextModel::ModelData::ModelData(
+    int aPageNr,
+    const QColor& aColor,
+    const QString& aBody) :
     iNote(aPageNr, aColor, aBody),
     iSelected(false),
     iEncReqId(0)
 {
 }
 
-FoilNotesPlaintextModel::ModelData::ModelData(const ModelData& aData) :
+FoilNotesPlaintextModel::ModelData::ModelData(
+    const ModelData& aData) :
     iNote(aData.iNote),
     iSelected(aData.iSelected),
     iEncReqId(aData.iEncReqId)
@@ -102,7 +120,8 @@ FoilNotesPlaintextModel::ModelData::ModelData(const ModelData& aData) :
 }
 
 FoilNotesPlaintextModel::ModelData&
-FoilNotesPlaintextModel::ModelData::operator=(const ModelData& aData)
+FoilNotesPlaintextModel::ModelData::operator=(
+    const ModelData& aData)
 {
     iNote = aData.iNote;
     iSelected = aData.iSelected;
@@ -110,7 +129,9 @@ FoilNotesPlaintextModel::ModelData::operator=(const ModelData& aData)
     return *this;
 }
 
-bool FoilNotesPlaintextModel::ModelData::equals(const ModelData& aData) const
+bool
+FoilNotesPlaintextModel::ModelData::equals(
+    const ModelData& aData) const
 {
     // Ignore iSelected and iEncReqId
     return iNote == aData.iNote;
@@ -120,8 +141,24 @@ bool FoilNotesPlaintextModel::ModelData::equals(const ModelData& aData) const
 // FoilNotesPlaintextModel::Private
 // ==========================================================================
 
-class FoilNotesPlaintextModel::Private : public QObject {
+enum FoilNotesPlaintextModelSignal {
+    #define SIGNAL_ENUM_(Name,name) Signal##Name##Changed,
+    MODEL_SIGNALS(SIGNAL_ENUM_)
+    #undef SIGNAL_ENUM_
+    FoilNotesPlaintextModelSignalCount
+};
+
+typedef HarbourParentSignalQueueObject<FoilNotesPlaintextModel,
+    FoilNotesPlaintextModelSignal, FoilNotesPlaintextModelSignalCount>
+    FoilNotesPlaintextModelPrivateBase;
+
+class FoilNotesPlaintextModel::Private :
+    public FoilNotesPlaintextModelPrivateBase
+{
     Q_OBJECT
+
+    static const SignalEmitter gSignalEmitters[];
+
 public:
     enum {
         FIELD_PAGENR,
@@ -145,39 +182,36 @@ public:
 
     static const int COMMIT_TIMEOUT = 500;
 
-    Private(FoilNotesPlaintextModel* aParent);
+    Private(FoilNotesPlaintextModel*);
     ~Private();
 
     static QString databaseDir();
     static QString databasePath();
-    static QVector<int> diff(const ModelData* aNote1, const ModelData* aNote2);
+    static QVector<int> diff(const ModelData*, const ModelData*);
 
     int rowCount() const;
-    const ModelData* dataAt(const QModelIndex& aIndex) const;
-    const ModelData* dataAt(int aIndex) const;
-    ModelData* dataAt(const QModelIndex& aIndex);
-    ModelData* dataAt(int aIndex);
-    void updatePageNr(uint aStartPos);
-    void updatePageNr(uint aStartPos, uint aEndPos);
-    void dataChanged(int aRow, Role aRole);
-    void addNote(QColor aColor, QString aBody);
-    void deleteNoteAt(int aRow);
+    const ModelData* dataAt(const QModelIndex&) const;
+    const ModelData* dataAt(int) const;
+    ModelData* dataAt(const QModelIndex&);
+    ModelData* dataAt(int);
+    void updatePageNr(uint);
+    void updatePageNr(uint, uint);
+    void dataChanged(int, Role);
+    void deleteNoteAt(int);
     void openDatabase(bool aNeedEvents = true);
     void scheduleCommit();
     void syncModel();
     void updateText();
     int nextReqId();
 
-    FoilNotesPlaintextModel* parentModel();
-
 public Q_SLOTS:
-    void onFileChanged(QString aPath);
-    void onDirectoryChanged(QString aPath);
+    void onFileChanged(QString);
+    void onDirectoryChanged(QString);
     void commitChanges();
 
 public:
     QSqlDatabase iDatabase;
-    QString iDatabasePath;
+    const QString iDatabasePath;
     QFileSystemWatcher* iFileWatcher;
     QTimer* iCommitTimer;
     int iColumn[NUM_FIELDS];
@@ -207,8 +241,15 @@ const QString FoilNotesPlaintextModel::Private::DB_FIELD[] = {
 #define DB_FIELD_COLOR DB_FIELD[FoilNotesPlaintextModel::Private::FIELD_COLOR]
 #define DB_FIELD_BODY DB_FIELD[FoilNotesPlaintextModel::Private::FIELD_BODY]
 
+const FoilNotesPlaintextModelPrivateBase::SignalEmitter
+    FoilNotesPlaintextModel::Private::gSignalEmitters [] = {
+    #define SIGNAL_EMITTER_(Name,name) &FoilNotesPlaintextModel::name##Changed,
+    MODEL_SIGNALS(SIGNAL_EMITTER_)
+    #undef  SIGNAL_EMITTER_
+};
+
 FoilNotesPlaintextModel::Private::Private(FoilNotesPlaintextModel* aModel) :
-    QObject(aModel),
+    FoilNotesPlaintextModelPrivateBase(aModel, gSignalEmitters),
     iDatabase(QSqlDatabase::database(DB_NAME)),
     iDatabasePath(databasePath()),
     iFileWatcher(new QFileSystemWatcher(this)),
@@ -247,6 +288,7 @@ FoilNotesPlaintextModel::Private::Private(FoilNotesPlaintextModel* aModel) :
     iDatabase.setDatabaseName(iDatabasePath);
     openDatabase(false);
     updateText();
+    clearQueuedSignals();
 }
 
 FoilNotesPlaintextModel::Private::~Private()
@@ -257,14 +299,12 @@ FoilNotesPlaintextModel::Private::~Private()
     }
 }
 
-inline FoilNotesPlaintextModel* FoilNotesPlaintextModel::Private::parentModel()
-{
-    return qobject_cast<FoilNotesPlaintextModel*>(parent());
-}
-
-QString FoilNotesPlaintextModel::Private::databaseDir()
+/* static */
+QString
+FoilNotesPlaintextModel::Private::databaseDir()
 {
     static QString sDatabasePath;
+
     if (sDatabasePath.isEmpty()) {
         // Original path:
         // ~/.local/share/jolla-notes/QML/OfflineStorage/Databases
@@ -273,6 +313,7 @@ QString FoilNotesPlaintextModel::Private::databaseDir()
         QString top(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
         QDir dir(top + "/" + ((HarbourSystemInfo::osVersionCompareWith("4.0.1") >= 0) ?
             "com.jolla/notes" : "jolla-notes") + "/QML/OfflineStorage/Databases");
+
         sDatabasePath = dir.path();
         HDEBUG("Jolla Notes data directory" << qPrintable(sDatabasePath));
         if (!dir.exists()) {
@@ -282,7 +323,9 @@ QString FoilNotesPlaintextModel::Private::databaseDir()
     return sDatabasePath;
 }
 
-QString FoilNotesPlaintextModel::Private::databasePath()
+/* static */
+QString
+FoilNotesPlaintextModel::Private::databasePath()
 {
     // This is how LocalStorage plugin generates database file name
     QCryptographicHash md5(QCryptographicHash::Md5);
@@ -291,11 +334,14 @@ QString FoilNotesPlaintextModel::Private::databasePath()
     return databaseDir() + "/" + dbId + ".sqlite";
 }
 
-void FoilNotesPlaintextModel::Private::openDatabase(bool aNeedEvents)
+void
+FoilNotesPlaintextModel::Private::openDatabase(
+    bool aNeedEvents)
 {
     if (!iDatabase.isOpen()) {
         if (iDatabase.open()) {
             QStringList tables = iDatabase.tables();
+
             if (tables.contains(DB_TABLE)) {
                 HDEBUG("opened" << iDatabasePath);
             } else {
@@ -308,12 +354,16 @@ void FoilNotesPlaintextModel::Private::openDatabase(bool aNeedEvents)
                     HWARN(query.lastError());
                 }
             }
+
             QSqlRecord record(iDatabase.record(DB_TABLE));
+
             for (int i = 0; i < NUM_FIELDS; i++) {
                 iColumn[i] = record.indexOf(DB_FIELD[i]);
                 HDEBUG(iColumn[i] << DB_FIELD[i]);
             }
+
             QSqlQuery query(iDatabase);
+
             iDatabaseData = ModelData::List();
             if (query.exec("SELECT "
                 FIELD_NAME_PAGENR ", "
@@ -329,6 +379,7 @@ void FoilNotesPlaintextModel::Private::openDatabase(bool aNeedEvents)
             } else {
                 HWARN(query.lastError());
             }
+
             if (aNeedEvents) {
                 if (iDatabaseData != iModelData) {
                     syncModel();
@@ -342,9 +393,14 @@ void FoilNotesPlaintextModel::Private::openDatabase(bool aNeedEvents)
     }
 }
 
-QVector<int> FoilNotesPlaintextModel::Private::diff(const ModelData* aNote1, const ModelData* aNote2)
+/* static */
+QVector<int>
+FoilNotesPlaintextModel::Private::diff(
+    const ModelData* aNote1,
+    const ModelData* aNote2)
 {
     QVector<int> roles;
+
     if (aNote1->iNote.iPageNr != aNote2->iNote.iPageNr) {
         roles.append(PageNrRole);
     }
@@ -363,12 +419,16 @@ QVector<int> FoilNotesPlaintextModel::Private::diff(const ModelData* aNote1, con
     return roles;
 }
 
-void FoilNotesPlaintextModel::Private::deleteNoteAt(int aRow)
+void
+FoilNotesPlaintextModel::Private::deleteNoteAt(
+    int aRow)
 {
     const int count = iModelData.count();
+
     HASSERT(aRow >= 0 && aRow < count);
     if (aRow >= 0 && aRow < count) {
-        FoilNotesPlaintextModel* model = parentModel();
+        FoilNotesPlaintextModel* model = parentObject();
+
         model->beginRemoveRows(QModelIndex(), aRow, aRow);
         iModelData.removeAt(aRow);
         model->endRemoveRows();
@@ -378,9 +438,10 @@ void FoilNotesPlaintextModel::Private::deleteNoteAt(int aRow)
     }
 }
 
-void FoilNotesPlaintextModel::Private::syncModel()
+void
+FoilNotesPlaintextModel::Private::syncModel()
 {
-    FoilNotesPlaintextModel* model = parentModel();
+    FoilNotesPlaintextModel* model = parentObject();
     const int databaseCount = iDatabaseData.count();
     int modelCount = iModelData.count();
     int i = 0;
@@ -388,6 +449,7 @@ void FoilNotesPlaintextModel::Private::syncModel()
     // Remove extra rows from the beginning
     if (databaseCount < modelCount) {
         const int removed = modelCount - databaseCount;
+
         HDEBUG("removing" << removed << "note(s) from the model");
         while (i < databaseCount && iDatabaseData.at(i).equals(iModelData.at(i))) i++;
         model->beginRemoveRows(QModelIndex(), i, i + removed - 1);
@@ -426,55 +488,73 @@ void FoilNotesPlaintextModel::Private::syncModel()
     updateText();
 }
 
-inline int FoilNotesPlaintextModel::Private::rowCount() const
+inline
+int FoilNotesPlaintextModel::Private::rowCount() const
 {
     return iModelData.count();
 }
 
-inline const FoilNotesPlaintextModel::ModelData*
-FoilNotesPlaintextModel::Private::dataAt(int aIndex) const
+inline
+const FoilNotesPlaintextModel::ModelData*
+FoilNotesPlaintextModel::Private::dataAt(
+    int aIndex) const
 {
     return (aIndex >= 0 && aIndex < iModelData.count()) ? &(iModelData[aIndex]) : NULL;
 }
 
-inline const FoilNotesPlaintextModel::ModelData*
-FoilNotesPlaintextModel::Private::dataAt(const QModelIndex& aIndex) const
+inline
+const FoilNotesPlaintextModel::ModelData*
+FoilNotesPlaintextModel::Private::dataAt(
+    const QModelIndex& aIndex) const
 {
     return dataAt(aIndex.row());
 }
 
-inline FoilNotesPlaintextModel::ModelData*
-FoilNotesPlaintextModel::Private::dataAt(int aIndex)
+inline
+FoilNotesPlaintextModel::ModelData*
+FoilNotesPlaintextModel::Private::dataAt(
+    int aIndex)
 {
     return (aIndex >= 0 && aIndex < iModelData.count()) ? &(iModelData[aIndex]) : NULL;
 }
 
-inline FoilNotesPlaintextModel::ModelData*
-FoilNotesPlaintextModel::Private::dataAt(const QModelIndex& aIndex)
+inline
+FoilNotesPlaintextModel::ModelData*
+FoilNotesPlaintextModel::Private::dataAt(
+    const QModelIndex& aIndex)
 {
     return dataAt(aIndex.row());
 }
 
-int FoilNotesPlaintextModel::Private::nextReqId()
+int
+FoilNotesPlaintextModel::Private::nextReqId()
 {
     int id;
+
     while (!(id = iNextReqId.fetchAndAddRelaxed(1)));
     return id;
 }
 
-void FoilNotesPlaintextModel::Private::updatePageNr(uint aStartRow)
+void
+FoilNotesPlaintextModel::Private::updatePageNr(
+    uint aStartRow)
 {
     updatePageNr(aStartRow, iModelData.count());
 }
 
-void FoilNotesPlaintextModel::Private::updatePageNr(uint aStartRow, uint aEndRow)
+void
+FoilNotesPlaintextModel::Private::updatePageNr(
+    uint aStartRow,
+    uint aEndRow)
 {
     if (aStartRow < aEndRow) {
+        FoilNotesPlaintextModel* model = parentObject();
         QVector<int> roles;
+
         roles.append(PageNrRole);
-        FoilNotesPlaintextModel* model = parentModel();
         for (uint row = aStartRow; row < aEndRow; row++) {
             ModelData* data = &iModelData[row];
+
             if (data->pagenr() != row + 1) {
                 HDEBUG(data->pagenr() << "->" << (row + 1));
                 data->iNote.iPageNr = row + 1;
@@ -485,24 +565,31 @@ void FoilNotesPlaintextModel::Private::updatePageNr(uint aStartRow, uint aEndRow
     }
 }
 
-void FoilNotesPlaintextModel::Private::dataChanged(int aRow, Role aRole)
+void
+FoilNotesPlaintextModel::Private::dataChanged(
+    int aRow,
+    Role aRole)
 {
-    QVector<int> roles;
-    roles.append(aRole);
-    FoilNotesPlaintextModel* model = parentModel();
+    FoilNotesPlaintextModel* model = parentObject();
     QModelIndex modelIndex(model->index(aRow));
+    QVector<int> roles;
+
+    roles.append(aRole);
     Q_EMIT model->dataChanged(modelIndex, modelIndex, roles);
     scheduleCommit();
 }
 
-void FoilNotesPlaintextModel::Private::scheduleCommit()
+void
+FoilNotesPlaintextModel::Private::scheduleCommit()
 {
     if (!iCommitTimer->isActive()) {
         iCommitTimer->start();
     }
 }
 
-void FoilNotesPlaintextModel::Private::onDirectoryChanged(QString aPath)
+void
+FoilNotesPlaintextModel::Private::onDirectoryChanged(
+    QString aPath)
 {
     if (iIgnoreDirChange) {
         iIgnoreDirChange--;
@@ -515,11 +602,14 @@ void FoilNotesPlaintextModel::Private::onDirectoryChanged(QString aPath)
                 iFileWatcher->addPath(iDatabasePath);
             }
             openDatabase();
+            emitQueuedSignals();
         }
     }
 }
 
-void FoilNotesPlaintextModel::Private::onFileChanged(QString aPath)
+void
+FoilNotesPlaintextModel::Private::onFileChanged(
+    QString aPath)
 {
     if (iIgnoreFileChange) {
         iIgnoreFileChange--;
@@ -528,10 +618,12 @@ void FoilNotesPlaintextModel::Private::onFileChanged(QString aPath)
         HDEBUG(qPrintable(aPath));
         iDatabase.close();
         openDatabase();
+        emitQueuedSignals();
     }
 }
 
-void FoilNotesPlaintextModel::Private::commitChanges()
+void
+FoilNotesPlaintextModel::Private::commitChanges()
 {
     if (iDatabase.transaction()) {
         iIgnoreDirChange++;
@@ -540,6 +632,7 @@ void FoilNotesPlaintextModel::Private::commitChanges()
         // Check if only text or color has changed for one or more notes
         const int count = iModelData.count();
         bool fullUpdate = true;
+
         if (count == iDatabaseData.count()) {
             fullUpdate = false;
             for (int i = 0; i < count; i++) {
@@ -556,10 +649,13 @@ void FoilNotesPlaintextModel::Private::commitChanges()
         const QString placeholderPagenr(":" FIELD_NAME_PAGENR);
         const QString placeholderColor(":" FIELD_NAME_COLOR);
         const QString placeholderBody(":" FIELD_NAME_BODY);
+
         if (fullUpdate) {
             // Delete everything and completely replace the contents
             HDEBUG("Updating all notes");
+
             QSqlQuery query(iDatabase);
+
             if (!query.exec("DELETE FROM " TABLE_NAME)) {
                 HWARN(query.lastError());
                 ok = false;
@@ -590,8 +686,10 @@ void FoilNotesPlaintextModel::Private::commitChanges()
             for (int i = 0; i < count; i++) {
                 const Note& note(iModelData.at(i).iNote);
                 const Note& dbNote(iDatabaseData.at(i).iNote);
+
                 if (!note.equals(dbNote)) {
                     QSqlQuery query(iDatabase);
+
                     if (query.prepare("UPDATE " TABLE_NAME " SET "
                         FIELD_NAME_COLOR " = :" FIELD_NAME_COLOR ", "
                         FIELD_NAME_BODY " = :" FIELD_NAME_BODY " WHERE "
@@ -629,10 +727,12 @@ void FoilNotesPlaintextModel::Private::commitChanges()
     }
 }
 
-void FoilNotesPlaintextModel::Private::updateText()
+void
+FoilNotesPlaintextModel::Private::updateText()
 {
     QString text;
     const int n = iModelData.count();
+
     if (iTextIndex >= 0 && iTextIndex < n) {
         text = iModelData.at(iTextIndex).body();
     } else if (n > 0) {
@@ -640,7 +740,7 @@ void FoilNotesPlaintextModel::Private::updateText()
     }
     if (iText != text) {
         iText = text;
-        Q_EMIT parentModel()->textChanged();
+        queueSignal(SignalTextChanged);
     }
 }
 
@@ -648,10 +748,9 @@ void FoilNotesPlaintextModel::Private::updateText()
 // FoilNotesPlaintextModel
 // ==========================================================================
 
-#define SUPER FoilNotesBaseModel
-
-FoilNotesPlaintextModel::FoilNotesPlaintextModel(QObject* aParent) :
-    SUPER(aParent),
+FoilNotesPlaintextModel::FoilNotesPlaintextModel(
+    QObject* aParent) :
+    FoilNotesBaseModel(aParent),
     iPrivate(new Private(this))
 {
     connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)), SIGNAL(countChanged()));
@@ -660,14 +759,19 @@ FoilNotesPlaintextModel::FoilNotesPlaintextModel(QObject* aParent) :
 }
 
 // Callback for qmlRegisterSingletonType<FoilNotesPlaintextModel>
-QObject* FoilNotesPlaintextModel::createSingleton(QQmlEngine*, QJSEngine*)
+QObject*
+FoilNotesPlaintextModel::createSingleton(
+    QQmlEngine*,
+    QJSEngine*)
 {
     return new FoilNotesPlaintextModel();
 }
 
-QHash<int,QByteArray> FoilNotesPlaintextModel::roleNames() const
+QHash<int,QByteArray>
+FoilNotesPlaintextModel::roleNames() const
 {
     QHash<int,QByteArray> roles;
+
     roles.insert(Private::PageNrRole, FIELD_NAME_PAGENR);
     roles.insert(Private::ColorRole, FIELD_NAME_COLOR);
     roles.insert(Private::BodyRole, FIELD_NAME_BODY);
@@ -676,14 +780,20 @@ QHash<int,QByteArray> FoilNotesPlaintextModel::roleNames() const
     return roles;
 }
 
-int FoilNotesPlaintextModel::rowCount(const QModelIndex& aParent) const
+int
+FoilNotesPlaintextModel::rowCount(
+    const QModelIndex&) const
 {
     return iPrivate->iModelData.count();
 }
 
-QVariant FoilNotesPlaintextModel::data(const QModelIndex& aIndex, int aRole) const
+QVariant
+FoilNotesPlaintextModel::data(
+    const QModelIndex& aIndex,
+    int aRole) const
 {
     const ModelData* data = iPrivate->dataAt(aIndex);
+
     if (data) {
         switch (aRole) {
         case Private::PageNrRole:   return data->pagenr();
@@ -696,22 +806,30 @@ QVariant FoilNotesPlaintextModel::data(const QModelIndex& aIndex, int aRole) con
     return QVariant();
 }
 
-bool FoilNotesPlaintextModel::setData(const QModelIndex& aIndex, const QVariant& aValue, int aRole)
+bool
+FoilNotesPlaintextModel::setData(
+    const QModelIndex& aIndex,
+    const QVariant& aValue,
+    int aRole)
 {
     ModelData* data = iPrivate->dataAt(aIndex);
+
     if (data) {
         QVector<int> roles;
+
         roles.append(aRole);
         switch ((Private::Role)aRole) {
         case Private::ColorRole:
             {
-                QColor color(aValue.toString());
+                const QColor color(aValue.toString());
+
                 if (color.isValid()) {
                     if (data->color() != color) {
                         HDEBUG(data->pagenr() << color);
                         data->iNote.iColor = color;
                         Q_EMIT dataChanged(aIndex, aIndex, roles);
                         iPrivate->scheduleCommit();
+                        iPrivate->emitQueuedSignals();
                     }
                     return true;
                 }
@@ -719,19 +837,22 @@ bool FoilNotesPlaintextModel::setData(const QModelIndex& aIndex, const QVariant&
             break;
         case Private::BodyRole:
             {
-                QString body(aValue.toString());
+                const QString body(aValue.toString());
+
                 if (data->body() != body) {
                     HDEBUG(data->pagenr() << body);
                     data->iNote.iBody = body;
                     Q_EMIT dataChanged(aIndex, aIndex, roles);
                     iPrivate->updateText();
                     iPrivate->scheduleCommit();
+                    iPrivate->emitQueuedSignals();
                 }
             }
             return true;
         case Private::SelectedRole:
             {
-                bool selected(aValue.toBool());
+                const bool selected(aValue.toBool());
+
                 if (data->iSelected != selected) {
                     HDEBUG(data->pagenr() << selected);
                     data->iSelected = selected;
@@ -742,7 +863,8 @@ bool FoilNotesPlaintextModel::setData(const QModelIndex& aIndex, const QVariant&
                         iPrivate->iSelected--;
                     }
                     Q_EMIT dataChanged(aIndex, aIndex, roles);
-                    Q_EMIT selectedChanged();
+                    iPrivate->queueSignal(SignalSelectedChanged);
+                    iPrivate->emitQueuedSignals();
                 }
             }
             return true;
@@ -754,8 +876,13 @@ bool FoilNotesPlaintextModel::setData(const QModelIndex& aIndex, const QVariant&
     return false;
 }
 
-bool FoilNotesPlaintextModel::moveRows(const QModelIndex &aSrcParent, int aSrcRow,
-    int aCount, const QModelIndex &aDestParent, int aDestRow)
+bool
+FoilNotesPlaintextModel::moveRows(
+    const QModelIndex& aSrcParent,
+    int aSrcRow,
+    int /* Assuming one row */,
+    const QModelIndex& aDestParent,
+    int aDestRow)
 {
     const int size = iPrivate->rowCount();
     if (aSrcParent == aDestParent &&
@@ -778,7 +905,10 @@ bool FoilNotesPlaintextModel::moveRows(const QModelIndex &aSrcParent, int aSrcRo
     }
 }
 
-void FoilNotesPlaintextModel::addNote(QColor aColor, QString aBody)
+void
+FoilNotesPlaintextModel::addNote(
+    QColor aColor,
+    QString aBody)
 {
     HDEBUG(aColor.name() << aBody);
 
@@ -790,74 +920,96 @@ void FoilNotesPlaintextModel::addNote(QColor aColor, QString aBody)
     iPrivate->updatePageNr(1);
     iPrivate->updateText();
     iPrivate->scheduleCommit();
+    iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesPlaintextModel::deleteNoteAt(int aRow)
+void
+FoilNotesPlaintextModel::deleteNoteAt(
+    int aRow)
 {
     HDEBUG(aRow);
     iPrivate->deleteNoteAt(aRow);
     iPrivate->updateText();
+    iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesPlaintextModel::setBodyAt(int aRow, QString aBody)
+void
+FoilNotesPlaintextModel::setBodyAt(
+    int aRow,
+    QString aBody)
 {
     ModelData* data = iPrivate->dataAt(aRow);
+
     if (data && data->body() != aBody) {
         data->iNote.iBody = aBody;
         HDEBUG(data->pagenr() << aBody);
         iPrivate->dataChanged(aRow, Private::BodyRole);
         iPrivate->updateText();
         iPrivate->scheduleCommit();
+        iPrivate->emitQueuedSignals();
     }
 }
 
-void FoilNotesPlaintextModel::setColorAt(int aRow, QColor aColor)
+void
+FoilNotesPlaintextModel::setColorAt(
+    int aRow,
+    QColor aColor)
 {
     ModelData* data = iPrivate->dataAt(aRow);
+
     if (data && data->color() != aColor) {
         data->iNote.iColor = aColor;
         HDEBUG(data->pagenr() << aColor);
         iPrivate->dataChanged(aRow, Private::ColorRole);
         iPrivate->scheduleCommit();
+        iPrivate->emitQueuedSignals();
     }
 }
 
-QString FoilNotesPlaintextModel::text() const
+QString
+FoilNotesPlaintextModel::text() const
 {
     return iPrivate->iText;
 }
 
-int FoilNotesPlaintextModel::textIndex() const
+int
+FoilNotesPlaintextModel::textIndex() const
 {
     return iPrivate->iTextIndex;
 }
 
-void FoilNotesPlaintextModel::setTextIndex(int aIndex)
+void
+FoilNotesPlaintextModel::setTextIndex(
+    int aIndex)
 {
     if (iPrivate->iTextIndex != aIndex) {
         iPrivate->iTextIndex = aIndex;
         iPrivate->updateText();
-        Q_EMIT textIndexChanged();
+        iPrivate->emitQueuedSignals();
     }
 }
 
-void FoilNotesPlaintextModel::deleteNotes(QList<int> aRows)
+void
+FoilNotesPlaintextModel::deleteNotes(
+    QList<int> aRows)
 {
     if (!aRows.isEmpty()) {
         qSort(aRows);
         HDEBUG(aRows);
-        bool selectionChanged = false;
+
         int deleted = 0;
         int lastRowToRemove = -1;
         int firstRowToRemove = -1;
+
         for (int i = aRows.count() - 1; i >= 0; i--) {
             const int pos = aRows.at(i);
             ModelData* data = iPrivate->dataAt(pos);
+
             if (data) {
                 if (data->iSelected) {
                     data->iSelected = false;
                     iPrivate->iSelected--;
-                    selectionChanged = true;
+                    iPrivate->queueSignal(SignalSelectedChanged);
                 }
                 HDEBUG("deleting" << data->pagenr());
                 iPrivate->iModelData.removeAt(pos);
@@ -874,26 +1026,31 @@ void FoilNotesPlaintextModel::deleteNotes(QList<int> aRows)
                 }
             }
         }
+
         if (firstRowToRemove >= 0) {
             HDEBUG("removed" << firstRowToRemove << ".." << lastRowToRemove);
             beginRemoveRows(QModelIndex(), firstRowToRemove, lastRowToRemove);
             endRemoveRows();
         }
+
         if (deleted > 0) {
             iPrivate->updatePageNr(aRows.at(0));
-            if (selectionChanged) {
-                Q_EMIT selectedChanged();
-            }
             iPrivate->scheduleCommit();
         }
+
+        iPrivate->emitQueuedSignals();
     }
 }
 
-int FoilNotesPlaintextModel::startEncryptingAt(int aRow)
+int
+FoilNotesPlaintextModel::startEncryptingAt(
+    int aRow)
 {
     ModelData* data = iPrivate->dataAt(aRow);
+
     if (data) {
         const bool wasBusy = data->isBusy();
+
         data->iEncReqId = iPrivate->nextReqId();
         HDEBUG("encrypting" << data->pagenr() << "id" << data->iEncReqId);
         if (!wasBusy) {
@@ -905,37 +1062,44 @@ int FoilNotesPlaintextModel::startEncryptingAt(int aRow)
     }
 }
 
-void FoilNotesPlaintextModel::onEncryptionDone(int aReqId, bool aSuccess)
+void
+FoilNotesPlaintextModel::onEncryptionDone(
+    int aReqId,
+    bool aSuccess)
 {
     const int n = iPrivate->rowCount();
+
     for (int i = 0; i < n; i++) {
         ModelData* data = iPrivate->dataAt(i);
+
         if (data->iEncReqId == aReqId) {
             HDEBUG("Request" << aReqId << (aSuccess ? "succeeded" : "failed"));
             data->iEncReqId = 0;
-            const bool wasSelected = data->iSelected;
-            if (wasSelected) {
+            if (data->iSelected) {
                 HASSERT(iPrivate->iSelected > 0);
                 iPrivate->iSelected--;
+                iPrivate->queueSignal(SignalSelectedChanged);
             }
             if (aSuccess) {
                 iPrivate->deleteNoteAt(i);
             }
-            if (wasSelected) {
-                Q_EMIT selectedChanged();
-            }
+            iPrivate->emitQueuedSignals();
             return;
         }
     }
     HDEBUG("Encrypt request" << aReqId << "not found");
 }
 
-void FoilNotesPlaintextModel::saveNote(int aPageNr, QColor aColor, QString aBody)
+void
+FoilNotesPlaintextModel::saveNote(
+    int aPageNr,
+    QColor aColor,
+    QString aBody)
 {
-    HDEBUG(aPageNr << aColor.name() << aBody);
+    const int n = iPrivate->rowCount();
 
     // Validate the position
-    const int n = iPrivate->rowCount();
+    HDEBUG(aPageNr << aColor.name() << aBody);
     if (aPageNr > n + 1) {
         HDEBUG("pagenr" << aPageNr << "->" << (n + 1));
         aPageNr = n + 1;
@@ -946,6 +1110,7 @@ void FoilNotesPlaintextModel::saveNote(int aPageNr, QColor aColor, QString aBody
 
     // Insert new note
     const int pos = aPageNr - 1;
+
     beginInsertRows(QModelIndex(), pos, pos);
     iPrivate->iModelData.insert(pos, ModelData(aPageNr, aColor, aBody));
     endInsertRows();
@@ -953,38 +1118,59 @@ void FoilNotesPlaintextModel::saveNote(int aPageNr, QColor aColor, QString aBody
     iPrivate->updatePageNr(aPageNr);
     iPrivate->updateText();
     iPrivate->scheduleCommit();
+    iPrivate->emitQueuedSignals();
 }
 
-const FoilNotesBaseModel::Note* FoilNotesPlaintextModel::noteAt(int aRow) const
+const FoilNotesBaseModel::Note*
+FoilNotesPlaintextModel::noteAt(
+    int aRow) const
 {
     const ModelData* data = iPrivate->dataAt(aRow);
+
     return data ? &data->iNote : NULL;
 }
 
-bool FoilNotesPlaintextModel::selectedAt(int aRow) const
+bool
+FoilNotesPlaintextModel::selectedAt(
+    int aRow) const
 {
     const ModelData* data = iPrivate->dataAt(aRow);
+
     return data && data->iSelected;
 }
 
-void FoilNotesPlaintextModel::setSelectedAt(int aRow, bool aSelected)
+int
+FoilNotesPlaintextModel::selectedCount() const
+{
+    return iPrivate->iSelected;
+}
+
+void
+FoilNotesPlaintextModel::setSelectedAt(
+    int aRow,
+    bool aSelected)
 {
     ModelData* data = iPrivate->dataAt(aRow);
+
     HDEBUG(data->pagenr() << aSelected);
     if (data->iSelected && !aSelected) {
         HASSERT(iPrivate->iSelected > 0);
+        data->iSelected = false;
         iPrivate->iSelected--;
+        iPrivate->queueSignal(SignalSelectedChanged);
     } else if (!data->iSelected && aSelected) {
         HASSERT(iPrivate->iSelected < iPrivate->rowCount());
+        data->iSelected = true;
         iPrivate->iSelected++;
+        iPrivate->queueSignal(SignalSelectedChanged);
     }
-    data->iSelected = aSelected;
     iPrivate->dataChanged(aRow, Private::SelectedRole);
 }
 
-int FoilNotesPlaintextModel::selectedCount() const
+void
+FoilNotesPlaintextModel::emitQueuedSignals()
 {
-    return iPrivate->iSelected;
+    iPrivate->emitQueuedSignals();
 }
 
 #include "FoilNotesPlaintextModel.moc"

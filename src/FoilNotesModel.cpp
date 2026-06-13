@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2024 Slava Monich <slava@monich.com>
+ * Copyright (C) 2018-2026 Slava Monich <slava@monich.com>
  * Copyright (C) 2018-2021 Jolla Ltd.
  *
  * You may use this file under the terms of the BSD license as follows:
@@ -41,7 +41,14 @@
 
 #include "HarbourDebug.h"
 #include "HarbourTask.h"
+#include "HarbourParentSignalQueueObject.h"
 #include "HarbourProcessState.h"
+
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QThreadPool>
 
 #include "foil_output.h"
 #include "foil_private_key.h"
@@ -74,48 +81,56 @@
 #define INFO_ORDER_DELIMITER_S  ","
 
 // Role names
-#define FOILNOTES_ROLES(role) \
+#define MODEL_ROLES(role) \
     role(Body, body) \
     role(Color, color) \
     role(PageNr, pagenr) \
-    role(Selected, selected) \
-    role(Busy, busy)
+    role(Selected, selected)
+
+// s(SignalName,signalName,Suffix)
+#define MODEL_SIGNALS(s) \
+    s(Selected,selected,Changed) \
+    s(Count,count,Changed) \
+    s(Busy,busy,Changed) \
+    s(KeyAvailable,keyAvailable,Changed) \
+    s(FoilState,foilState,Changed) \
+    s(Key,key,Generated) \
+    s(TextIndex,textIndex,Changed) \
+    s(Text,text,Changed)
 
 // ==========================================================================
 // FoilNotesModel::ModelData
 // ==========================================================================
 
-class FoilNotesModel::ModelData {
+class FoilNotesModel::ModelData
+{
 public:
     enum Role {
         FirstRole = Qt::UserRole,
-#define ROLE(X,x) X##Role,
-        FOILNOTES_ROLES(ROLE)
-#undef ROLE
+        #define ROLE(X,x) X##Role,
+        MODEL_ROLES(ROLE)
+        #undef ROLE
         LastRole
     };
 
-#define ROLE(X,x) static const QString RoleName##X;
-    FOILNOTES_ROLES(ROLE)
-#undef ROLE
+    #define ROLE(X,x) static const QString RoleName##X;
+    MODEL_ROLES(ROLE)
+    #undef ROLE
 
     typedef QList<ModelData*> List;
     typedef List::ConstIterator ConstIterator;
 
-    ModelData(QString aBody, QColor aColor, uint aPageNr,
-        QString aPath, uint aNoteId);
-    ~ModelData();
+    ModelData(const QString&, const QColor&, uint, const QString&, uint);
 
-    QVariant get(Role aRole) const;
+    QVariant get(Role) const;
     QString body() const { return iNote.iBody; }
     QColor color() const { return iNote.iColor; }
     QString colorName() const { return iNote.iColor.name(); }
     uint pagenr() const { return iNote.iPageNr; }
-    bool busy() const;
 
-    static QString headerString(const FoilMsg* aMsg, const char* aKey);
-    static QColor headerColor(const FoilMsg* aMsg, const char* aKey);
-    static uint nextId(QAtomicInt* aNextId);
+    static QString headerString(const FoilMsg*, const char*);
+    static QColor headerColor(const FoilMsg*, const char*);
+    static uint nextId(QAtomicInt*);
 
 public:
     Note iNote;
@@ -123,36 +138,33 @@ public:
     QString iPath;
     QString iFileName;
     bool iSelected;
-    HarbourTask* iDecryptTask;
 };
 
 #define ROLE(X,x) const QString FoilNotesModel::ModelData::RoleName##X(#x);
-FOILNOTES_ROLES(ROLE)
+MODEL_ROLES(ROLE)
 #undef ROLE
 
-FoilNotesModel::ModelData::ModelData(QString aBody, QColor aColor, uint aPageNr,
-    QString aPath, uint aNoteId) :
+FoilNotesModel::ModelData::ModelData(
+    const QString& aBody,
+    const QColor& aColor,
+    uint aPageNr,
+    const QString& aPath,
+    uint aNoteId) :
     iNote(aPageNr, aColor, aBody),
     iNoteId(aNoteId),
     iPath(aPath),
-    iSelected(false),
-    iDecryptTask(NULL)
-{
-}
+    iSelected(false)
+{}
 
-FoilNotesModel::ModelData::~ModelData()
-{
-    if (iDecryptTask) iDecryptTask->release();
-}
-
-QVariant FoilNotesModel::ModelData::get(Role aRole) const
+QVariant
+FoilNotesModel::ModelData::get(
+    Role aRole) const
 {
     switch (aRole) {
     case BodyRole: return body();
     case ColorRole: return color();
     case PageNrRole: return pagenr();
     case SelectedRole: return iSelected;
-    case BusyRole: return busy();
     // No default to make sure that we get "warning: enumeration value
     // not handled in switch" if we forget to handle a real role.
     case FirstRole:
@@ -162,27 +174,30 @@ QVariant FoilNotesModel::ModelData::get(Role aRole) const
     return QVariant();
 }
 
-bool FoilNotesModel::ModelData::busy() const
-{
-    return iDecryptTask != NULL;
-}
-
-QString FoilNotesModel::ModelData::headerString(const FoilMsg* aMsg,
+QString
+FoilNotesModel::ModelData::headerString(
+    const FoilMsg* aMsg,
     const char* aKey)
 {
     const char* value = foilmsg_get_value(aMsg, aKey);
+
     return (value && value[0]) ? QString::fromLatin1(value) : QString();
 }
 
-QColor FoilNotesModel::ModelData::headerColor(const FoilMsg* aMsg,
+QColor
+FoilNotesModel::ModelData::headerColor(
+    const FoilMsg* aMsg,
     const char* aKey)
 {
     return QColor(headerString(aMsg, aKey));
 }
 
-uint FoilNotesModel::ModelData::nextId(QAtomicInt* aNextId)
+uint
+FoilNotesModel::ModelData::nextId(
+    QAtomicInt* aNextId)
 {
     uint id;
+
     while (!(id = aNextId->fetchAndAddRelaxed(1)));
     return id;
 }
@@ -191,51 +206,48 @@ uint FoilNotesModel::ModelData::nextId(QAtomicInt* aNextId)
 // FoilNotesModel::ModelInfo
 // ==========================================================================
 
-class FoilNotesModel::ModelInfo {
+class FoilNotesModel::ModelInfo
+{
 public:
     ModelInfo() {}
-    ModelInfo(const FoilMsg* msg);
-    ModelInfo(const ModelInfo& aInfo);
-    ModelInfo(const ModelData::List aData);
+    ModelInfo(const FoilMsg*);
+    ModelInfo(const ModelInfo&);
+    ModelInfo(const ModelData::List&);
 
-    static ModelInfo load(QString aDir, FoilPrivateKey* aPrivate,
-        FoilKey* aPublic);
+    static ModelInfo load(const QString&, FoilPrivateKey*, FoilKey*);
 
-    void save(QString aDir, FoilPrivateKey* aPrivate, FoilKey* aPublic);
-    ModelInfo& operator = (const ModelInfo& aInfo);
+    void save(const QString&, FoilPrivateKey*, FoilKey*) const;
+    ModelInfo& operator=(const ModelInfo&);
 
 public:
     QStringList iOrder;
 };
 
-FoilNotesModel::ModelInfo::ModelInfo(const ModelInfo& aInfo) :
+FoilNotesModel::ModelInfo::ModelInfo(
+    const ModelInfo& aInfo) :
     iOrder(aInfo.iOrder)
-{
-}
+{}
 
-FoilNotesModel::ModelInfo& FoilNotesModel::ModelInfo::operator=(const ModelInfo& aInfo)
-{
-    iOrder = aInfo.iOrder;
-    return *this;
-}
-
-FoilNotesModel::ModelInfo::ModelInfo(const ModelData::List aData)
+FoilNotesModel::ModelInfo::ModelInfo(
+    const ModelData::List& aData)
 {
     const int n = aData.count();
-    if (n > 0) {
-        iOrder.reserve(n);
-        for (int i = 0; i < n; i++) {
-            const ModelData* data = aData.at(i);
-            iOrder.append(QFileInfo(data->iPath).fileName());
-        }
+
+    iOrder.reserve(n);
+    for (int i = 0; i < n; i++) {
+        const ModelData* data = aData.at(i);
+        iOrder.append(QFileInfo(data->iPath).fileName());
     }
 }
 
-FoilNotesModel::ModelInfo::ModelInfo(const FoilMsg* msg)
+FoilNotesModel::ModelInfo::ModelInfo(
+    const FoilMsg* msg)
 {
     const char* order = foilmsg_get_value(msg, INFO_ORDER_HEADER);
+
     if (order) {
         char** strv = g_strsplit(order, INFO_ORDER_DELIMITER_S, -1);
+
         for (char** ptr = strv; *ptr; ptr++) {
             iOrder.append(g_strstrip(*ptr));
         }
@@ -244,15 +256,29 @@ FoilNotesModel::ModelInfo::ModelInfo(const FoilMsg* msg)
     }
 }
 
-FoilNotesModel::ModelInfo FoilNotesModel::ModelInfo::load(QString aDir,
-    FoilPrivateKey* aPrivate, FoilKey* aPublic)
+FoilNotesModel::ModelInfo&
+FoilNotesModel::ModelInfo::operator=(
+    const ModelInfo& aInfo)
 {
-    ModelInfo info;
+    iOrder = aInfo.iOrder;
+    return *this;
+}
+
+FoilNotesModel::ModelInfo
+FoilNotesModel::ModelInfo::load(
+    const QString& aDir,
+    FoilPrivateKey* aPrivate,
+    FoilKey* aPublic)
+{
     QString fullPath(aDir + "/" INFO_FILE);
     const QByteArray path(fullPath.toUtf8());
     const char* fname = path.constData();
+
     HDEBUG("Loading" << fname);
-    FoilMsg* msg = foilmsg_decrypt_file(aPrivate, fname, NULL);
+
+    ModelInfo info;
+    FoilMsg* msg = foilmsg_decrypt_file(aPrivate, fname, Q_NULLPTR);
+
     if (msg) {
         if (foilmsg_verify(msg, aPublic)) {
             info = ModelInfo(msg);
@@ -264,16 +290,21 @@ FoilNotesModel::ModelInfo FoilNotesModel::ModelInfo::load(QString aDir,
     return info;
 }
 
-void FoilNotesModel::ModelInfo::save(QString aDir, FoilPrivateKey* aPrivate,
-    FoilKey* aPublic)
+void
+FoilNotesModel::ModelInfo::save(
+    const QString& aDir,
+    FoilPrivateKey* aPrivate,
+    FoilKey* aPublic) const
 {
     QString fullPath(aDir + "/" INFO_FILE);
     const QByteArray path(fullPath.toUtf8());
     const char* fname = path.constData();
     FoilOutput* out = foil_output_file_new_open(fname);
+
     if (out) {
         QString buf;
         const int n = iOrder.count();
+
         for (int i = 0; i < n; i++) {
             if (!buf.isEmpty()) buf += QChar(INFO_ORDER_DELIMITER);
             buf += iOrder.at(i);
@@ -286,6 +317,7 @@ void FoilNotesModel::ModelInfo::save(QString aDir, FoilPrivateKey* aPrivate,
 
         FoilMsgHeaders headers;
         FoilMsgHeader header[1];
+
         headers.header = header;
         headers.count = 0;
         header[headers.count].name = INFO_ORDER_HEADER;
@@ -293,14 +325,16 @@ void FoilNotesModel::ModelInfo::save(QString aDir, FoilPrivateKey* aPrivate,
         headers.count++;
 
         FoilMsgEncryptOptions opt;
+
         foilmsg_encrypt_defaults(&opt);
         opt.key_type = ENCRYPT_KEY_TYPE;
         opt.signature = SIGNATURE_TYPE;
 
         FoilBytes data;
+
         foil_bytes_from_string(&data, INFO_CONTENTS);
-        foilmsg_encrypt(out, &data, NULL, &headers, aPrivate, aPublic,
-            &opt, NULL);
+        foilmsg_encrypt(out, &data, Q_NULLPTR, &headers, aPrivate, aPublic,
+            &opt, Q_NULLPTR);
         foil_output_unref(out);
         if (chmod(fname, ENCRYPT_FILE_MODE) < 0) {
             HWARN("Failed to chmod" << fname << strerror(errno));
@@ -314,33 +348,33 @@ void FoilNotesModel::ModelInfo::save(QString aDir, FoilPrivateKey* aPrivate,
 // FoilNotesModel::BaseTask
 // ==========================================================================
 
-class FoilNotesModel::BaseTask : public HarbourTask {
-    Q_OBJECT
-
+class FoilNotesModel::BaseTask :
+    public HarbourTask
+{
 public:
-    BaseTask(QThreadPool* aPool, FoilPrivateKey* aPrivateKey,
-        FoilKey* aPublicKey);
+    BaseTask(QThreadPool*, FoilPrivateKey*, FoilKey*);
     virtual ~BaseTask();
 
-    FoilMsg* decryptAndVerify(QString aFileName) const;
-    FoilMsg* decryptAndVerify(const char* aFileName) const;
+    FoilMsg* decryptAndVerify(const QString&) const;
+    FoilMsg* decryptAndVerify(const char*) const;
 
-    static bool removeFile(QString aPath);
-    static QString toString(const FoilMsg* aMsg);
-    static FoilOutput* createFoilFile(QString aDestDir, GString* aOutPath);
+    static bool removeFile(const QString&);
+    static QString toString(const FoilMsg*);
+    static FoilOutput* createFoilFile(const QString&, GString*);
 
 public:
     FoilPrivateKey* iPrivateKey;
     FoilKey* iPublicKey;
 };
 
-FoilNotesModel::BaseTask::BaseTask(QThreadPool* aPool,
-    FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey) :
+FoilNotesModel::BaseTask::BaseTask(
+    QThreadPool* aPool,
+    FoilPrivateKey* aPrivateKey,
+    FoilKey* aPublicKey) :
     HarbourTask(aPool),
     iPrivateKey(foil_private_key_ref(aPrivateKey)),
     iPublicKey(foil_key_ref(aPublicKey))
-{
-}
+{}
 
 FoilNotesModel::BaseTask::~BaseTask()
 {
@@ -348,7 +382,9 @@ FoilNotesModel::BaseTask::~BaseTask()
     foil_key_unref(iPublicKey);
 }
 
-bool FoilNotesModel::BaseTask::removeFile(QString aPath)
+bool
+FoilNotesModel::BaseTask::removeFile(
+    const QString& aPath)
 {
     if (!aPath.isEmpty()) {
         if (QFile::remove(aPath)) {
@@ -360,21 +396,28 @@ bool FoilNotesModel::BaseTask::removeFile(QString aPath)
     return false;
 }
 
-FoilMsg* FoilNotesModel::BaseTask::decryptAndVerify(QString aFileName) const
+FoilMsg*
+FoilNotesModel::BaseTask::decryptAndVerify(
+    const QString& aFileName) const
 {
     if (!aFileName.isEmpty()) {
         const QByteArray fileNameBytes(aFileName.toUtf8());
+
         return decryptAndVerify(fileNameBytes.constData());
     } else{
-        return NULL;
+        return Q_NULLPTR;
     }
 }
 
-FoilMsg* FoilNotesModel::BaseTask::decryptAndVerify(const char* aFileName) const
+FoilMsg*
+FoilNotesModel::BaseTask::decryptAndVerify(
+    const char* aFileName) const
 {
     if (aFileName) {
         HDEBUG("Decrypting" << aFileName);
-        FoilMsg* msg = foilmsg_decrypt_file(iPrivateKey, aFileName, NULL);
+
+        FoilMsg* msg = foilmsg_decrypt_file(iPrivateKey, aFileName, Q_NULLPTR);
+
         if (msg) {
 #if HARBOUR_DEBUG
             for (uint i = 0; i < msg->headers.count; i++) {
@@ -390,16 +433,20 @@ FoilMsg* FoilNotesModel::BaseTask::decryptAndVerify(const char* aFileName) const
             foilmsg_free(msg);
         }
     }
-    return NULL;
+    return Q_NULLPTR;
 }
 
-QString FoilNotesModel::BaseTask::toString(const FoilMsg* aMsg)
+QString
+FoilNotesModel::BaseTask::toString(
+    const FoilMsg* aMsg)
 {
     if (aMsg) {
         const char* type = aMsg->content_type;
+
         if (!type || g_str_has_prefix(type, "text/")) {
             gsize size;
             const char* data = (char*)g_bytes_get_data(aMsg->data, &size);
+
             if (data && size) {
                 return QString::fromUtf8(data, size);
             }
@@ -410,18 +457,24 @@ QString FoilNotesModel::BaseTask::toString(const FoilMsg* aMsg)
     return QString();
 }
 
-FoilOutput* FoilNotesModel::BaseTask::createFoilFile(QString aDestDir,
+FoilOutput*
+FoilNotesModel::BaseTask::createFoilFile(
+    const QString& aDestDir,
     GString* aOutPath)
 {
     // Generate random name for the encrypted file
-    FoilOutput* out = NULL;
+    FoilOutput* out = Q_NULLPTR;
     const QByteArray dir(aDestDir.toUtf8());
+
     g_string_truncate(aOutPath, 0);
     g_string_append_len(aOutPath, dir.constData(), dir.size());
     g_string_append_c(aOutPath, '/');
+
     const gsize prefix_len = aOutPath->len;
+
     for (int i = 0; i < 100 && !out; i++) {
         guint8 data[8];
+
         foil_random_generate(FOIL_RANDOM_DEFAULT, data, sizeof(data));
         g_string_truncate(aOutPath, prefix_len);
         g_string_append_printf(aOutPath, "%02X%02X%02X%02X%02X%02X%02X%02X",
@@ -436,43 +489,50 @@ FoilOutput* FoilNotesModel::BaseTask::createFoilFile(QString aDestDir,
 // FoilNotesModel::GenerateKeyTask
 // ==========================================================================
 
-class FoilNotesModel::GenerateKeyTask : public BaseTask {
+class FoilNotesModel::GenerateKeyTask :
+    public BaseTask
+{
     Q_OBJECT
 
 public:
-    GenerateKeyTask(QThreadPool* aPool, QString aKeyFile, int aBits,
-        QString aPassword);
+    GenerateKeyTask(QThreadPool*, const QString&, int, const QString&);
 
-    virtual void performTask();
+    virtual void performTask() Q_DECL_OVERRIDE;
 
 public:
-    QString iKeyFile;
-    int iBits;
-    QString iPassword;
+    const QString iKeyFile;
+    const int iBits;
+    const QString iPassword;
 };
 
-FoilNotesModel::GenerateKeyTask::GenerateKeyTask(QThreadPool* aPool,
-    QString aKeyFile, int aBits, QString aPassword) :
-    BaseTask(aPool, NULL, NULL),
+FoilNotesModel::GenerateKeyTask::GenerateKeyTask(
+    QThreadPool* aPool,
+    const QString& aKeyFile,
+    int aBits,
+    const QString& aPassword) :
+    BaseTask(aPool, Q_NULLPTR, Q_NULLPTR),
     iKeyFile(aKeyFile),
     iBits(aBits),
     iPassword(aPassword)
-{
-}
+{}
 
-void FoilNotesModel::GenerateKeyTask::performTask()
+void
+FoilNotesModel::GenerateKeyTask::performTask()
 {
     HDEBUG("Generating key..." << iBits << "bits");
+
     FoilKey* key = foil_key_generate_new(FOIL_KEY_RSA_PRIVATE, iBits);
+
     if (key) {
-        GError* error = NULL;
+        GError* error = Q_NULLPTR;
         const QByteArray path(iKeyFile.toUtf8());
         const QByteArray passphrase(iPassword.toUtf8());
         FoilOutput* out = foil_output_file_new_open(path.constData());
         FoilPrivateKey* pk = FOIL_PRIVATE_KEY(key);
+
         if (foil_private_key_encrypt(pk, out, FOIL_KEY_EXPORT_FORMAT_DEFAULT,
             passphrase.constData(),
-            NULL, &error)) {
+            Q_NULLPTR, &error)) {
             iPrivateKey = pk;
             iPublicKey = foil_public_key_new_from_private(pk);
         } else {
@@ -489,35 +549,41 @@ void FoilNotesModel::GenerateKeyTask::performTask()
 // FoilNotesModel::EncryptTask
 // ==========================================================================
 
-class FoilNotesModel::EncryptTask : public BaseTask {
+class FoilNotesModel::EncryptTask :
+    public BaseTask
+{
     Q_OBJECT
 
 public:
-    EncryptTask(QThreadPool* aPool, QString aBody, QColor aColor, uint aPageNr,
-        uint aNoteId, FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey,
-        QString aDestDir, uint aReqId);
-    EncryptTask(QThreadPool* aPool, const ModelData* aData,
-        FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey,
-        QString aDestDir);
+    EncryptTask(QThreadPool*, const QString&, const QColor&, uint, uint,
+        FoilPrivateKey*, FoilKey*, const QString&, uint);
+    EncryptTask(QThreadPool*, const ModelData*, FoilPrivateKey*, FoilKey*,
+        const QString&);
 
     ~EncryptTask();
 
-    virtual void performTask();
+    virtual void performTask() Q_DECL_OVERRIDE;
 
 public:
-    QString iBody;
-    QColor iColor;
-    uint iPageNr;
-    uint iNoteId;
-    uint iReqId;
-    QString iDestDir;
-    QString iRemoveFile;
+    const QString iBody;
+    const QColor iColor;
+    const uint iPageNr;
+    const uint iNoteId;
+    const uint iReqId;
+    const QString iDestDir;
+    const QString iRemoveFile;
     ModelData* iData;
 };
 
-FoilNotesModel::EncryptTask::EncryptTask(QThreadPool* aPool,
-    QString aBody, QColor aColor, uint aPageNr, uint aNoteId,
-    FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey, QString aDestDir,
+FoilNotesModel::EncryptTask::EncryptTask(
+    QThreadPool* aPool,
+    const QString& aBody,
+    const QColor& aColor,
+    uint aPageNr,
+    uint aNoteId,
+    FoilPrivateKey* aPrivateKey,
+    FoilKey* aPublicKey,
+    const QString& aDestDir,
     uint aReqId) :
     BaseTask(aPool, aPrivateKey, aPublicKey),
     iBody(aBody),
@@ -526,14 +592,17 @@ FoilNotesModel::EncryptTask::EncryptTask(QThreadPool* aPool,
     iNoteId(aNoteId),
     iReqId(aReqId),
     iDestDir(aDestDir),
-    iData(NULL)
+    iData(Q_NULLPTR)
 {
     HDEBUG("Encrypting" << iPageNr << iColor.name() << iBody << iReqId);
 }
 
-FoilNotesModel::EncryptTask::EncryptTask(QThreadPool* aPool,
-    const ModelData* aData, FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey,
-    QString aDestDir) :
+FoilNotesModel::EncryptTask::EncryptTask(
+    QThreadPool* aPool,
+    const ModelData* aData,
+    FoilPrivateKey* aPrivateKey,
+    FoilKey* aPublicKey,
+    const QString& aDestDir) :
     BaseTask(aPool, aPrivateKey, aPublicKey),
     iBody(aData->body()),
     iColor(aData->color()),
@@ -542,7 +611,7 @@ FoilNotesModel::EncryptTask::EncryptTask(QThreadPool* aPool,
     iReqId(0),
     iDestDir(aDestDir),
     iRemoveFile(aData->iPath),
-    iData(NULL)
+    iData(Q_NULLPTR)
 {
     HDEBUG("Encrypting" << iPageNr << iColor.name() << iBody);
 }
@@ -555,12 +624,15 @@ FoilNotesModel::EncryptTask::~EncryptTask()
     }
 }
 
-void FoilNotesModel::EncryptTask::performTask()
+void
+FoilNotesModel::EncryptTask::performTask()
 {
     GString* dest = g_string_sized_new(iDestDir.size() + 9);
     FoilOutput* out = createFoilFile(iDestDir, dest);
+
     if (out) {
         FoilMsgEncryptOptions opt;
+
         foilmsg_encrypt_defaults(&opt);
         opt.key_type = ENCRYPT_KEY_TYPE;
         opt.signature = SIGNATURE_TYPE;
@@ -572,6 +644,7 @@ void FoilNotesModel::EncryptTask::performTask()
         headers.count = 0;
 
         QByteArray color(iColor.name().toLatin1());
+
         header[headers.count].name = HEADER_COLOR;
         header[headers.count].value = color.constData();
         headers.count++;
@@ -581,11 +654,12 @@ void FoilNotesModel::EncryptTask::performTask()
 
         QByteArray bodyBytes(iBody.toUtf8());
         FoilBytes body;
+
         body.val = (guint8*)bodyBytes.constData();
         body.len = bodyBytes.length();
 
-        if (foilmsg_encrypt(out, &body, NULL, &headers,
-            iPrivateKey, iPublicKey, &opt, NULL)) {
+        if (foilmsg_encrypt(out, &body, Q_NULLPTR, &headers,
+            iPrivateKey, iPublicKey, &opt, Q_NULLPTR)) {
             QString path(QString::fromLocal8Bit(dest->str, dest->len));
             iData = new ModelData(iBody, iColor, 0, path, iNoteId);
             removeFile(iRemoveFile);
@@ -606,29 +680,35 @@ void FoilNotesModel::EncryptTask::performTask()
 // FoilNotesModel::SaveInfoTask
 // ==========================================================================
 
-class FoilNotesModel::SaveInfoTask : public BaseTask {
+class FoilNotesModel::SaveInfoTask :
+    public BaseTask
+{
     Q_OBJECT
 
 public:
-    SaveInfoTask(QThreadPool* aPool, ModelInfo aInfo, QString aDir,
-        FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey);
+    SaveInfoTask(QThreadPool*, ModelInfo, const QString&,
+        FoilPrivateKey*,FoilKey*);
 
-    virtual void performTask();
+    virtual void performTask() Q_DECL_OVERRIDE;
 
 public:
-    ModelInfo iInfo;
-    QString iFoilDir;
+    const ModelInfo iInfo;
+    const QString iFoilDir;
 };
 
-FoilNotesModel::SaveInfoTask::SaveInfoTask(QThreadPool* aPool, ModelInfo aInfo,
-    QString aFoilDir, FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey) :
+FoilNotesModel::SaveInfoTask::SaveInfoTask(
+    QThreadPool* aPool,
+    ModelInfo aInfo,
+    const QString& aFoilDir,
+    FoilPrivateKey* aPrivateKey,
+    FoilKey* aPublicKey) :
     BaseTask(aPool, aPrivateKey, aPublicKey),
     iInfo(aInfo),
     iFoilDir(aFoilDir)
-{
-}
+{}
 
-void FoilNotesModel::SaveInfoTask::performTask()
+void
+FoilNotesModel::SaveInfoTask::performTask()
 {
     if (!isCanceled()) {
         iInfo.save(iFoilDir, iPrivateKey, iPublicKey);
@@ -639,7 +719,9 @@ void FoilNotesModel::SaveInfoTask::performTask()
 // FoilNotesModel::DecryptNotesTask
 // ==========================================================================
 
-class FoilNotesModel::DecryptNotesTask : public BaseTask {
+class FoilNotesModel::DecryptNotesTask :
+    public BaseTask
+{
     Q_OBJECT
 
 public:
@@ -665,39 +747,45 @@ public:
         DecryptNotesTask* iTask;
     };
 
-    DecryptNotesTask(QThreadPool* aPool, QString aDir,
+    DecryptNotesTask(QThreadPool* aPool, const QString& aDir,
         FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey,
         QAtomicInt* aNextNoteId);
 
-    virtual void performTask();
+    virtual void performTask() Q_DECL_OVERRIDE;
 
-    bool decryptNote(QString aPath, uint aPageNr);
+    bool decryptNote(const QString&, uint);
 
 Q_SIGNALS:
     void progress(DecryptNotesTask::Progress::Ptr aProgress);
 
 public:
-    QString iDir;
+    const QString iDir;
     QAtomicInt* iNextNoteId;
     bool iSaveInfo;
 };
 
 Q_DECLARE_METATYPE(FoilNotesModel::DecryptNotesTask::Progress::Ptr)
 
-FoilNotesModel::DecryptNotesTask::DecryptNotesTask(QThreadPool* aPool,
-    QString aDir, FoilPrivateKey* aPrivateKey, FoilKey* aPublicKey,
+FoilNotesModel::DecryptNotesTask::DecryptNotesTask(
+    QThreadPool* aPool,
+    const QString& aDir,
+    FoilPrivateKey* aPrivateKey,
+    FoilKey* aPublicKey,
     QAtomicInt* aNextNoteId) :
     BaseTask(aPool, aPrivateKey, aPublicKey),
     iDir(aDir),
     iNextNoteId(aNextNoteId),
     iSaveInfo(false)
-{
-}
+{}
 
-bool FoilNotesModel::DecryptNotesTask::decryptNote(QString aPath, uint aPageNr)
+bool
+FoilNotesModel::DecryptNotesTask::decryptNote(
+    const QString& aPath,
+    uint aPageNr)
 {
     bool ok = false;
     FoilMsg* msg = decryptAndVerify(aPath);
+
     if (msg) {
         QColor color = ModelData::headerColor(msg, HEADER_COLOR);
         if (color.isValid()) {
@@ -713,10 +801,12 @@ bool FoilNotesModel::DecryptNotesTask::decryptNote(QString aPath, uint aPageNr)
     return ok;
 }
 
-void FoilNotesModel::DecryptNotesTask::performTask()
+void
+FoilNotesModel::DecryptNotesTask::performTask()
 {
     if (!isCanceled()) {
         const QString path(iDir);
+
         HDEBUG("Checking" << iDir);
 
         QDir dir(path);
@@ -729,6 +819,7 @@ void FoilNotesModel::DecryptNotesTask::performTask()
         const QString infoFile(INFO_FILE);
         QHash<QString,QString> fileMap;
         int i;
+
         for (i = 0; i < list.count(); i++) {
             const QFileInfo& info = list.at(i);
             if (info.isFile()) {
@@ -741,6 +832,7 @@ void FoilNotesModel::DecryptNotesTask::performTask()
 
         // First decrypt files in known order
         uint pagenr = 1;
+
         for (i = 0; i < info.iOrder.count() && !isCanceled(); i++) {
             const QString name(info.iOrder.at(i));
             if (fileMap.contains(name) &&
@@ -756,6 +848,7 @@ void FoilNotesModel::DecryptNotesTask::performTask()
         // Followed by the remaining files in no particular order
         if (!fileMap.isEmpty()) {
             const QStringList remainingFiles = fileMap.values();
+
             HDEBUG("Remaining file(s)" << remainingFiles);
             for (i = 0; i < remainingFiles.count() && !isCanceled(); i++) {
                 if (decryptNote(remainingFiles.at(i), pagenr)) {
@@ -773,32 +866,30 @@ void FoilNotesModel::DecryptNotesTask::performTask()
 // FoilNotesModel::Private
 // ==========================================================================
 
-class FoilNotesModel::Private : public QObject {
+enum FoilNotesModelSignal {
+    #define SIGNAL_ENUM_(Name,name,Suffix) Signal##Name##Suffix,
+    MODEL_SIGNALS(SIGNAL_ENUM_)
+    #undef SIGNAL_ENUM_
+    FoilNotesModelSignalCount
+};
+
+typedef HarbourParentSignalQueueObject<FoilNotesModel,
+    FoilNotesModelSignal, FoilNotesModelSignalCount>
+    FoilNotesModelPrivateBase;
+
+class FoilNotesModel::Private :
+    public FoilNotesModelPrivateBase
+{
     Q_OBJECT
 
+    static const SignalEmitter gSignalEmitters[];
+
 public:
-    typedef void (FoilNotesModel::*SignalEmitter)();
-    typedef uint SignalMask;
-
-    // The order of constants must match the array in emitQueuedSignals()
-    enum Signal {
-        SignalCountChanged,
-        SignalBusyChanged,
-        SignalKeyAvailableChanged,
-        SignalFoilStateChanged,
-        SignalKeyGenerated,
-        SignalSelectedChanged,
-        SignalTextIndexChanged,
-        SignalTextChanged,
-        SignalDecryptionStarted,
-        SignalCount
-    };
-
-    Private(FoilNotesModel* aParent);
+    Private(FoilNotesModel*);
     ~Private();
 
 public Q_SLOTS:
-    void onDecryptNotesProgress(DecryptNotesTask::Progress::Ptr aProgress);
+    void onDecryptNotesProgress(DecryptNotesTask::Progress::Ptr);
     void onDecryptNotesTaskDone();
     void onEncryptNoteDone();
     void onSaveInfoDone();
@@ -806,42 +897,37 @@ public Q_SLOTS:
     void onGenerateKeyTaskDone();
 
 public:
-    FoilNotesModel* parentModel();
     int rowCount() const;
     ModelData* dataAt(int aIndex);
-    void queueSignal(Signal aSignal);
-    void emitQueuedSignals();
     uint nextId();
     int findNote(uint aNoteId);
-    void updatePageNr(uint aStartPos);
-    void updatePageNr(uint aStartPos, uint aEndPos);
+    void updatePageNr(uint);
+    void updatePageNr(uint, uint);
     void updateText();
-    bool checkPassword(QString aPassword);
-    bool changePassword(QString aOldPassword, QString aNewPassword);
-    void setKeys(FoilPrivateKey* aPrivate, FoilKey* aPublic = NULL);
-    void setFoilState(FoilState aState);
-    void addNote(QColor aColor, QString aBody);
-    void insertModelData(ModelData* aData);
-    void dataChanged(int aIndex, ModelData::Role aRole);
-    void dataChanged(QList<int> aRows, ModelData::Role aRole);
+    bool checkPassword(const QString&);
+    bool changePassword(const QString&, const QString&);
+    void setKeys(FoilPrivateKey*, FoilKey* aPublic = Q_NULLPTR);
+    void setFoilState(FoilState);
+    void addNote(const QColor&, const QString&);
+    void insertModelData(ModelData*);
+    void dataChanged(int, ModelData::Role);
+    void dataChanged(const QList<int>&, ModelData::Role);
     void destroyItemAt(int aIndex);
-    bool destroyItemAndRemoveFilesAt(int aIndex);
-    void deleteNoteAt(int aIndex);
-    void deleteNotes(QList<int> aRows);
-    void saveNoteAt(int aIndex);
-    void setBodyAt(int aIndex, QString aBody);
-    void setColorAt(int aIndex, QColor aColor);
+    bool destroyItemAndRemoveFilesAt(int);
+    void deleteNoteAt(int);
+    void deleteNotes(QList<int>);
+    void saveNoteAt(int);
+    void setBodyAt(int, const QString&);
+    void setColorAt(int, const QColor&);
     void clearModel();
     bool busy() const;
     void saveInfo();
-    void generate(int aBits, QString aPassword);
+    void generate(int, const QString&);
     void lock(bool aTimeout);
-    bool unlock(QString aPassword);
-    bool encrypt(QString aBody, QColor aColor, uint aPageNr, uint aReqId);
+    bool unlock(const QString&);
+    bool encrypt(const QString&, const QColor&, uint, uint);
 
 public:
-    SignalMask iQueuedSignals;
-    Signal iFirstQueuedSignal;
     ModelData::List iData;
     FoilState iFoilState;
     QString iFoilNotesDir;
@@ -850,9 +936,9 @@ public:
     FoilPrivateKey* iPrivateKey;
     FoilKey* iPublicKey;
     QThreadPool* iThreadPool;
-    SaveInfoTask* iSaveInfoTask;
-    GenerateKeyTask* iGenerateKeyTask;
-    DecryptNotesTask* iDecryptNotesTask;
+    HarbourTask::AutoReleasePointer<SaveInfoTask> iSaveInfoTask;
+    HarbourTask::AutoReleasePointer<GenerateKeyTask> iGenerateKeyTask;
+    HarbourTask::AutoReleasePointer<DecryptNotesTask> iDecryptNotesTask;
     QList<EncryptTask*> iEncryptTasks;
     QAtomicInt iNextId;
     int iSelected;
@@ -860,20 +946,23 @@ public:
     QString iText;
 };
 
-FoilNotesModel::Private::Private(FoilNotesModel* aParent) :
-    QObject(aParent),
-    iQueuedSignals(0),
-    iFirstQueuedSignal(SignalCount),
+const FoilNotesModelPrivateBase::SignalEmitter
+FoilNotesModel::Private::gSignalEmitters [] = {
+    #define SIGNAL_EMITTER_(Name,name,Suffix) &FoilNotesModel::name##Suffix,
+    MODEL_SIGNALS(SIGNAL_EMITTER_)
+    #undef  SIGNAL_EMITTER_
+};
+
+FoilNotesModel::Private::Private(
+    FoilNotesModel* aParent) :
+    FoilNotesModelPrivateBase(aParent, gSignalEmitters),
     iFoilState(FoilKeyMissing),
     iFoilNotesDir(QDir::homePath() + "/" FOIL_NOTES_DIR),
     iFoilKeyDir(QDir::homePath() + "/" FOIL_KEY_DIR),
     iFoilKeyFile(iFoilKeyDir + "/" + FOIL_KEY_FILE),
-    iPrivateKey(NULL),
-    iPublicKey(NULL),
+    iPrivateKey(Q_NULLPTR),
+    iPublicKey(Q_NULLPTR),
     iThreadPool(new QThreadPool(this)),
-    iSaveInfoTask(NULL),
-    iGenerateKeyTask(NULL),
-    iDecryptNotesTask(NULL),
     iNextId(1),
     iSelected(0),
     iTextIndex(-1)
@@ -897,10 +986,10 @@ FoilNotesModel::Private::Private(FoilNotesModel* aParent) :
     }
 
     // Initialize the key state
-    GError* error = NULL;
+    GError* error = Q_NULLPTR;
     const QByteArray path(iFoilKeyFile.toUtf8());
     FoilPrivateKey* key = foil_private_key_decrypt_from_file
-        (FOIL_KEY_RSA_PRIVATE, path.constData(), NULL, &error);
+        (FOIL_KEY_RSA_PRIVATE, path.constData(), Q_NULLPTR, &error);
     if (key) {
         HDEBUG("Key not encrypted");
         iFoilState = FoilKeyNotEncrypted;
@@ -927,9 +1016,9 @@ FoilNotesModel::Private::~Private()
 {
     foil_private_key_unref(iPrivateKey);
     foil_key_unref(iPublicKey);
-    if (iSaveInfoTask) iSaveInfoTask->release();
-    if (iGenerateKeyTask) iGenerateKeyTask->release();
-    if (iDecryptNotesTask) iDecryptNotesTask->release();
+    iSaveInfoTask.reset();
+    iGenerateKeyTask.reset();
+    iDecryptNotesTask.reset();
     for (int i = 0; i < iEncryptTasks.count(); i++) {
         iEncryptTasks.at(i)->release();
     }
@@ -938,79 +1027,34 @@ FoilNotesModel::Private::~Private()
     qDeleteAll(iData);
 }
 
-inline FoilNotesModel* FoilNotesModel::Private::parentModel()
-{
-    return qobject_cast<FoilNotesModel*>(parent());
-}
-
-void FoilNotesModel::Private::queueSignal(Signal aSignal)
-{
-    if (aSignal >= 0 && aSignal < SignalCount) {
-        const SignalMask signalBit = (SignalMask(1) << aSignal);
-        if (iQueuedSignals) {
-            iQueuedSignals |= signalBit;
-            if (iFirstQueuedSignal > aSignal) {
-                iFirstQueuedSignal = aSignal;
-            }
-        } else {
-            iQueuedSignals = signalBit;
-            iFirstQueuedSignal = aSignal;
-        }
-    }
-}
-
-void FoilNotesModel::Private::emitQueuedSignals()
-{
-    // The order must match the Signal enum:
-    static const SignalEmitter emitSignal [] = {
-        &FoilNotesModel::countChanged,          // SignalCountChanged
-        &FoilNotesModel::busyChanged,           // SignalBusyChanged
-        &FoilNotesModel::keyAvailableChanged,   // SignalKeyAvailableChanged
-        &FoilNotesModel::foilStateChanged,      // SignalFoilStateChanged
-        &FoilNotesModel::keyGenerated,          // SignalKeyGenerated
-        &FoilNotesModel::selectedChanged,       // SignalSelectedChanged
-        &FoilNotesModel::textIndexChanged,      // SignalTextIndexChanged
-        &FoilNotesModel::textChanged,           // SignalTextChanged
-        &FoilNotesModel::decryptionStarted      // SignalDecryptionStarted
-    };
-
-    Q_STATIC_ASSERT(G_N_ELEMENTS(emitSignal) == SignalCount);
-    if (iQueuedSignals) {
-        FoilNotesModel* model = parentModel();
-        // Reset first queued signal before emitting the signals.
-        // Signal handlers may emit new signals.
-        uint i = iFirstQueuedSignal;
-        iFirstQueuedSignal = SignalCount;
-        for (; i < SignalCount && iQueuedSignals; i++) {
-            const SignalMask signalBit = (SignalMask(1) << i);
-            if (iQueuedSignals & signalBit) {
-                iQueuedSignals &= ~signalBit;
-                Q_EMIT (model->*(emitSignal[i]))();
-            }
-        }
-    }
-}
-
-inline int FoilNotesModel::Private::rowCount() const
+inline
+int FoilNotesModel::Private::rowCount() const
 {
     return iData.count();
 }
 
-inline FoilNotesModel::ModelData* FoilNotesModel::Private::dataAt(int aIndex)
+inline
+FoilNotesModel::ModelData*
+FoilNotesModel::Private::dataAt(
+    int aIndex)
 {
     if (aIndex >= 0 && aIndex < iData.count()) {
         return iData.at(aIndex);
     } else {
-        return NULL;
+        return Q_NULLPTR;
     }
 }
 
-inline uint FoilNotesModel::Private::nextId()
+inline
+uint
+FoilNotesModel::Private::nextId()
 {
     return ModelData::nextId(&iNextId);
 }
 
-int FoilNotesModel::Private::findNote(uint aNoteId)
+int
+FoilNotesModel::Private::findNote(
+    uint aNoteId)
 {
     const int n = iData.count();
     for (int i = 0; i < n; i++) {
@@ -1022,7 +1066,10 @@ int FoilNotesModel::Private::findNote(uint aNoteId)
     return -1;
 }
 
-void FoilNotesModel::Private::setKeys(FoilPrivateKey* aPrivate, FoilKey* aPublic)
+void
+FoilNotesModel::Private::setKeys(
+    FoilPrivateKey* aPrivate,
+    FoilKey* aPublic)
 {
     if (aPrivate) {
         if (iPrivateKey) {
@@ -1038,20 +1085,22 @@ void FoilNotesModel::Private::setKeys(FoilPrivateKey* aPrivate, FoilKey* aPublic
         queueSignal(SignalKeyAvailableChanged);
         foil_private_key_unref(iPrivateKey);
         foil_key_unref(iPublicKey);
-        iPrivateKey = NULL;
-        iPublicKey = NULL;
+        iPrivateKey = Q_NULLPTR;
+        iPublicKey = Q_NULLPTR;
     }
 }
 
-bool FoilNotesModel::Private::checkPassword(QString aPassword)
+bool
+FoilNotesModel::Private::checkPassword(
+    const QString& aPassword)
 {
-    GError* error = NULL;
+    GError* error = Q_NULLPTR;
     HDEBUG(iFoilKeyFile);
     const QByteArray path(iFoilKeyFile.toUtf8());
 
     // First make sure that it's encrypted
     FoilPrivateKey* key = foil_private_key_decrypt_from_file
-        (FOIL_KEY_RSA_PRIVATE, path.constData(), NULL, &error);
+        (FOIL_KEY_RSA_PRIVATE, path.constData(), Q_NULLPTR, &error);
     if (key) {
         HWARN("Key not encrypted");
         foil_private_key_unref(key);
@@ -1082,31 +1131,35 @@ bool FoilNotesModel::Private::checkPassword(QString aPassword)
     return false;
 }
 
-bool FoilNotesModel::Private::changePassword(QString aOldPassword,
-    QString aNewPassword)
+bool
+FoilNotesModel::Private::changePassword(
+    const QString& aOldPassword,
+    const QString& aNewPassword)
 {
     HDEBUG(iFoilKeyFile);
     if (checkPassword(aOldPassword)) {
-        GError* error = NULL;
+        GError* error = Q_NULLPTR;
         QByteArray password(aNewPassword.toUtf8());
 
         // First write the temporary file
         QString tmpKeyFile = iFoilKeyFile + ".new";
         const QByteArray tmp(tmpKeyFile.toUtf8());
         FoilOutput* out = foil_output_file_new_open(tmp.constData());
+
         if (foil_private_key_encrypt(iPrivateKey, out,
             FOIL_KEY_EXPORT_FORMAT_DEFAULT, password.constData(),
-            NULL, &error) && foil_output_flush(out)) {
+            Q_NULLPTR, &error) && foil_output_flush(out)) {
             foil_output_unref(out);
 
             // Then rename it
             QString saveKeyFile = iFoilKeyFile + ".save";
             QFile::remove(saveKeyFile);
+
             if (QFile::rename(iFoilKeyFile, saveKeyFile) &&
                 QFile::rename(tmpKeyFile, iFoilKeyFile)) {
                 BaseTask::removeFile(saveKeyFile);
                 HDEBUG("Password changed");
-                Q_EMIT parentModel()->passwordChanged();
+                Q_EMIT parentObject()->passwordChanged();
                 return true;
             }
         } else {
@@ -1120,7 +1173,9 @@ bool FoilNotesModel::Private::changePassword(QString aOldPassword,
     return false;
 }
 
-void FoilNotesModel::Private::setFoilState(FoilState aState)
+void
+FoilNotesModel::Private::setFoilState(
+    FoilState aState)
 {
     if (iFoilState != aState) {
         iFoilState = aState;
@@ -1129,26 +1184,36 @@ void FoilNotesModel::Private::setFoilState(FoilState aState)
     }
 }
 
-void FoilNotesModel::Private::dataChanged(int aIndex, ModelData::Role aRole)
+void
+FoilNotesModel::Private::dataChanged(
+    int aIndex,
+    ModelData::Role aRole)
 {
     if (aIndex >= 0 && aIndex < iData.count()) {
+        FoilNotesModel* model = parentObject();
+        QModelIndex modelIndex(model->index(aIndex));
         QVector<int> roles;
         roles.append(aRole);
-        FoilNotesModel* model = parentModel();
-        QModelIndex modelIndex(model->index(aIndex));
+
         Q_EMIT model->dataChanged(modelIndex, modelIndex, roles);
     }
 }
 
-void FoilNotesModel::Private::dataChanged(QList<int> aRows, ModelData::Role aRole)
+void
+FoilNotesModel::Private::dataChanged(
+    const QList<int>& aRows,
+    ModelData::Role aRole)
 {
     const int n = aRows.count();
+
     if (n > 0) {
+        FoilNotesModel* model = parentObject();
         QVector<int> roles;
         roles.append(aRole);
-        FoilNotesModel* model = parentModel();
+
         for (int i = 0; i < n; i++) {
             const int row = aRows.at(i);
+
             if (row>= 0 && row < iData.count()) {
                 QModelIndex modelIndex(model->index(row));
                 Q_EMIT model->dataChanged(modelIndex, modelIndex, roles);
@@ -1157,10 +1222,13 @@ void FoilNotesModel::Private::dataChanged(QList<int> aRows, ModelData::Role aRol
     }
 }
 
-void FoilNotesModel::Private::insertModelData(ModelData* aData)
+void
+FoilNotesModel::Private::insertModelData(
+    ModelData* aData)
 {
-    // Validate the position
     const uint n = iData.count();
+
+    // Validate the position
     if (aData->pagenr() > n) {
         aData->iNote.iPageNr = n + 1;
     } else if (!aData->pagenr()) {
@@ -1169,7 +1237,8 @@ void FoilNotesModel::Private::insertModelData(ModelData* aData)
 
     // Insert it into the model
     const int pos = aData->pagenr() - 1;
-    FoilNotesModel* model = parentModel();
+    FoilNotesModel* model = parentObject();
+
     model->beginInsertRows(QModelIndex(), pos, pos);
     iData.insert(pos, aData);
     HDEBUG(aData->pagenr() << aData->colorName() << aData->body());
@@ -1179,46 +1248,52 @@ void FoilNotesModel::Private::insertModelData(ModelData* aData)
     updatePageNr(pos + 1);
 }
 
-void FoilNotesModel::Private::onDecryptNotesProgress(DecryptNotesTask::Progress::Ptr aProgress)
+void
+FoilNotesModel::Private::onDecryptNotesProgress(
+    DecryptNotesTask::Progress::Ptr aProgress)
 {
-    if (aProgress && aProgress->iTask == iDecryptNotesTask) {
+    if (aProgress && aProgress->iTask == iDecryptNotesTask.data()) {
         // Transfer ownership of this ModelData to the model
         insertModelData(aProgress->iModelData);
-        aProgress->iModelData = NULL;
+        aProgress->iModelData = Q_NULLPTR;
     }
     emitQueuedSignals();
 }
 
-void FoilNotesModel::Private::onDecryptNotesTaskDone()
+void
+FoilNotesModel::Private::onDecryptNotesTaskDone()
 {
     HDEBUG(iData.count() << "note(s) decrypted");
-    if (sender() == iDecryptNotesTask) {
-        bool infoUpdated = iDecryptNotesTask->iSaveInfo;
-        iDecryptNotesTask->release();
-        iDecryptNotesTask = NULL;
-        if (iFoilState == FoilDecrypting) {
-            setFoilState(FoilNotesReady);
-        }
-        if (infoUpdated) saveInfo();
-        if (!busy()) {
-            // We know we were busy when we received this signal
-            queueSignal(SignalBusyChanged);
-        }
+    const bool infoUpdated = iDecryptNotesTask->iSaveInfo;
+
+    iDecryptNotesTask.reset();
+    if (iFoilState == FoilDecrypting) {
+        setFoilState(FoilNotesReady);
+    }
+    if (infoUpdated) saveInfo();
+    if (!busy()) {
+        // We know we were busy when we received this signal
+        queueSignal(SignalBusyChanged);
     }
     emitQueuedSignals();
 }
 
-void FoilNotesModel::Private::addNote(QColor aColor, QString aBody)
+void
+FoilNotesModel::Private::addNote(
+    const QColor& aColor,
+    const QString& aBody)
 {
-    // Update model right away
     const bool wasBusy = busy();
     const uint id = nextId();
     ModelData* data = new ModelData(aBody, aColor, 1, QString(), id);
+
+    // Update the model right away
     insertModelData(data);
 
     // Then submit the encryption task
     EncryptTask* task = new EncryptTask(iThreadPool, data,
         iPrivateKey, iPublicKey, iFoilNotesDir);
+
     iEncryptTasks.append(task);
     task->submit(this, SLOT(onSaveNoteDone()));
     if (!wasBusy) {
@@ -1227,20 +1302,24 @@ void FoilNotesModel::Private::addNote(QColor aColor, QString aBody)
     }
 }
 
-void FoilNotesModel::Private::onSaveNoteDone()
+void
+FoilNotesModel::Private::onSaveNoteDone()
 {
     EncryptTask* task = qobject_cast<EncryptTask*>(sender());
+
     if (task) {
         HVERIFY(iEncryptTasks.removeAll(task));
         ModelData* taskData = task->iData;
+
         if (taskData) {
             // We let EncryptTask to delete taskData
-            int index = findNote(taskData->iNoteId);
+            const int index = findNote(taskData->iNoteId);
+
             if (index >= 0) {
                 // Steal actual path from taskData
                 HDEBUG("Encrypted" << qPrintable(taskData->iPath));
                 iData.at(index)->iPath = taskData->iPath;
-                taskData->iPath = QString();
+                taskData->iPath.clear();
                 saveInfo();
             }
         }
@@ -1253,14 +1332,19 @@ void FoilNotesModel::Private::onSaveNoteDone()
     }
 }
 
-bool FoilNotesModel::Private::encrypt(QString aBody, QColor aColor,
-    uint aPageNr, uint aReqId)
+bool
+FoilNotesModel::Private::encrypt(
+    const QString& aBody,
+    const QColor& aColor,
+    uint aPageNr,
+    uint aReqId)
 {
     if (iPrivateKey) {
         const bool wasBusy = busy();
         EncryptTask* task = new EncryptTask(iThreadPool, aBody, aColor,
             aPageNr, nextId(), iPrivateKey, iPublicKey, iFoilNotesDir,
             aReqId);
+
         iEncryptTasks.append(task);
         task->submit(this, SLOT(onEncryptNoteDone()));
         if (!wasBusy) {
@@ -1272,21 +1356,25 @@ bool FoilNotesModel::Private::encrypt(QString aBody, QColor aColor,
     return false;
 }
 
-void FoilNotesModel::Private::onEncryptNoteDone()
+void
+FoilNotesModel::Private::onEncryptNoteDone()
 {
     EncryptTask* task = qobject_cast<EncryptTask*>(sender());
+
     if (task) {
-        HVERIFY(iEncryptTasks.removeAll(task));
         ModelData* data = task->iData;
+
+        HVERIFY(iEncryptTasks.removeAll(task));
+
         // Notify submitter that we are done with this request
         if (data) {
             // Steal data from EncryptTask
             HDEBUG("Encrypted" << qPrintable(data->iPath));
             insertModelData(task->iData);
-            task->iData = NULL;
+            task->iData = Q_NULLPTR;
             saveInfo();
         }
-        Q_EMIT parentModel()->encryptionDone(task->iReqId, data != NULL);
+        Q_EMIT parentObject()->encryptionDone(task->iReqId, data != Q_NULLPTR);
         task->release();
         if (!busy()) {
             // We know we were busy when we received this signal
@@ -1296,36 +1384,37 @@ void FoilNotesModel::Private::onEncryptNoteDone()
     }
 }
 
-void FoilNotesModel::Private::saveInfo()
+void
+FoilNotesModel::Private::saveInfo()
 {
     // N.B. This method may change the busy state but doesn't queue
     // BusyChanged signal, it's done by the caller.
-    if (iSaveInfoTask) iSaveInfoTask->release();
-    iSaveInfoTask = new SaveInfoTask(iThreadPool, ModelInfo(iData),
-        iFoilNotesDir, iPrivateKey, iPublicKey);
+    iSaveInfoTask.reset(new SaveInfoTask(iThreadPool, ModelInfo(iData),
+        iFoilNotesDir, iPrivateKey, iPublicKey));
     iSaveInfoTask->submit(this, SLOT(onSaveInfoDone()));
 }
 
-void FoilNotesModel::Private::onSaveInfoDone()
+void
+FoilNotesModel::Private::onSaveInfoDone()
 {
     HDEBUG("Done");
-    if (sender() == iSaveInfoTask) {
-        iSaveInfoTask->release();
-        iSaveInfoTask = NULL;
-        if (!busy()) {
-            // We know we were busy when we received this signal
-            queueSignal(SignalBusyChanged);
-        }
-        emitQueuedSignals();
+    iSaveInfoTask.reset();
+    if (!busy()) {
+        // We know we were busy when we received this signal
+        queueSignal(SignalBusyChanged);
     }
+    emitQueuedSignals();
 }
 
-void FoilNotesModel::Private::generate(int aBits, QString aPassword)
+void
+FoilNotesModel::Private::generate(
+    int aBits,
+    const QString& aPassword)
 {
     const bool wasBusy = busy();
-    if (iGenerateKeyTask) iGenerateKeyTask->release();
-    iGenerateKeyTask = new GenerateKeyTask(iThreadPool, iFoilKeyFile,
-        aBits, aPassword);
+
+    iGenerateKeyTask.reset(new GenerateKeyTask(iThreadPool, iFoilKeyFile,
+        aBits, aPassword));
     iGenerateKeyTask->submit(this, SLOT(onGenerateKeyTaskDone()));
     setFoilState(FoilGeneratingKey);
     if (!wasBusy) {
@@ -1335,19 +1424,18 @@ void FoilNotesModel::Private::generate(int aBits, QString aPassword)
     emitQueuedSignals();
 }
 
-void FoilNotesModel::Private::onGenerateKeyTaskDone()
+void
+FoilNotesModel::Private::onGenerateKeyTaskDone()
 {
     HDEBUG("Got a new key");
-    HASSERT(sender() == iGenerateKeyTask);
     if (iGenerateKeyTask->iPrivateKey) {
         setKeys(iGenerateKeyTask->iPrivateKey, iGenerateKeyTask->iPublicKey);
         setFoilState(FoilNotesReady);
     } else {
-        setKeys(NULL);
+        setKeys(Q_NULLPTR);
         setFoilState(FoilKeyError);
     }
-    iGenerateKeyTask->release();
-    iGenerateKeyTask = NULL;
+    iGenerateKeyTask.reset();
     if (!busy()) {
         // We know we were busy when we received this signal
         queueSignal(SignalBusyChanged);
@@ -1356,18 +1444,25 @@ void FoilNotesModel::Private::onGenerateKeyTaskDone()
     emitQueuedSignals();
 }
 
-inline void FoilNotesModel::Private::updatePageNr(uint aStartPos)
+inline
+void
+FoilNotesModel::Private::updatePageNr(uint aStartPos)
 {
     updatePageNr(aStartPos, iData.count());
 }
 
-void FoilNotesModel::Private::updatePageNr(uint aStartPos, uint aEndPos)
+void
+FoilNotesModel::Private::updatePageNr(
+    uint aStartPos,
+    uint aEndPos)
 {
     if (aStartPos < aEndPos) {
         QList<int> updateRows;
+
         for (uint i = aStartPos; i < aEndPos; i++) {
             ModelData* data = iData.at(i);
             const uint pagenr = i + 1;
+
             if (data->pagenr() != pagenr) {
                 HDEBUG(data->pagenr() << "->" << pagenr);
                 data->iNote.iPageNr = pagenr;
@@ -1378,10 +1473,12 @@ void FoilNotesModel::Private::updatePageNr(uint aStartPos, uint aEndPos)
     }
 }
 
-void FoilNotesModel::Private::updateText()
+void
+FoilNotesModel::Private::updateText()
 {
-    QString text;
     const int n = iData.count();
+    QString text;
+
     if (iTextIndex >= 0 && iTextIndex < n) {
         text = iData.at(iTextIndex)->body();
     } else if (n > 0) {
@@ -1393,10 +1490,13 @@ void FoilNotesModel::Private::updateText()
     }
 }
 
-void FoilNotesModel::Private::destroyItemAt(int aIndex)
+void
+FoilNotesModel::Private::destroyItemAt(
+    int aIndex)
 {
     if (aIndex >= 0 && aIndex <= iData.count()) {
-        FoilNotesModel* model = parentModel();
+        FoilNotesModel* model = parentObject();
+
         HDEBUG(iData.at(aIndex)->pagenr());
         model->beginRemoveRows(QModelIndex(), aIndex, aIndex);
         delete iData.takeAt(aIndex);
@@ -1407,7 +1507,9 @@ void FoilNotesModel::Private::destroyItemAt(int aIndex)
     }
 }
 
-bool FoilNotesModel::Private::destroyItemAndRemoveFilesAt(int aIndex)
+bool
+FoilNotesModel::Private::destroyItemAndRemoveFilesAt(
+    int aIndex)
 {
     ModelData* data = dataAt(aIndex);
     if (data) {
@@ -1419,9 +1521,12 @@ bool FoilNotesModel::Private::destroyItemAndRemoveFilesAt(int aIndex)
     return false;
 }
 
-void FoilNotesModel::Private::deleteNoteAt(int aIndex)
+void
+FoilNotesModel::Private::deleteNoteAt(
+    int aIndex)
 {
     const bool wasBusy = busy();
+
     if (destroyItemAndRemoveFilesAt(aIndex)) {
         // saveInfo() doesn't queue BusyChanged signal, we have to do it here
         saveInfo();
@@ -1431,20 +1536,24 @@ void FoilNotesModel::Private::deleteNoteAt(int aIndex)
     }
 }
 
-void FoilNotesModel::Private::deleteNotes(QList<int> aRows)
+void
+FoilNotesModel::Private::deleteNotes(
+    QList<int> aRows)
 {
     if (!aRows.isEmpty()) {
-        qSort(aRows);
         int deleted = 0;
         const bool wasBusy = busy();
+
+        qSort(aRows);
         for (int i = aRows.count() - 1; i >= 0; i--) {
             const int pos = aRows.at(i);
             ModelData* data = dataAt(pos);
+
             if (data) {
                 if (data->iSelected) {
                     data->iSelected = false;
                     iSelected--;
-                    queueSignal(Private::SignalSelectedChanged);
+                    queueSignal(SignalSelectedChanged);
                 }
                 HDEBUG(data->pagenr());
                 HVERIFY(destroyItemAndRemoveFilesAt(pos));
@@ -1461,7 +1570,9 @@ void FoilNotesModel::Private::deleteNotes(QList<int> aRows)
     }
 }
 
-void FoilNotesModel::Private::saveNoteAt(int aIndex)
+void
+FoilNotesModel::Private::saveNoteAt(
+    int aIndex)
 {
     const bool wasBusy = busy();
     // Caller has checked the index
@@ -1471,8 +1582,10 @@ void FoilNotesModel::Private::saveNoteAt(int aIndex)
 
     // Cancel pending encryption tasks
     bool replaced = false;
+
     for (int i = 0; i < iEncryptTasks.count(); i++) {
         EncryptTask* task = iEncryptTasks.at(i);
+
         if (task->iNoteId == data->iNoteId) {
             // A bit of optimization (reuse the list slot)
             iEncryptTasks.replace(i, saveTask);
@@ -1494,9 +1607,13 @@ void FoilNotesModel::Private::saveNoteAt(int aIndex)
     }
 }
 
-void FoilNotesModel::Private::setBodyAt(int aIndex, QString aBody)
+void
+FoilNotesModel::Private::setBodyAt(
+    int aIndex,
+    const QString& aBody)
 {
     ModelData* data = dataAt(aIndex);
+
     if (data && data->body() != aBody) {
         data->iNote.iBody = aBody;
         saveNoteAt(aIndex);
@@ -1505,9 +1622,13 @@ void FoilNotesModel::Private::setBodyAt(int aIndex, QString aBody)
     }
 }
 
-void FoilNotesModel::Private::setColorAt(int aIndex, QColor aColor)
+void
+FoilNotesModel::Private::setColorAt(
+    int aIndex,
+    const QColor& aColor)
 {
     ModelData* data = dataAt(aIndex);
+
     if (data && data->color() != aColor) {
         data->iNote.iColor = aColor;
         saveNoteAt(aIndex);
@@ -1515,11 +1636,14 @@ void FoilNotesModel::Private::setColorAt(int aIndex, QColor aColor)
     }
 }
 
-void FoilNotesModel::Private::clearModel()
+void
+FoilNotesModel::Private::clearModel()
 {
     const int n = iData.count();
+
     if (n > 0) {
-        FoilNotesModel* model = parentModel();
+        FoilNotesModel* model = parentObject();
+
         model->beginRemoveRows(QModelIndex(), 0, n - 1);
         qDeleteAll(iData);
         iData.clear();
@@ -1528,27 +1652,25 @@ void FoilNotesModel::Private::clearModel()
     }
 }
 
-void FoilNotesModel::Private::lock(bool aTimeout)
+void
+FoilNotesModel::Private::lock(
+    bool aTimeout)
 {
     // Cancel whatever we are doing
-    FoilNotesModel* model = parentModel();
+    FoilNotesModel* model = parentObject();
+    QList<EncryptTask*> encryptTasks;
     const bool wasBusy = busy();
-    if (iSaveInfoTask) {
-        iSaveInfoTask->release();
-        iSaveInfoTask = NULL;
-    }
-    if (iDecryptNotesTask) {
-        iDecryptNotesTask->release();
-        iDecryptNotesTask = NULL;
-    }
-    QList<EncryptTask*> encryptTasks(iEncryptTasks);
-    iEncryptTasks.clear();
-    int i;
-    for (i = 0; i < encryptTasks.count(); i++) {
+
+    iSaveInfoTask.reset();
+    iDecryptNotesTask.reset();
+    encryptTasks.swap(iEncryptTasks);
+
+    for (int i = 0; i < encryptTasks.count(); i++) {
         EncryptTask* task = encryptTasks.at(i);
         Q_EMIT model->encryptionDone(task->iReqId, false);
         task->release();
     }
+
     // Destroy decrypted notes
     if (!iData.isEmpty()) {
         model->beginRemoveRows(QModelIndex(), 0, iData.count() - 1);
@@ -1562,7 +1684,7 @@ void FoilNotesModel::Private::lock(bool aTimeout)
     }
     if (iPrivateKey) {
         // Throw the keys away
-        setKeys(NULL);
+        setKeys(Q_NULLPTR);
         setFoilState(aTimeout ? FoilLockedTimedOut : FoilLocked);
         HDEBUG("Locked");
     } else {
@@ -1570,16 +1692,19 @@ void FoilNotesModel::Private::lock(bool aTimeout)
     }
 }
 
-bool FoilNotesModel::Private::unlock(QString aPassword)
+bool
+FoilNotesModel::Private::unlock(
+    const QString& aPassword)
 {
-    GError* error = NULL;
-    HDEBUG(iFoilKeyFile);
+    GError* error = Q_NULLPTR;
     const QByteArray path(iFoilKeyFile.toUtf8());
     bool ok = false;
 
     // First make sure that it's encrypted
+    HDEBUG(iFoilKeyFile);
     FoilPrivateKey* key = foil_private_key_decrypt_from_file
-        (FOIL_KEY_RSA_PRIVATE, path.constData(), NULL, &error);
+        (FOIL_KEY_RSA_PRIVATE, path.constData(), Q_NULLPTR, &error);
+
     if (key) {
         HWARN("Key not encrypted");
         setFoilState(FoilKeyNotEncrypted);
@@ -1596,11 +1721,10 @@ bool FoilNotesModel::Private::unlock(QString aPassword)
                 HDEBUG("Password accepted, thank you!");
                 setKeys(key);
                 // Now that we know the key, decrypt the notes
-                if (iDecryptNotesTask) iDecryptNotesTask->release();
-                iDecryptNotesTask = new DecryptNotesTask(iThreadPool,
-                    iFoilNotesDir, iPrivateKey, iPublicKey, &iNextId);
+                iDecryptNotesTask.reset(new DecryptNotesTask(iThreadPool,
+                    iFoilNotesDir, iPrivateKey, iPublicKey, &iNextId));
                 clearModel();
-                connect(iDecryptNotesTask,
+                connect(iDecryptNotesTask.data(),
                     SIGNAL(progress(DecryptNotesTask::Progress::Ptr)),
                     SLOT(onDecryptNotesProgress(DecryptNotesTask::Progress::Ptr)),
                     Qt::QueuedConnection);
@@ -1626,7 +1750,8 @@ bool FoilNotesModel::Private::unlock(QString aPassword)
     return ok;
 }
 
-bool FoilNotesModel::Private::busy() const
+bool
+FoilNotesModel::Private::busy() const
 {
     if (iSaveInfoTask ||
         iGenerateKeyTask ||
@@ -1642,50 +1767,66 @@ bool FoilNotesModel::Private::busy() const
 // FoilNotesModel
 // ==========================================================================
 
-#define SUPER FoilNotesBaseModel
-
-FoilNotesModel::FoilNotesModel(QObject* aParent) :
-    SUPER(aParent),
+FoilNotesModel::FoilNotesModel(
+    QObject* aParent) :
+    FoilNotesBaseModel(aParent),
     iPrivate(new Private(this))
-{
-}
+{}
 
 // Callback for qmlRegisterSingletonType<FoilNotesModel>
-QObject* FoilNotesModel::createSingleton(QQmlEngine* aEngine, QJSEngine* aScript)
+QObject*
+FoilNotesModel::createSingleton(
+    QQmlEngine*,
+    QJSEngine*)
 {
     return new FoilNotesModel();
 }
 
-QHash<int,QByteArray> FoilNotesModel::roleNames() const
+QHash<int,QByteArray>
+FoilNotesModel::roleNames() const
 {
     QHash<int,QByteArray> roles;
-#define ROLE(X,x) roles.insert(ModelData::X##Role, #x);
-FOILNOTES_ROLES(ROLE)
-#undef ROLE
+
+    #define ROLE(X,x) roles.insert(ModelData::X##Role, #x);
+    MODEL_ROLES(ROLE)
+    #undef ROLE
     return roles;
 }
 
-int FoilNotesModel::rowCount(const QModelIndex& aParent) const
+int
+FoilNotesModel::rowCount(
+    const QModelIndex&) const
 {
     return iPrivate->rowCount();
 }
 
-QVariant FoilNotesModel::data(const QModelIndex& aIndex, int aRole) const
+QVariant
+FoilNotesModel::data(
+    const QModelIndex& aIndex,
+    int aRole) const
 {
     ModelData* data = iPrivate->dataAt(aIndex.row());
-    return data ? data->get((ModelData::Role)aRole) : QVariant();
+
+    return data ? data->get(ModelData::Role(aRole)) : QVariant();
 }
 
-bool FoilNotesModel::setData(const QModelIndex& aIndex, const QVariant& aValue, int aRole)
+bool
+FoilNotesModel::setData(
+    const QModelIndex& aIndex,
+    const QVariant& aValue,
+    int aRole)
 {
     const int row = aIndex.row();
     ModelData* data = iPrivate->dataAt(row);
+
     if (data) {
         QVector<int> roles;
+
         switch ((ModelData::Role)aRole) {
         case ModelData::BodyRole:
             {
-                QString body = aValue.toString();
+                const QString body(aValue.toString());
+
                 if (data->body() != body) {
                     data->iNote.iBody = body;
                     iPrivate->saveNoteAt(row);
@@ -1699,6 +1840,7 @@ bool FoilNotesModel::setData(const QModelIndex& aIndex, const QVariant& aValue, 
         case ModelData::ColorRole:
             {
                 QColor color(aValue.toString());
+
                 if (color.isValid()) {
                     if (data->color() != color) {
                         data->iNote.iColor = color;
@@ -1713,7 +1855,8 @@ bool FoilNotesModel::setData(const QModelIndex& aIndex, const QVariant& aValue, 
             break;
         case ModelData::SelectedRole:
             {
-                bool selected(aValue.toBool());
+                const bool selected(aValue.toBool());
+
                 if (data->iSelected != selected) {
                     HDEBUG(data->pagenr() << selected);
                     data->iSelected = selected;
@@ -1723,7 +1866,7 @@ bool FoilNotesModel::setData(const QModelIndex& aIndex, const QVariant& aValue, 
                         HASSERT(iPrivate->iSelected > 0);
                         iPrivate->iSelected--;
                     }
-                    iPrivate->queueSignal(Private::SignalSelectedChanged);
+                    iPrivate->queueSignal(SignalSelectedChanged);
                     iPrivate->emitQueuedSignals();
                     roles.append(aRole);
                     Q_EMIT dataChanged(aIndex, aIndex, roles);
@@ -1732,7 +1875,6 @@ bool FoilNotesModel::setData(const QModelIndex& aIndex, const QVariant& aValue, 
             return true;
         // No default to make sure that we get "warning: enumeration value
         // not handled in switch" if we forget to handle a real role.
-        case ModelData::BusyRole:
         case ModelData::PageNrRole:
         case ModelData::FirstRole:
         case ModelData::LastRole:
@@ -1742,17 +1884,23 @@ bool FoilNotesModel::setData(const QModelIndex& aIndex, const QVariant& aValue, 
     return false;
 }
 
-bool FoilNotesModel::moveRows(const QModelIndex &aSrcParent, int aSrcRow,
-    int aCount, const QModelIndex &aDestParent, int aDestRow)
+bool
+FoilNotesModel::moveRows(
+    const QModelIndex& aSrcParent,
+    int aSrcRow,
+    int aCount,
+    const QModelIndex& aDestParent,
+    int aDestRow)
 {
     const int size = iPrivate->rowCount();
+
     if (aSrcParent == aDestParent &&
         aSrcRow != aDestRow &&
         aSrcRow >= 0 && aSrcRow < size &&
         aDestRow >= 0 && aDestRow < size) {
-
         HDEBUG(aSrcRow << "->" << aDestRow);
         const bool wasBusy = iPrivate->busy();
+
         beginMoveRows(aSrcParent, aSrcRow, aSrcRow, aDestParent,
             (aDestRow < aSrcRow) ? aDestRow : (aDestRow + 1));
         iPrivate->iData.move(aSrcRow, aDestRow);
@@ -1762,7 +1910,7 @@ bool FoilNotesModel::moveRows(const QModelIndex &aSrcParent, int aSrcRow,
         iPrivate->updateText();
         iPrivate->saveInfo();
         if (!wasBusy) {
-            iPrivate->queueSignal(Private::SignalBusyChanged);
+            iPrivate->queueSignal(SignalBusyChanged);
         }
         iPrivate->emitQueuedSignals();
         return true;
@@ -1771,149 +1919,203 @@ bool FoilNotesModel::moveRows(const QModelIndex &aSrcParent, int aSrcRow,
     }
 }
 
-bool FoilNotesModel::busy() const
+bool
+FoilNotesModel::busy() const
 {
     return iPrivate->busy();
 }
 
-bool FoilNotesModel::keyAvailable() const
+bool
+FoilNotesModel::keyAvailable() const
 {
-    return iPrivate->iPrivateKey != NULL;
+    return iPrivate->iPrivateKey != Q_NULLPTR;
 }
 
-FoilNotesModel::FoilState FoilNotesModel::foilState() const
+FoilNotesModel::FoilState
+FoilNotesModel::foilState() const
 {
     return iPrivate->iFoilState;
 }
 
-QString FoilNotesModel::text() const
+QString
+FoilNotesModel::text() const
 {
     return iPrivate->iText;
 }
 
-int FoilNotesModel::textIndex() const
+int
+FoilNotesModel::textIndex() const
 {
     return iPrivate->iTextIndex;
 }
 
-void FoilNotesModel::setTextIndex(int aIndex)
+void
+FoilNotesModel::setTextIndex(
+    int aIndex)
 {
     if (iPrivate->iTextIndex != aIndex) {
         iPrivate->iTextIndex = aIndex;
-        iPrivate->queueSignal(Private::SignalTextIndexChanged);
+        iPrivate->queueSignal(SignalTextIndexChanged);
         iPrivate->updateText();
         iPrivate->emitQueuedSignals();
     }
 }
 
-bool FoilNotesModel::checkPassword(QString aPassword)
+bool
+FoilNotesModel::checkPassword(
+    QString aPassword)
 {
     return iPrivate->checkPassword(aPassword);
 }
 
-bool FoilNotesModel::changePassword(QString aOld, QString aNew)
+bool
+FoilNotesModel::changePassword(
+    QString aOld,
+    QString aNew)
 {
     bool ok = iPrivate->changePassword(aOld, aNew);
+
     iPrivate->emitQueuedSignals();
     return ok;
 }
 
-void FoilNotesModel::generateKey(int aBits, QString aPassword)
+void
+FoilNotesModel::generateKey(
+    int aBits,
+    QString aPassword)
 {
     iPrivate->generate(aBits, aPassword);
     iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesModel::lock(bool aTimeout)
+void
+FoilNotesModel::lock(
+    bool aTimeout)
 {
     iPrivate->lock(aTimeout);
     iPrivate->emitQueuedSignals();
 }
 
-bool FoilNotesModel::unlock(QString aPassword)
+bool
+FoilNotesModel::unlock(
+    QString aPassword)
 {
     const bool ok = iPrivate->unlock(aPassword);
+
     iPrivate->emitQueuedSignals();
     return ok;
 }
 
-void FoilNotesModel::addNote(QColor aColor, QString aBody)
+void
+FoilNotesModel::addNote(
+    QColor aColor,
+    QString aBody)
 {
     HDEBUG(aColor.name() << aBody);
     iPrivate->addNote(aColor, aBody);
     iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesModel::deleteNoteAt(int aIndex)
+void
+FoilNotesModel::deleteNoteAt(
+    int aIndex)
 {
     HDEBUG(aIndex);
     iPrivate->deleteNoteAt(aIndex);
     iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesModel::setBodyAt(int aIndex, QString aBody)
+void
+FoilNotesModel::setBodyAt(
+    int aIndex,
+    QString aBody)
 {
     iPrivate->setBodyAt(aIndex, aBody);
     iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesModel::setColorAt(int aIndex, QColor aColor)
+void
+FoilNotesModel::setColorAt(
+    int aIndex,
+    QColor aColor)
 {
     iPrivate->setColorAt(aIndex, aColor);
     iPrivate->emitQueuedSignals();
 }
 
-void FoilNotesModel::deleteNotes(QList<int> aRows)
+void
+FoilNotesModel::deleteNotes(
+    QList<int> aRows)
 {
     iPrivate->deleteNotes(aRows);
     iPrivate->emitQueuedSignals();
 }
 
-bool FoilNotesModel::encryptNote(QString aBody, QColor aColor, int aPageNr, int aReqId)
+bool
+FoilNotesModel::encryptNote(
+    QString aBody,
+    QColor aColor,
+    int aPageNr,
+    int aReqId)
 {
     HDEBUG(aReqId << aColor.name() << aBody);
     bool ok = iPrivate->encrypt(aBody, aColor, aPageNr, aReqId);
+
     iPrivate->emitQueuedSignals();
     return ok;
 }
 
-const FoilNotesBaseModel::Note* FoilNotesModel::noteAt(int aRow) const
+const FoilNotesBaseModel::Note*
+FoilNotesModel::noteAt(
+    int aRow) const
 {
     const ModelData* data = iPrivate->dataAt(aRow);
-    return data ? &data->iNote : NULL;
+
+    return data ? &data->iNote : Q_NULLPTR;
 }
 
-bool FoilNotesModel::selectedAt(int aRow) const
+bool
+FoilNotesModel::selectedAt(
+    int aRow) const
 {
     const ModelData* data = iPrivate->dataAt(aRow);
+
     return data && data->iSelected;
 }
 
-int FoilNotesModel::selectedCount() const
+int
+FoilNotesModel::selectedCount() const
 {
     return iPrivate->iSelected;
 }
 
-void FoilNotesModel::setSelectedAt(int aRow, bool aSelected)
+void
+FoilNotesModel::setSelectedAt(
+    int aRow,
+    bool aSelected)
 {
     ModelData* data = iPrivate->dataAt(aRow);
+
     if (data) {
         HDEBUG(data->pagenr() << aSelected);
         if (data->iSelected && !aSelected) {
             HASSERT(iPrivate->iSelected > 0);
+            data->iSelected = false;
             iPrivate->iSelected--;
+            iPrivate->queueSignal(SignalSelectedChanged);
         } else if (!data->iSelected && aSelected) {
             HASSERT(iPrivate->iSelected < iPrivate->rowCount());
+            data->iSelected = true;
             iPrivate->iSelected++;
+            iPrivate->queueSignal(SignalSelectedChanged);
         }
-        data->iSelected = aSelected;
         iPrivate->dataChanged(aRow, ModelData::SelectedRole);
     }
 }
 
-void FoilNotesModel::emitSelectedChanged()
+void
+FoilNotesModel::emitQueuedSignals()
 {
-    iPrivate->queueSignal(Private::SignalSelectedChanged);
     iPrivate->emitQueuedSignals();
 }
 

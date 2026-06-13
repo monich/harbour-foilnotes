@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2018-2026 Slava Monich <slava@monich.com>
  * Copyright (C) 2018-2021 Jolla Ltd.
- * Copyright (C) 2018-2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,41 +8,49 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #ifndef FOILNOTES_MODEL_H
 #define FOILNOTES_MODEL_H
 
-#include "foil_types.h"
-
 #include "FoilNotesBaseModel.h"
 
-#include <QtQml>
+class QJSEngine;
+class QQmlEngine;
 
-class FoilNotesModel : public FoilNotesBaseModel {
+class FoilNotesModel :
+    public FoilNotesBaseModel
+{
     Q_OBJECT
     Q_ENUMS(FoilState)
+    Q_PROPERTY(int selected READ selectedCount NOTIFY selectedChanged)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool keyAvailable READ keyAvailable NOTIFY keyAvailableChanged)
@@ -76,7 +84,7 @@ public:
         FoilJailed
     };
 
-    FoilNotesModel(QObject* aParent = NULL);
+    FoilNotesModel(QObject* aParent = Q_NULLPTR);
 
     bool busy() const;
     bool keyAvailable() const;
@@ -84,41 +92,41 @@ public:
 
     QString text() const;
     int textIndex() const;
-    void setTextIndex(int aIndex);
+    void setTextIndex(int);
 
     // FoilNotesBaseModel
-    void addNote(QColor aColor, QString aBody) Q_DECL_OVERRIDE;
-    void deleteNoteAt(int aIndex) Q_DECL_OVERRIDE;
-    void setBodyAt(int aRow, QString aBody) Q_DECL_OVERRIDE;
-    void setColorAt(int aRow, QColor aColor) Q_DECL_OVERRIDE;
-    void deleteNotes(QList<int> aRows) Q_DECL_OVERRIDE;
+    void addNote(QColor, QString) Q_DECL_OVERRIDE;
+    void deleteNoteAt(int) Q_DECL_OVERRIDE;
+    void setBodyAt(int, QString) Q_DECL_OVERRIDE;
+    void setColorAt(int, QColor) Q_DECL_OVERRIDE;
+    void deleteNotes(QList<int>) Q_DECL_OVERRIDE;
 
-    const Note* noteAt(int aRow) const Q_DECL_OVERRIDE;
+    const Note* noteAt(int) const Q_DECL_OVERRIDE;
     int selectedCount() const Q_DECL_OVERRIDE;
-    bool selectedAt(int aRow) const Q_DECL_OVERRIDE;
-    void setSelectedAt(int aRow, bool aSelected) Q_DECL_OVERRIDE;
-    void emitSelectedChanged() Q_DECL_OVERRIDE;
+    bool selectedAt(int) const Q_DECL_OVERRIDE;
+    void setSelectedAt(int, bool) Q_DECL_OVERRIDE;
+    void emitQueuedSignals() Q_DECL_OVERRIDE;
 
     // QAbstractItemModel
     QHash<int,QByteArray> roleNames() const Q_DECL_OVERRIDE;
     int rowCount(const QModelIndex& aParent = QModelIndex()) const Q_DECL_OVERRIDE;
-    QVariant data(const QModelIndex& aIndex, int aRole) const Q_DECL_OVERRIDE;
-    bool setData(const QModelIndex& aIndex, const QVariant& aValue, int aRole) Q_DECL_OVERRIDE;
-    bool moveRows(const QModelIndex &aSrcParent, int aSrcRow, int aCount,
-        const QModelIndex &aDestParent, int aDestRow) Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex&, int) const Q_DECL_OVERRIDE;
+    bool setData(const QModelIndex&, const QVariant&, int) Q_DECL_OVERRIDE;
+    bool moveRows(const QModelIndex&, int, int, const QModelIndex&, int) Q_DECL_OVERRIDE;
 
     // These are specific to secret model
-    Q_INVOKABLE void generateKey(int aBits, QString aPassword);
-    Q_INVOKABLE bool checkPassword(QString aPassword);
-    Q_INVOKABLE bool changePassword(QString aOld, QString aNew);
-    Q_INVOKABLE void lock(bool aTimeout);
-    Q_INVOKABLE bool unlock(QString aPassword);
-    Q_INVOKABLE bool encryptNote(QString aBody, QColor aColor, int aPageNr, int aReqId);
+    Q_INVOKABLE void generateKey(int, QString);
+    Q_INVOKABLE bool checkPassword(QString);
+    Q_INVOKABLE bool changePassword(QString, QString);
+    Q_INVOKABLE void lock(bool);
+    Q_INVOKABLE bool unlock(QString);
+    Q_INVOKABLE bool encryptNote(QString, QColor, int, int);
 
     // Callback for qmlRegisterSingletonType<FoilNotesModel>
-    static QObject* createSingleton(QQmlEngine* aEngine, QJSEngine* aScript);
+    static QObject* createSingleton(QQmlEngine*, QJSEngine*);
 
 Q_SIGNALS:
+    void selectedChanged();
     void countChanged();
     void busyChanged();
     void keyAvailableChanged();
@@ -133,7 +141,5 @@ Q_SIGNALS:
 private:
     Private* iPrivate;
 };
-
-QML_DECLARE_TYPE(FoilNotesModel)
 
 #endif // FOILNOTES_MODEL_H

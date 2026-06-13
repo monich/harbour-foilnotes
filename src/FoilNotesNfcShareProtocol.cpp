@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2021-2026 Slava Monich <slava@monich.com>
  * Copyright (C) 2021 Jolla Ltd.
- * Copyright (C) 2021 Slava Monich <slava@monich.com>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -8,33 +8,39 @@
  * modification, are permitted provided that the following conditions
  * are met:
  *
- *   1. Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *   2. Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in
- *      the documentation and/or other materials provided with the
- *      distribution.
- *   3. Neither the names of the copyright holders nor the names of its
- *      contributors may be used to endorse or promote products derived
- *      from this software without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *  3. Neither the names of the copyright holders nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation
+ * are those of the authors and should not be interpreted as representing
+ * any official policies, either expressed or implied.
  */
 
 #include "FoilNotesNfcShare.h"
 #include "FoilNotesNfcShareProtocol.h"
 
-#include <QSocketNotifier>
+#include <QtCore/QSocketNotifier>
 
 #include "HarbourDebug.h"
 
@@ -46,7 +52,9 @@
 // FoilNotesNfcShareProtocol::Private
 // ==========================================================================
 
-class FoilNotesNfcShareProtocol::Private : public QObject {
+class FoilNotesNfcShareProtocol::Private :
+    public QObject
+{
     Q_OBJECT
 
     static const char HELLO_MAGIC[];
@@ -109,7 +117,9 @@ public:
 
 const char FoilNotesNfcShareProtocol::Private::HELLO_MAGIC[] = "foilnotes:share";
 
-FoilNotesNfcShareProtocol::Private::Private(int aFd, FoilNotesNfcShareProtocol* aProtocol) :
+FoilNotesNfcShareProtocol::Private::Private(
+    int aFd,
+    FoilNotesNfcShareProtocol* aProtocol) :
     iProtocol(aProtocol),
     iFd(dup(aFd)),
     iStarted(false),
@@ -139,20 +149,26 @@ FoilNotesNfcShareProtocol::Private::~Private()
     }
 }
 
-inline uint FoilNotesNfcShareProtocol::Private::be3(const uchar* aBuffer)
+inline
+uint
+FoilNotesNfcShareProtocol::Private::be3(
+    const uchar* aBuffer)
 {
     // Big engian 3-byte unsigned int
     return ((uint)aBuffer[0] << 16) + ((uint)aBuffer[1] << 8) + aBuffer[2];
 }
 
-void FoilNotesNfcShareProtocol::Private::error()
+void
+FoilNotesNfcShareProtocol::Private::error()
 {
     iReadNotifier->setEnabled(false);
     iWriteNotifier->setEnabled(false);
     iProtocol->handleError();
 }
 
-void FoilNotesNfcShareProtocol::Private::submitPacket(Packet* aPacket)
+void
+FoilNotesNfcShareProtocol::Private::submitPacket(
+    Packet* aPacket)
 {
     // Takes ownership of the packet
     if (!iWritePacket) {
@@ -173,7 +189,8 @@ void FoilNotesNfcShareProtocol::Private::submitPacket(Packet* aPacket)
     }
 }
 
-void FoilNotesNfcShareProtocol::Private::tryToWrite()
+void
+FoilNotesNfcShareProtocol::Private::tryToWrite()
 {
     if (!iWritePacket) {
         if (iWriteQueue) {
@@ -244,12 +261,16 @@ void FoilNotesNfcShareProtocol::Private::tryToWrite()
     }
 }
 
-bool FoilNotesNfcShareProtocol::Private::tryToRead(size_t aNumBytes)
+bool
+FoilNotesNfcShareProtocol::Private::tryToRead(
+    size_t aNumBytes)
 {
-    const size_t oldSize = iReadBuf.size();
-    iReadBuf.resize(oldSize + aNumBytes);
     ssize_t bytesRead;
+    const size_t oldSize = iReadBuf.size();
+
+    iReadBuf.resize(oldSize + aNumBytes);
     char* buf = iReadBuf.data() + oldSize;
+
     while ((bytesRead = read(iFd, buf, aNumBytes)) == -1 && (errno == EINTR));
     iReadBuf.resize(oldSize + qMax(bytesRead, (ssize_t)0));
     if (bytesRead > 0) {
@@ -265,7 +286,8 @@ bool FoilNotesNfcShareProtocol::Private::tryToRead(size_t aNumBytes)
     }
 }
 
-void FoilNotesNfcShareProtocol::Private::canRead()
+void
+FoilNotesNfcShareProtocol::Private::canRead()
 {
     if (iReadBuf.size() < HeaderSize) {
         if (!tryToRead(HeaderSize - iReadBuf.size()) ||
@@ -347,8 +369,11 @@ void FoilNotesNfcShareProtocol::Private::canRead()
     iReadBuf = QByteArray();
 }
 
-void FoilNotesNfcShareProtocol::Private::handleEvent(uchar aCode,
-    const uchar* aData, uint aLength)
+void
+FoilNotesNfcShareProtocol::Private::handleEvent(
+    uchar aCode,
+    const uchar* aData,
+    uint aLength)
 {
     if (aCode == (uchar)EventHello) {
         if (!iStarted && aLength == HelloEventPayloadSize &&
@@ -367,7 +392,9 @@ void FoilNotesNfcShareProtocol::Private::handleEvent(uchar aCode,
 }
 
 FoilNotesNfcShareProtocol::Private::Packet*
-FoilNotesNfcShareProtocol::Private::newEvent(EventCode aCode, const QByteArray& aData)
+FoilNotesNfcShareProtocol::Private::newEvent(
+    EventCode aCode,
+    const QByteArray& aData)
 {
     Packet* packet = new Packet;
     const uint size = aData.size() + (EventHeaderSize - HeaderSize);
@@ -419,7 +446,9 @@ FoilNotesNfcShareProtocol::Private::newRequest(uint aId,
 }
 
 FoilNotesNfcShareProtocol::Private::Packet*
-FoilNotesNfcShareProtocol::Private::newResponse(uint aId, const QByteArray& aData)
+FoilNotesNfcShareProtocol::Private::newResponse(
+    uint aId,
+    const QByteArray& aData)
 {
     Packet* packet = new Packet;
     const uint size = aData.size() + (ResponseHeaderSize - HeaderSize);
@@ -481,57 +510,80 @@ FoilNotesNfcShareProtocol::Private::newHelloEvent()
 // FoilNotesNfcShareProtocol
 // ==========================================================================
 
-FoilNotesNfcShareProtocol::FoilNotesNfcShareProtocol(int aFd) :
+FoilNotesNfcShareProtocol::FoilNotesNfcShareProtocol(
+    int aFd) :
     iPrivate(new Private(aFd, this))
-{
-}
+{}
 
 FoilNotesNfcShareProtocol::~FoilNotesNfcShareProtocol()
-{
-}
+{}
 
-void FoilNotesNfcShareProtocol::handleEvent(EventCode aCode, const uchar*, uint)
+void
+FoilNotesNfcShareProtocol::handleEvent(
+    EventCode aCode,
+    const uchar* /* aData */,
+    uint /* aLength */)
 {
     HDEBUG("Unhandled event" << aCode);
 }
 
-void FoilNotesNfcShareProtocol::handleHelloEvent(ProtocolVersion, const AppVersion*)
-{
-}
+void
+FoilNotesNfcShareProtocol::handleHelloEvent(
+    ProtocolVersion /* aProtocol */,
+    const AppVersion* /* aApp */)
+{}
 
-void FoilNotesNfcShareProtocol::handleRequestSendProgress(uint, uint, uint)
-{
-}
+void
+FoilNotesNfcShareProtocol::handleRequestSendProgress(
+    uint /* aId */,
+    uint /* aBytesSent */,
+    uint /* aBytesTotal */)
+{}
 
-void FoilNotesNfcShareProtocol::handleIncomingRequest(RequestCode, uint, const uchar*, uint)
-{
-}
+void
+FoilNotesNfcShareProtocol::handleIncomingRequest(
+    RequestCode /* aCode */,
+    uint /* aReqId */,
+    const uchar* /* aData */,
+    uint /* aLength */)
+{}
 
-void FoilNotesNfcShareProtocol::handleResponse(uint, const uchar*, uint)
-{
-}
+void
+FoilNotesNfcShareProtocol::handleResponse(
+    uint aReqId,
+    const uchar* /* aData */,
+    uint /* aLength */)
+{}
 
 void FoilNotesNfcShareProtocol::handleError()
-{
-}
+{}
 
-bool FoilNotesNfcShareProtocol::started() const
+bool
+FoilNotesNfcShareProtocol::started() const
 {
     return iPrivate->iStarted;
 }
 
-uint FoilNotesNfcShareProtocol::sendRequest(RequestCode aCode, const QByteArray& aPayload)
+uint
+FoilNotesNfcShareProtocol::sendRequest(
+    RequestCode aCode,
+    const QByteArray& aPayload)
 {
     const uint id = ++iPrivate->iLastId;
+
     iPrivate->submitPacket(iPrivate->newRequest(id, aCode, aPayload));
     return id;
 }
 
-uint FoilNotesNfcShareProtocol::sendPlaintextRequest(const QColor& aColor, const QString& aText)
+uint
+FoilNotesNfcShareProtocol::sendPlaintextRequest(
+    const QColor& aColor,
+    const QString& aText)
 {
     const QByteArray colorName(aColor.name().toLatin1());
     const QByteArray textBytes(aText.toUtf8());
     QByteArray payload;
+
     payload.reserve(colorName.size() + 1 + textBytes.size());
     payload.append(colorName);
     payload.append((char)0);
@@ -539,7 +591,10 @@ uint FoilNotesNfcShareProtocol::sendPlaintextRequest(const QColor& aColor, const
     return sendRequest(RequestSendPlaintext, payload);
 }
 
-void FoilNotesNfcShareProtocol::sendResponse(uint aReqId, const QByteArray& aPayload)
+void
+FoilNotesNfcShareProtocol::sendResponse(
+    uint aReqId,
+    const QByteArray& aPayload)
 {
     iPrivate->submitPacket(iPrivate->newResponse(aReqId, aPayload));
 }

@@ -253,8 +253,9 @@ HEADERS += \
     $${HARBOUR_LIB_INCLUDE}/HarbourBase32.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourColorEditorModel.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourDebug.h \
-    $${HARBOUR_LIB_INCLUDE}/HarbourProcessState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourOrganizeListModel.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourParentSignalQueueObject.h \
+    $${HARBOUR_LIB_INCLUDE}/HarbourProcessState.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeGenerator.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourQrCodeImageProvider.h \
     $${HARBOUR_LIB_INCLUDE}/HarbourSystemInfo.h \

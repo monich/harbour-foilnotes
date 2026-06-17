@@ -253,7 +253,7 @@ Page {
         sourceComponent: Component {
             HarbourHorizontalSwipeHint {
                 //: Right swipe hint text
-                //% "Encrypted pictures are moved there to the left"
+                //% "Encrypted notes are moved there to the left"
                 text: qsTrId("foilnotes-hint-swipe_right_to_encrypted")
                 swipeRight: true
                 hintEnabled: true

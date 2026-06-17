@@ -330,9 +330,9 @@
         <translation>左滑以访问明文笔记</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
-        <translation>加密照片会从这里移到左侧</translation>
+        <translation type="unfinished">加密笔记会从这里移到左侧</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_decrypted">
         <source>Decrypted notes are moved back to the right</source>

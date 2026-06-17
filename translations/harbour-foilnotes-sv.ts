@@ -333,7 +333,7 @@
         <translation>Svep åt vänster för oformaterade anteckningar</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
         <translation>Krypterade anteckningar flyttas åt vänster</translation>
     </message>

@@ -333,9 +333,9 @@
         <translation>Swipe left to access plaintext notes</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
-        <translation>Encrypted pictures are moved there to the left</translation>
+        <translation>Encrypted notes are moved there to the left</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_decrypted">
         <source>Decrypted notes are moved back to the right</source>

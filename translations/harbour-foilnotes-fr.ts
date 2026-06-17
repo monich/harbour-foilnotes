@@ -333,7 +333,7 @@
         <translation>Glissez à gauche pour accéder aux notes en texte brut</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
         <translation>Les notes chiffrées sont déplacées à gauche</translation>
     </message>

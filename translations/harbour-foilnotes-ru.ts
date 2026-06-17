@@ -336,7 +336,7 @@
         <translation>Там справа незашифрованные заметки</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
         <translation>Зашифрованные заметки попадают туда, налево</translation>
     </message>

@@ -333,9 +333,9 @@
         <translation>Wische nach Links um deine unverschlüsselten Notizen zusehen</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
-        <translation>Wische nach Rechts um deine verschlüsselten Notizen zusehen</translation>
+        <translation>Wische nach Notizen um deine verschlüsselten Notizen zusehen</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_decrypted">
         <source>Decrypted notes are moved back to the right</source>

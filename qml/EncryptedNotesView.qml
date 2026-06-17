@@ -5,7 +5,7 @@ import harbour.foilnotes 1.0
 import "harbour"
 
 SilicaFlickable {
-    id: view
+    id: thisView
 
     property Page mainPage
     property var hints
@@ -13,10 +13,11 @@ SilicaFlickable {
     property var foilModel
     property var pulleyFlickable
 
-    property string filter
     property bool searchMode
     readonly property bool busy: foilModel.busy || progressTimer.running
     readonly property bool canNavigate: !grid.contextMenuItem
+
+    readonly property int _columnCount: mainPage.isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
 
     signal decryptNote(var note)
 
@@ -43,7 +44,7 @@ SilicaFlickable {
                function() {
                    var rows = foilModel.selectedRows()
                    for (var i = 0; i < rows.length; i++) {
-                       view.decryptNote(foilModel.get(rows[i]))
+                       thisView.decryptNote(foilModel.get(rows[i]))
                    }
                    foilModel.deleteNotes(rows)
                    leftSwipeToDecryptedHintLoader.armed = true
@@ -59,16 +60,9 @@ SilicaFlickable {
         bulkActionRemorse.canceled.connect(cancelCallback)
     }
 
-    Component {
-        id: organizePageComponent
+    Component.onCompleted: pullDownMenu.updateMenuItems()
 
-        OrganizePage {
-            //: Page header
-            //% "Organize secret notes"
-            title: qsTrId("foilnotes-organize_page-secret_header")
-            secret: true
-        }
-    }
+    onMovementStarted: grid.focus = false   // close the vkb
 
     Component {
         id: selectPageComponent
@@ -90,7 +84,7 @@ SilicaFlickable {
                 onDeleteSelected: {
                     bulkActionRemorse.cancelNicely()
                     leaveSelectionActive = true
-                    view.deleteSelectedNotes(notesModel)
+                    thisView.deleteSelectedNotes(notesModel)
                 }
                 //: Hint text
                 //% "Decrypt selected notes"
@@ -98,7 +92,7 @@ SilicaFlickable {
                 onDecryptSelected: {
                     bulkActionRemorse.cancelNicely()
                     leaveSelectionActive = true
-                    view.decryptSelectedNotes(notesModel)
+                    thisView.decryptSelectedNotes(notesModel)
                 }
             }
         }
@@ -114,248 +108,169 @@ SilicaFlickable {
         }
     }
 
-    FoilNotesSearchModel {
-        id: filterModel
+    NotesGridView {
+        id: grid
 
-        filterRoleName: "body"
-    }
+        columnCount: _columnCount
+        page: mainPage
+        model: foilModel
+        showSelection: bulkActionRemorse.visible
+        secret: true
 
-    onSearchModeChanged: {
-        if (searchMode) {
-            filter = ""
-            filterModel.setFilterFixedString("")
-            filterModel.sourceModel = foilModel
-            grid.model = filterModel
-            grid.removeAnimationDuration = 0
-            grid.animateDisplacement = false
-        } else {
-            grid.model = foilModel
-            grid.animateDisplacement = true
-            filterModel.sourceModel = null
-            filter = ""
+        //: Generic menu item
+        //% "Decrypt"
+        noteActionMenuText: qsTrId("foilnotes-menu-decrypt")
+        onPerformNoteAction: {
+            grid.positionViewAtIndex(item.modelIndex, GridView.Visible)
+            //: Decrypting note in 5 seconds
+            //% "Decrypting"
+            item.remorseAction(qsTrId("foilnotes-remorse-decrypting"),
+                function(index) { decryptNoteAt(index) })
+            pageStack.pop()
         }
-        pullDownMenu.updateMenuItems()
-    }
 
-    onFilterChanged: filterModel.setFilterFixedString(filter)
+        function decryptNoteAt(index) {
+            var note = model.get(index)
+            if ('body' in note) {
+                thisView.decryptNote(note)
+                // Always animate deletion of decrypted items
+                animateDisplacement = false
+                model.deleteNoteAt(index)
+                animateDisplacement = !searchMode
+                leftSwipeToDecryptedHintLoader.armed = true
+            }
+        }
 
-    SilicaFlickable {
-        id: flickable
+        contextMenuComponent: Component {
+            ContextMenu {
+                id: contextMenu
 
-        anchors.fill: parent
+                // The menu extends across the whole gridview horizontally
+                width: thisView.width
+                x: parent ? -parent.x : 0
 
-        // atYBeginning property seems to be unreliable, sometimes topMargin
-        // equals -contentY but for whatever reason atYBeginning stays false
-        readonly property bool fullyExpanded: topMargin > 0 && topMargin == -contentY
-        property bool moving
+                MenuItem {
+                    //: Context menu item
+                    //% "Copy to clipboard"
+                    text: qsTrId("foilnotes-menu-copy")
+                    onClicked: contextMenu.parent.copyToClipboard()
+                }
 
-        onMovementStarted: moving = true
-        onMovementEnded: moving = false
+                MenuItem {
+                    //: Generic menu item
+                    //% "Decrypt"
+                    text: qsTrId("foilnotes-menu-decrypt")
+                    onClicked: {
+                        //: Decrypting note in 5 seconds
+                        //% "Decrypting"
+                        contextMenu.parent.remorseAction(qsTrId("foilnotes-remorse-decrypting"),
+                            function(index) { grid.decryptNoteAt(index) })
+                    }
+                }
+
+                MenuItem {
+                    //: Generic menu item
+                    //% "Delete"
+                    text: qsTrId("foilnotes-menu-delete")
+                    onClicked: contextMenu.parent.deleteNote()
+                }
+            }
+        }
+
+        onCountChanged: pullDownMenu.updateMenuItems()
 
         PullDownMenu {
             id: pullDownMenu
 
             enabled: !grid.contextMenuItem
 
-            property bool searchModeBeforeSnap
-            property bool menuItemClicked
-            readonly property bool snapped: active && flickable.fullyExpanded && !flickable.moving
-
-            onSnappedChanged: {
-                if (snapped) {
-                    searchModeBeforeSnap = searchMode
-                    if (searchMode) searchField.focus = false
-                } else {
-                    // Release from snap
-                    if (searchModeBeforeSnap) {
-                        searchMode = false
-                        searchField.text = ""
-                    } else if (searchField.opacity > 0) {
-                        searchField.focus = true
-                        searchMode = true
-                    }
-                }
-            }
-
             onActiveChanged: {
-                if (active) {
-                    menuItemClicked = false
-                } else {
+                if (!active) {
                     updateMenuItems()
                 }
             }
 
             function updateMenuItems() {
                 if (!active) {
-                    selectMenuItem.visible = organizeMenuItem.visible = (!view.searchMode) && grid.count > 1
+                    changePasswordMenuItem.visible = mainPage.isPortrait || !grid.count
+                    selectMenuItem.visible = organizeMenuItem.visible = grid.count > 1
+                    searchMenuItem.visible = grid.count > 0
                 }
             }
 
             MenuItem {
+                id: changePasswordMenuItem
+
                 //: Pulley menu item
                 //% "Change password"
                 text: qsTrId("foilnotes-menu-change_password")
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    pageStack.push(Qt.resolvedUrl("foil-ui/FoilUiChangePasswordPage.qml"), {
-                        mainPage: view.mainPage,
-                        foilUi: view.foilUi,
-                        foilModel: view.foilModel,
-                        //: Password change prompt
-                        //% "Please enter the current and the new password"
-                        promptText: qsTrId("foilnotes-change_password_page-label-enter_passwords"),
-                        //: Placeholder and label for the current password prompt
-                        //% "Current password"
-                        currentPasswordLabel: qsTrId("foilnotes-change_password_page-text_field_label-current_password"),
-                        //: Placeholder and label for the new password prompt
-                        //% "New password"
-                        newPasswordLabel: qsTrId("foilnotes-change_password_page-text_field_label-new_password"),
-                        //: Button label
-                        //% "Change password"
-                        buttonText: qsTrId("foilnotes-change_password_page-button-change_password")
-                    })
-                }
+                visible: mainPage.isPortrait // Reduce number of items in the landscape pulley menu
+                onClicked: pageStack.push(Qt.resolvedUrl("foil-ui/FoilUiChangePasswordPage.qml"), {
+                    mainPage: thisView.mainPage,
+                    foilUi: thisView.foilUi,
+                    foilModel: thisView.foilModel,
+                    //: Password change prompt
+                    //% "Please enter the current and the new password"
+                    promptText: qsTrId("foilnotes-change_password_page-label-enter_passwords"),
+                    //: Placeholder and label for the current password prompt
+                    //% "Current password"
+                    currentPasswordLabel: qsTrId("foilnotes-change_password_page-text_field_label-current_password"),
+                    //: Placeholder and label for the new password prompt
+                    //% "New password"
+                    newPasswordLabel: qsTrId("foilnotes-change_password_page-text_field_label-new_password"),
+                    //: Button label
+                    //% "Change password"
+                    buttonText: qsTrId("foilnotes-change_password_page-button-change_password")
+                })
             }
+
+            MenuItem {
+                id: searchMenuItem
+
+                //: Pulley menu item
+                //% "Search"
+                text: qsTrId("foilnotes-menu-search")
+                onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"), {
+                    allowedOrientations: thisPage.allowedOrientations,
+                    notesModel: thisView.foilModel,
+                    secret: true
+                })
+            }
+
             MenuItem {
                 id: organizeMenuItem
                 //: Pulley menu item
                 //% "Organize"
                 text: qsTrId("foilnotes-menu-organize")
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    pageStack.push(organizePageComponent, {
-                        notesModel: foilModel,
-                        allowedOrientations: mainPage.allowedOrientations
-                    })
-                }
+                onClicked: pageStack.push(Qt.resolvedUrl("OrganizePage.qml"), {
+                    //: Page header
+                    //% "Organize secret notes"
+                    title: qsTrId("foilnotes-organize_page-secret_header"),
+                    allowedOrientations: mainPage.allowedOrientations,
+                    notesModel: foilModel,
+                    secret: true
+                })
             }
+
             MenuItem {
                 id: selectMenuItem
                 //: Pulley menu item
                 //% "Select"
                 readonly property string defaultText: qsTrId("foilnotes-menu-select")
                 text: defaultText
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    pageStack.push(selectPageComponent, {
-                        notesModel: foilModel,
-                        allowedOrientations: mainPage.allowedOrientations
-                    })
-                }
+                onClicked: pageStack.push(selectPageComponent, {
+                    notesModel: foilModel,
+                    allowedOrientations: mainPage.allowedOrientations
+                })
             }
+
             MenuItem {
                 id: newNoteMenuItem
                 //: Create a new secret note ready for editing
                 //% "New secret note"
                 text: qsTrId("foilnotes-menu-new_secret_note")
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    grid.newNote(foilModel, PageStackAction.Animated)
-                }
+                onClicked: grid.newNote(foilModel, PageStackAction.Animated)
             }
-        }
-
-        readonly property real searchFieldVisibility: !foilModel.count ? 0 : searchMode ? 1 :
-            ((pullDownMenu.active && grid.count > 0 && (topMargin > 0) && (contentY + topMargin) < searchField.height) ? (searchField.height - contentY - topMargin) / searchField.height : 0)
-        property real searchAreaHeight: searchFieldVisibility * searchField.height
-
-        Behavior on searchAreaHeight { SmoothedAnimation { duration: 200 } }
-
-        SearchField {
-            id: searchField
-
-            y: flickable.searchAreaHeight - height
-            enabled: searchMode
-            width: parent.width - Theme.paddingLarge
-            opacity: flickable.searchFieldVisibility
-            visible: opacity > 0
-
-            readonly property bool active: activeFocus || text.length > 0
-
-            onActiveChanged: if (!active) searchMode = false
-            onEnabledChanged: {
-                text = ""
-                if (enabled) {
-                    forceActiveFocus()
-                }
-            }
-            onTextChanged: view.filter = text
-
-            EnterKey.iconSource: "image://theme/icon-m-enter-close"
-            EnterKey.onClicked: focus = false
-
-            Behavior on opacity { FadeAnimation {} }
-        }
-
-        NotesGridView {
-            id: grid
-
-            anchors.topMargin: flickable.searchAreaHeight
-            columnCount: mainPage.isPortrait ? appPortraitColumnCount : appLandscapeColumnCount
-            page: mainPage
-            filter: view.filter
-            model: foilModel
-            showSelection: bulkActionRemorse.visible
-            secret: true
-
-            //: Generic menu item
-            //% "Decrypt"
-            noteActionMenuText: qsTrId("foilnotes-menu-decrypt")
-            onPerformNoteAction: {
-                grid.positionViewAtIndex(item.modelIndex, GridView.Visible)
-                //: Decrypting note in 5 seconds
-                //% "Decrypting"
-                item.remorseAction(qsTrId("foilnotes-remorse-decrypting"),
-                    function(index) { decryptNoteAt(index) })
-                pageStack.pop()
-            }
-
-            function decryptNoteAt(index) {
-                var note = model.get(index)
-                if ('body' in note) {
-                    view.decryptNote(note)
-                    // Always animate deletion of decrypted items
-                    animateDisplacement = false
-                    model.deleteNoteAt(index)
-                    animateDisplacement = !searchMode
-                    leftSwipeToDecryptedHintLoader.armed = true
-                }
-            }
-
-            contextMenuComponent: Component {
-                ContextMenu {
-                    id: contextMenu
-
-                    // The menu extends across the whole gridview horizontally
-                    width: view.width
-                    x: parent ? -parent.x : 0
-
-                    MenuItem {
-                        //: Context menu item
-                        //% "Copy to clipboard"
-                        text: qsTrId("foilnotes-menu-copy")
-                        onClicked: contextMenu.parent.copyToClipboard()
-                    }
-                    MenuItem {
-                        //: Generic menu item
-                        //% "Decrypt"
-                        text: qsTrId("foilnotes-menu-decrypt")
-                        onClicked: {
-                            //: Decrypting note in 5 seconds
-                            //% "Decrypting"
-                            contextMenu.parent.remorseAction(qsTrId("foilnotes-remorse-decrypting"),
-                                function(index) { grid.decryptNoteAt(index) })
-                        }
-                    }
-                    MenuItem {
-                        //: Generic menu item
-                        //% "Delete"
-                        text: qsTrId("foilnotes-menu-delete")
-                        onClicked: contextMenu.parent.deleteNote()
-                    }
-                }
-            }
-            onCountChanged: pullDownMenu.updateMenuItems()
         }
 
         RemorsePopup {
@@ -368,29 +283,13 @@ SilicaFlickable {
         }
 
         ViewPlaceholder {
-            enabled: !view.busy && foilModel && foilModel.count === 0
+            enabled: !thisView.busy && foilModel && foilModel.count === 0
             //: Placeholder text
             //% "You do not have any encrypted notes"
             text: qsTrId("foilnotes-encrypted_view-placeholder")
             //: Placeholder hint
             //% "Open pulley menu to add one."
             hintText: qsTrId("foilnotes-plaintext_view-placeholder_hint")
-        }
-
-        InfoLabel {
-            // Something like ViewPlaceholder but without a pulley hint
-            opacity: (!view.busy && foilModel && !grid.count && searchMode) ? 1 : 0
-            visible: opacity > 0
-            verticalAlignment: Text.AlignVCenter
-            anchors {
-                top: parent.top
-                topMargin: flickable.searchAreaHeight
-                bottom: parent.bottom
-            }
-            //: Placeholder text
-            //% "Sorry, couldn't find anything"
-            text: qsTrId("foilnotes-search-placeholder")
-            Behavior on opacity { FadeAnimation { duration: 150 } }
         }
     }
 
@@ -400,7 +299,6 @@ SilicaFlickable {
         interval: 1000
         running: true
     }
-
 
     Loader {
         id: leftSwipeToPlaintextHintLoader

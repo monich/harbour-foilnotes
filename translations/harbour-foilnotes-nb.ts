@@ -98,6 +98,11 @@
         <extracomment>Placeholder text for new notes. At this point there is nothing else on the screen.</extracomment>
         <translation>Skriv et notat...</translation>
     </message>
+    <message id="foilnotes-menu-search">
+        <source>Search</source>
+        <extracomment>Pulley menu item</extracomment>
+        <translation>Søk</translation>
+    </message>
     <message id="foilnotes-menu-organize">
         <source>Organize</source>
         <extracomment>Pulley menu item</extracomment>

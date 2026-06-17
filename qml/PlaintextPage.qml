@@ -10,8 +10,6 @@ Page {
     property var hints
     property var foilModel
     property var plaintextModel
-    property string filter
-    property bool searchMode: false
     readonly property bool isCurrentPage: status === PageStatus.Active || status === PageStatus.Activating ||
         pageStack.find(function (pageOnStack) { return (thisPage === pageOnStack) })
 
@@ -64,16 +62,6 @@ Page {
     }
 
     Component {
-        id: organizePageComponent
-
-        OrganizePage {
-            //: Page header
-            //% "Organize notes"
-            title: qsTrId("foilnotes-organize_page-plaintext_header")
-        }
-    }
-
-    Component {
         id: selectPageComponent
 
         SelectPage {
@@ -102,17 +90,7 @@ Page {
         }
     }
 
-    FoilNotesSearchModel {
-        id: filterModel
-
-        filterRoleName: "body"
-    }
-
-    onIsCurrentPageChanged: {
-        if (!isCurrentPage) {
-            searchMode = false
-        }
-    }
+    Component.onCompleted: pullDownMenu.updateMenuItems()
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
@@ -120,79 +98,89 @@ Page {
         }
     }
 
-    onSearchModeChanged: {
-        if (searchMode) {
-            filter = ""
-            filterModel.setFilterFixedString("")
-            filterModel.sourceModel = plaintextModel
-            grid.model = filterModel
-            grid.removeAnimationDuration = 0
-            grid.animateDisplacement = false
-        } else {
-            grid.model = plaintextModel
-            grid.animateDisplacement = true
-            filterModel.sourceModel = null
-            filter = ""
-        }
-        pullDownMenu.updateMenuItems()
-    }
-
-    onFilterChanged: filterModel.setFilterFixedString(filter)
-
     // Otherwise width is changing with a delay, causing visible layout changes
     // when on-screen keyboard is active and taking part of the screen.
     onIsLandscapeChanged: width = isLandscape ? _landscapeWidth : Screen.width
 
-    SilicaFlickable {
-        id: flickable
+    NotesGridView {
+        id: grid
 
-        anchors.fill: parent
+        page: thisPage
+        columnCount: _columnCount
+        model: plaintextModel
+        showSelection: bulkActionRemorse.visible
 
-        // atYBeginning property seems to be unreliable, sometimes topMargin
-        // equals -contentY but for whatever reason atYBeginning stays false
-        readonly property bool fullyExpanded: topMargin > 0 && topMargin == -contentY
-        property bool moving
+        //: Generic menu item
+        //% "Encrypt"
+        noteActionMenuText: foilModel.keyAvailable ? qsTrId("foilnotes-menu-encrypt") : ""
+        onPerformNoteAction: {
+            encryptNoteAt(grid.model.sourceRow(item.modelIndex))
+            rightSwipeToEncryptedHintLoader.armed = true
+            pageStack.pop()
+        }
 
-        onMovementStarted: moving = true
-        onMovementEnded: moving = false
+        contextMenuComponent: Component {
+            ContextMenu {
+                id: contextMenu
+
+                // The menu extends across the whole gridview horizontally
+                width: thisPage.width
+                x: parent ? -parent.x : 0
+
+                MenuItem {
+                    //: Context menu item
+                    //% "Copy to clipboard"
+                    text: qsTrId("foilnotes-menu-copy")
+                    onClicked: contextMenu.parent.copyToClipboard()
+                }
+                MenuItem {
+                    //: Generic menu item
+                    //% "Encrypt"
+                    text: qsTrId("foilnotes-menu-encrypt")
+                    visible: foilModel.keyAvailable
+                    onClicked: {
+                        encryptNoteAt(grid.model.sourceRow(contextMenu.parent.modelIndex))
+                        rightSwipeToEncryptedHintLoader.armed = true
+                    }
+                }
+                MenuItem {
+                    //: Generic menu item
+                    //% "Delete"
+                    text: qsTrId("foilnotes-menu-delete")
+                    onClicked: contextMenu.parent.deleteNote()
+                }
+            }
+        }
+        onCountChanged: pullDownMenu.updateMenuItems()
 
         PullDownMenu {
             id: pullDownMenu
 
             enabled: !grid.contextMenuItem
 
-            property bool searchModeBeforeSnap
-            property bool menuItemClicked
-            readonly property bool snapped: active && flickable.fullyExpanded && !flickable.moving
-
-            onSnappedChanged: {
-                if (snapped) {
-                    searchModeBeforeSnap = searchMode
-                    if (searchMode) searchField.focus = false
-                } else {
-                    // Release from snap
-                    if (searchModeBeforeSnap) {
-                        searchMode = false
-                        searchField.text = ""
-                    } else if (searchField.opacity > 0) {
-                        searchField.focus = true
-                        searchMode = true
-                    }
-                }
-            }
-
             onActiveChanged: {
-                if (active) {
-                    menuItemClicked = false
-                } else {
+                if (!active) {
                     updateMenuItems()
                 }
             }
 
             function updateMenuItems() {
                 if (!active) {
-                    selectMenuItem.visible = organizeMenuItem.visible = (!thisPage.searchMode) && grid.count > 1
+                    selectMenuItem.visible = organizeMenuItem.visible = grid.count > 1
+                    searchMenuItem.visible = grid.count > 0
                 }
+            }
+
+            MenuItem {
+                id: searchMenuItem
+
+                //: Pulley menu item
+                //% "Search"
+                text: qsTrId("foilnotes-menu-search")
+                onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"), {
+                    notesModel: plaintextModel,
+                    allowedOrientations: thisPage.allowedOrientations
+                })
             }
 
             MenuItem {
@@ -201,13 +189,13 @@ Page {
                 //: Pulley menu item
                 //% "Organize"
                 text: qsTrId("foilnotes-menu-organize")
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    pageStack.push(organizePageComponent, {
-                        notesModel: plaintextModel,
-                        allowedOrientations: thisPage.allowedOrientations
-                    })
-                }
+                onClicked: pageStack.push(Qt.resolvedUrl("OrganizePage.qml"), {
+                    //: Page header
+                    //% "Organize notes"
+                    title: qsTrId("foilnotes-organize_page-plaintext_header"),
+                    notesModel: plaintextModel,
+                    allowedOrientations: thisPage.allowedOrientations
+                })
             }
 
             MenuItem {
@@ -217,13 +205,10 @@ Page {
                 //% "Select"
                 readonly property string defaultText: qsTrId("foilnotes-menu-select")
                 text: defaultText
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    pageStack.push(selectPageComponent, {
-                        notesModel: plaintextModel,
-                        allowedOrientations: thisPage.allowedOrientations
-                    })
-                }
+                onClicked: pageStack.push(selectPageComponent, {
+                    notesModel: plaintextModel,
+                    allowedOrientations: thisPage.allowedOrientations
+                })
             }
 
             MenuItem {
@@ -232,97 +217,8 @@ Page {
                 //: Create a new note ready for editing
                 //% "New note"
                 text: qsTrId("foilnotes-menu-new_note")
-                onClicked: {
-                    pullDownMenu.menuItemClicked = true
-                    grid.newNote(plaintextModel, PageStackAction.Animated)
-                }
+                onClicked: grid.newNote(plaintextModel, PageStackAction.Animated)
             }
-        }
-
-        readonly property real searchFieldVisibility: !plaintextModel.count ? 0 : searchMode ? 1 :
-            ((pullDownMenu.active && grid.count > 0 && (topMargin > 0) && (contentY + topMargin) < searchField.height) ? (searchField.height - contentY - topMargin) / searchField.height : 0)
-        property real searchAreaHeight: searchFieldVisibility * searchField.height
-
-        Behavior on searchAreaHeight { SmoothedAnimation { duration: 200 } }
-
-        SearchField {
-            id: searchField
-
-            y: flickable.searchAreaHeight - height
-            enabled: searchMode
-            width: parent.width
-            opacity: flickable.searchFieldVisibility
-            visible: opacity > 0
-
-            readonly property bool active: activeFocus || text.length > 0
-
-            onActiveChanged: if (!active) searchMode = false
-            onEnabledChanged: {
-                text = ""
-                if (enabled) {
-                    forceActiveFocus()
-                }
-            }
-            onTextChanged: filter = text
-
-            EnterKey.iconSource: "image://theme/icon-m-enter-close"
-            EnterKey.onClicked: focus = false
-
-            Behavior on opacity { FadeAnimation {} }
-        }
-
-        NotesGridView {
-            id: grid
-
-            anchors.topMargin: flickable.searchAreaHeight
-            page: thisPage
-            columnCount: _columnCount
-            filter: thisPage.filter
-            model: plaintextModel
-            showSelection: bulkActionRemorse.visible
-
-            //: Generic menu item
-            //% "Encrypt"
-            noteActionMenuText: foilModel.keyAvailable ? qsTrId("foilnotes-menu-encrypt") : ""
-            onPerformNoteAction: {
-                encryptNoteAt(grid.model.sourceRow(item.modelIndex))
-                rightSwipeToEncryptedHintLoader.armed = true
-                pageStack.pop()
-            }
-
-            contextMenuComponent: Component {
-                ContextMenu {
-                    id: contextMenu
-
-                    // The menu extends across the whole gridview horizontally
-                    width: thisPage.width
-                    x: parent ? -parent.x : 0
-
-                    MenuItem {
-                        //: Context menu item
-                        //% "Copy to clipboard"
-                        text: qsTrId("foilnotes-menu-copy")
-                        onClicked: contextMenu.parent.copyToClipboard()
-                    }
-                    MenuItem {
-                        //: Generic menu item
-                        //% "Encrypt"
-                        text: qsTrId("foilnotes-menu-encrypt")
-                        visible: foilModel.keyAvailable
-                        onClicked: {
-                            encryptNoteAt(grid.model.sourceRow(contextMenu.parent.modelIndex))
-                            rightSwipeToEncryptedHintLoader.armed = true
-                        }
-                    }
-                    MenuItem {
-                        //: Generic menu item
-                        //% "Delete"
-                        text: qsTrId("foilnotes-menu-delete")
-                        onClicked: contextMenu.parent.deleteNote()
-                    }
-                }
-            }
-            onCountChanged: pullDownMenu.updateMenuItems()
         }
 
         RemorsePopup {
@@ -335,29 +231,13 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: !grid.count && !searchMode
+            enabled: !plaintextModel.count
             //: Placeholder text
             //% "You do not have any notes."
             text: qsTrId("foilnotes-plaintext_view-placeholder")
             //: Placeholder hint
             //% "Open pulley menu to add one."
             hintText: qsTrId("foilnotes-plaintext_view-placeholder_hint")
-        }
-
-        InfoLabel {
-            // Something like ViewPlaceholder but without a pulley hint
-            opacity: (!grid.count && searchMode) ? 1 : 0
-            visible: opacity > 0
-            verticalAlignment: Text.AlignVCenter
-            anchors {
-                top: parent.top
-                topMargin: flickable.searchAreaHeight
-                bottom: parent.bottom
-            }
-            //: Placeholder text
-            //% "Sorry, couldn't find anything"
-            text: qsTrId("foilnotes-search-placeholder")
-            Behavior on opacity { FadeAnimation { duration: 150 } }
         }
     }
 

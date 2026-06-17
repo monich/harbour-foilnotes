@@ -3,11 +3,12 @@ import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
 SilicaGridView {
-    id: grid
+    id: thisView
 
     anchors.fill: parent
     cellHeight: _cellSize
     cellWidth: _cellSize
+    currentIndex: -1
     clip: true
 
     // Custom note action
@@ -52,7 +53,7 @@ SilicaGridView {
             currentItem.deleteNote()
             pageStack.pop()
         })
-        notePage.performAction.connect(function() { grid.performNoteAction(currentItem) })
+        notePage.performAction.connect(function() { thisView.performNoteAction(currentItem) })
     }
 
     function newNote(model,transition) {
@@ -87,16 +88,16 @@ SilicaGridView {
                 if (notePage.body.length > 0) {
                     model.setBodyAt(0, notePage.body)
                     model.setColorAt(0, notePage.color)
-                    grid.positionViewAtBeginning()
-                    grid.currentItem.deleteNote()
+                    thisView.positionViewAtBeginning()
+                    thisView.currentItem.deleteNote()
                 } else {
                     model.deleteNoteAt(0)
                 }
             } else if (notePage.body.length > 0) {
                 model.addNote(notePage.color, notePage.body)
                 currentIndex = 0
-                grid.positionViewAtBeginning()
-                grid.currentItem.deleteNote()
+                thisView.positionViewAtBeginning()
+                thisView.currentItem.deleteNote()
             }
             // Reset the dirty flag to prevent save on pop
             notePage.dirty = false
@@ -108,6 +109,7 @@ SilicaGridView {
         if (!_contextMenu) {
             _contextMenu = contextMenuComponent.createObject(page)
         }
+        focus = false // close the vkb
         // ContextMenu::show is deprecated in Silica 0.25.6 (Dec 2017)
         // and produces an annoying warning
         if ("open" in _contextMenu) {
@@ -116,6 +118,8 @@ SilicaGridView {
             _contextMenu.show(item)
         }
     }
+
+    onMovementStarted: focus = false // close the vkb
 
     Component {
         id: notePageComponent
@@ -137,26 +141,26 @@ SilicaGridView {
         MouseArea {
             id: noteDelegate
 
-            width: grid.cellWidth
-            height: menuOpen ? grid.cellHeight + grid._contextMenu.height : grid.cellHeight
-            enabled: !grid.contextMenuItem
+            width: thisView.cellWidth
+            height: menuOpen ? thisView.cellHeight + thisView._contextMenu.height : thisView.cellHeight
+            enabled: !thisView.contextMenuItem
 
             readonly property bool down: pressed && containsMouse
-            readonly property bool selected: grid.showSelection && model.selected
+            readonly property bool selected: thisView.showSelection && model.selected
             readonly property bool highlighted: down || menuOpen || selected
             readonly property int modelIndex: model.index
             readonly property int modelPageNr: model.pagenr
             readonly property string modelText: model.body
-            readonly property bool menuOpen: grid.contextMenuItem === noteDelegate
-            readonly property real contentYOffset: index >= grid._minOffsetIndex ? grid._expandHeight : 0.0
+            readonly property bool menuOpen: thisView.contextMenuItem === noteDelegate
+            readonly property real contentYOffset: index >= thisView._minOffsetIndex ? thisView._expandHeight : 0.0
 
             function deleteNote() {
-                grid.positionViewAtIndex(noteDelegate.modelIndex, GridView.Visible)
+                thisView.positionViewAtIndex(noteDelegate.modelIndex, GridView.Visible)
                 //: Remorse item text, will delete note when timer expires
                 //% "Deleting"
                 remorseAction(qsTrId("foilnotes-remorse-deleting"), function(index) {
-                    grid.removeAnimationDuration = 0
-                    grid.model.deleteNoteAt(index)
+                    thisView.removeAnimationDuration = 0
+                    thisView.model.deleteNoteAt(index)
                 })
             }
 
@@ -165,10 +169,10 @@ SilicaGridView {
                 var remorseParent = noteItem
                 remorseComponent.createObject(remorseParent).execute(remorseParent, text,
                     function() {
-                        var prevAnimateDisplacement  = grid.animateDisplacement
-                        grid.animateDisplacement = true
+                        var prevAnimateDisplacement  = thisView.animateDisplacement
+                        thisView.animateDisplacement = true
                         callback(delegateItem.modelIndex)
-                        grid.animateDisplacement = prevAnimateDisplacement
+                        thisView.animateDisplacement = prevAnimateDisplacement
                     })
             }
 
@@ -180,16 +184,16 @@ SilicaGridView {
                 id: noteItem
 
                 y: noteDelegate.contentYOffset
-                filter: grid.filter
+                filter: thisView.filter
                 body: modelText
                 color: model.color
                 pageNumber: model.pagenr
-                width: grid.cellWidth
-                height: grid.cellHeight
+                width: thisView.cellWidth
+                height: thisView.cellHeight
                 pressed: noteDelegate.down && !noteDelegate.menuOpen
                 selected: noteDelegate.selected
                 highlighted: noteDelegate.highlighted
-                secret: grid.secret
+                secret: thisView.secret
             }
 
             onClicked: {
@@ -201,7 +205,7 @@ SilicaGridView {
 
             onPressAndHold: {
                 if (!noteItem.selected) {
-                    grid.showContextMenu(noteDelegate)
+                    thisView.showContextMenu(noteDelegate)
                 }
             }
 
@@ -220,7 +224,7 @@ SilicaGridView {
                     target: noteDelegate
                     properties: "opacity,scale"
                     to: 0
-                    duration: grid.removeAnimationDuration
+                    duration: thisView.removeAnimationDuration
                     easing.type: Easing.InOutQuad
                 }
                 PropertyAction {
@@ -233,7 +237,7 @@ SilicaGridView {
     }
 
     moveDisplaced: Transition {
-        enabled: grid.animateDisplacement
+        enabled: thisView.animateDisplacement
         SmoothedAnimation {
             alwaysRunToEnd: true
             properties: "x,y"
@@ -242,7 +246,7 @@ SilicaGridView {
     }
 
     removeDisplaced: Transition {
-        enabled: grid.animateDisplacement
+        enabled: thisView.animateDisplacement
         SmoothedAnimation {
             alwaysRunToEnd: true
             properties: "x,y"
@@ -250,5 +254,5 @@ SilicaGridView {
         }
     }
 
-    VerticalScrollDecorator { flickable: grid }
+    VerticalScrollDecorator { flickable: thisView }
 }

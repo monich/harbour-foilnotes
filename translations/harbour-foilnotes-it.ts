@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="it_IT">
+<TS version="2.1" language="itT">
 <context>
     <name></name>
     <message id="foilnotes-app_name">
@@ -98,6 +98,11 @@
         <extracomment>Placeholder text for new notes. At this point there is nothing else on the screen.</extracomment>
         <translation>Scrivi una nota...</translation>
     </message>
+    <message id="foilnotes-menu-search">
+        <source>Search</source>
+        <extracomment>Pulley menu item</extracomment>
+        <translation>Cerca</translation>
+    </message>
     <message id="foilnotes-menu-organize">
         <source>Organize</source>
         <extracomment>Pulley menu item</extracomment>
@@ -123,7 +128,6 @@
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
             <numerusform>Elimino %0 nota selezionata</numerusform>
-            <numerusform>Elimino %0 note selezionate</numerusform>
         </translation>
     </message>
     <message id="foilnotes-organize_page-plaintext_header">
@@ -216,7 +220,6 @@
         <extracomment>Password field label</extracomment>
         <translation>
             <numerusform>Scrivi almeno %0 carattere</numerusform>
-            <numerusform>Scrivi almeno %0 caratteri</numerusform>
         </translation>
     </message>
     <message id="foilnotes-generate_key_view-button-generate_key">
@@ -299,7 +302,6 @@
         <extracomment>Generic remorse popup text</extracomment>
         <translation>
             <numerusform>Decifrando %0 nota selezionata</numerusform>
-            <numerusform>Decifrando %0 note selezionate</numerusform>
         </translation>
     </message>
     <message id="foilnotes-foil_apps_warning">
@@ -328,7 +330,7 @@
         <translation>Trascina a sinistra per accedere alle note non cifrate</translation>
     </message>
     <message id="foilnotes-hint-swipe_right_to_encrypted">
-        <source>Encrypted pictures are moved there to the left</source>
+        <source>Encrypted notes are moved there to the left</source>
         <extracomment>Right swipe hint text</extracomment>
         <translation>Le note cifrate saranno spostate a sinistra</translation>
     </message>
@@ -447,14 +449,12 @@
         <extracomment>Slider value</extracomment>
         <translation>
             <numerusform>%1 Min</numerusform>
-            <numerusform>%1 Min</numerusform>
         </translation>
     </message>
     <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
         <source>%1 sec</source>
         <extracomment>Slider value</extracomment>
         <translation>
-            <numerusform>%1 Sec</numerusform>
             <numerusform>%1 Sec</numerusform>
         </translation>
     </message>

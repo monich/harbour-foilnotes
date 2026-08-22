@@ -2,6 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "Utils.js" as Utils
+
 Page {
     id: thisPage
 
@@ -12,14 +14,12 @@ Page {
 
     backNavigation: !grid.contextMenuItem
 
-    Component.onCompleted: grid.headerItem.forceActiveFocus()
-
     NotesGridView {
         id: grid
 
         page: thisPage
         columnCount: _columnCount
-        filter: headerItem.text
+        filter: headerItem.searchText
 
         model: FoilNotesSearchModel {
             id: filterModel
@@ -27,42 +27,52 @@ Page {
             filterRoleName: "body"
         }
 
-        header: SearchField {
-            id: searchField
+        header: Item {
+            property alias searchText: searchField.text
 
+            height: searchField.y + searchField.height
             width: parent.width
-            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
 
-            onHideClicked: {
-                requestFocusTimer.stop()
-                keepFocusTimer.stop()
-                searchActive = false
-            }
-            onTextChanged: {
-                focusOutBehavior = FocusBehavior.KeepFocus
-                filterModel.setFilterFixedString(text) // steals the focus
-                requestFocusTimer.start()
-            }
+            SearchField {
+                id: searchField
 
-            EnterKey.iconSource: "image://theme/icon-m-enter-close"
-            EnterKey.onClicked: focus = false
+                y: (thisPage.orientation === Orientation.Portrait) ? Math.max(0, Utils.topNotchHeight - textTopMargin) : 0
+                width: parent.width
+                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
 
-            Timer {
-                id: requestFocusTimer
+                Component.onCompleted: requestFocusTimer.start()
 
-                interval: 1
-                onTriggered: {
-                    searchField.focus = true
-                    searchField.forceActiveFocus()
-                    keepFocusTimer.start()
+                onHideClicked: {
+                    requestFocusTimer.stop()
+                    keepFocusTimer.stop()
+                    searchActive = false
                 }
-            }
+                onTextChanged: {
+                    focusOutBehavior = FocusBehavior.KeepFocus
+                    filterModel.setFilterFixedString(text) // steals the focus
+                    requestFocusTimer.start()
+                }
 
-            Timer {
-                id: keepFocusTimer
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: focus = false
 
-                interval: 100
-                onTriggered: searchField.focusOutBehavior = FocusBehavior.ClearPageFocus
+                Timer {
+                    id: requestFocusTimer
+
+                    interval: 1
+                    onTriggered: {
+                        searchField.focus = true
+                        searchField.forceActiveFocus()
+                        keepFocusTimer.start()
+                    }
+                }
+
+                Timer {
+                    id: keepFocusTimer
+
+                    interval: 100
+                    onTriggered: searchField.focusOutBehavior = FocusBehavior.ClearPageFocus
+                }
             }
         }
 

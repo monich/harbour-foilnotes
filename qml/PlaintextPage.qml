@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.foilnotes 1.0
 
+import "Utils.js" as Utils
 import "harbour"
 
 Page {
@@ -117,6 +118,11 @@ Page {
             encryptNoteAt(grid.model.sourceRow(item.modelIndex))
             rightSwipeToEncryptedHintLoader.armed = true
             pageStack.pop()
+        }
+
+        header: Item {
+            width: 1
+            height: (thisPage.orientation === Orientation.Portrait) ? Utils.topNotchHeight : 0
         }
 
         contextMenuComponent: Component {

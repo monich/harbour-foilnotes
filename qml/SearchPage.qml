@@ -42,11 +42,6 @@ Page {
 
                 Component.onCompleted: requestFocusTimer.start()
 
-                onHideClicked: {
-                    requestFocusTimer.stop()
-                    keepFocusTimer.stop()
-                    searchActive = false
-                }
                 onTextChanged: {
                     focusOutBehavior = FocusBehavior.KeepFocus
                     filterModel.setFilterFixedString(text) // steals the focus

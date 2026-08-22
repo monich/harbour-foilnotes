@@ -1,6 +1,6 @@
 Name:           harbour-foilnotes
 Summary:        Encrypted notes
-Version:        1.1.6
+Version:        1.1.7
 Release:        1
 License:        BSD
 URL:            https://github.com/monich/harbour-foilnotes
@@ -20,7 +20,6 @@ BuildRequires:  qt5-qttools-linguist
 
 %{!?qtc_qmake5:%define qtc_qmake5 %qmake5}
 %{!?qtc_make:%define qtc_make make}
-%{?qtc_builddir:%define _builddir %qtc_builddir}
 
 %description
 Notes encryption application.

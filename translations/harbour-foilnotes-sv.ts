@@ -11,7 +11,7 @@
     <message id="foilnotes-search-placeholder">
         <source>Sorry, couldn&apos;t find anything</source>
         <extracomment>Placeholder text</extracomment>
-        <translation type="unfinished">Vi kunde tyvärr inte hitta något</translation>
+        <translation>Vi kunde tyvärr inte hitta något</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder">
         <source>You do not have any notes.</source>
@@ -21,7 +21,7 @@
     <message id="foilnotes-encrypted_view-placeholder">
         <source>You do not have any encrypted notes</source>
         <extracomment>Placeholder text</extracomment>
-        <translation>Du har inga krypterade anteckningar.</translation>
+        <translation>Du har inga krypterade anteckningar</translation>
     </message>
     <message id="foilnotes-plaintext_view-placeholder_hint">
         <source>Open pulley menu to add one.</source>
@@ -41,7 +41,7 @@
     <message id="foilnotes-menu-nfc_share">
         <source>Share via NFC</source>
         <extracomment>Share current note via NFC</extracomment>
-        <translation type="unfinished">Dela via NFC</translation>
+        <translation>Dela via NFC</translation>
     </message>
     <message id="foilnotes-menu-show_qrcode">
         <source>Show QR code</source>
@@ -66,7 +66,7 @@
     <message id="foilnotes-menu-decrypt">
         <source>Decrypt</source>
         <extracomment>Generic menu item</extracomment>
-        <translation>Dekryptera</translation>
+        <translation>Avkryptera</translation>
     </message>
     <message id="foilnotes-menu-delete">
         <source>Delete</source>
@@ -81,7 +81,7 @@
     <message id="foilnotes-menu-change_password">
         <source>Change password</source>
         <extracomment>Pulley menu item</extracomment>
-        <translation>Ändra lösenord</translation>
+        <translation>Byt lösenord</translation>
     </message>
     <message id="foilnotes-remorse-deleting">
         <source>Deleting</source>
@@ -144,7 +144,7 @@
     <message id="foilnotes-organize_page-description">
         <source>Press and drag to reorder</source>
         <extracomment>Page description</extracomment>
-        <translation type="unfinished">Tryck och dra för att ändra ordningen</translation>
+        <translation>Tryck och dra för att ändra ordningen</translation>
     </message>
     <message id="foilnotes-select_page-header">
         <source>Select notes</source>
@@ -154,17 +154,17 @@
     <message id="foilnotes-notification-generated_key">
         <source>Generated new key</source>
         <extracomment>Pop-up notification</extracomment>
-        <translation>Genererade ny nyckel</translation>
+        <translation>Skapade ny nyckel</translation>
     </message>
     <message id="foilnotes-notification-password_changed">
         <source>Password changed</source>
         <extracomment>Pop-up notification</extracomment>
-        <translation>Lösenord ändrat</translation>
+        <translation>Lösenordet ändrat</translation>
     </message>
     <message id="foilnotes-notification-nfc_note_received">
         <source>Note received via NFC</source>
         <extracomment>Pop-up notification</extracomment>
-        <translation type="unfinished">Anteckning kom via NFC</translation>
+        <translation>Anteckning inkom via NFC</translation>
     </message>
     <message id="foilnotes-enter_password_view-label-enter_password">
         <source>Secret notes are locked. Please enter your password</source>
@@ -189,7 +189,7 @@
     <message id="foilnotes-menu-generate_key">
         <source>Generate a new key</source>
         <extracomment>Pulley menu item</extracomment>
-        <translation>Generera en ny nyckel</translation>
+        <translation>Skapa en ny nyckel</translation>
     </message>
     <message id="foilnotes-decrypting_view-unlocking">
         <source>Unlocking...</source>
@@ -204,12 +204,12 @@
     <message id="foilnotes-generate_key_page-title">
         <source>You are about to generate a new key</source>
         <extracomment>Prompt label</extracomment>
-        <translation>Du håller på att generera en ny nyckel</translation>
+        <translation>Du håller på att skapa en ny nyckel</translation>
     </message>
     <message id="foilnotes-generate_key_view-label-key_needed">
         <source>You need to generate the key and select the password before you can encrypt your notes</source>
         <extracomment>Label text</extracomment>
-        <translation>Du måste generera nyckeln och välja ett lösenord, innan du kan kryptera dina anteckningar.</translation>
+        <translation>Du måste skapa en nyckel och välja ett lösenord, innan du kan kryptera dina anteckningar</translation>
     </message>
     <message id="foilnotes-generate_key_view-label-key_size">
         <source>Key size</source>
@@ -227,27 +227,27 @@
     <message id="foilnotes-generate_key_view-button-generate_key">
         <source>Generate key</source>
         <extracomment>Button label</extracomment>
-        <translation>Generera nyckel</translation>
+        <translation>Skapa nyckel</translation>
     </message>
     <message id="foilnotes-generate_key_view-button-generating_key">
         <source>Generating...</source>
         <extracomment>Button label</extracomment>
-        <translation>Genererar...</translation>
+        <translation>Skapar...</translation>
     </message>
     <message id="foilnotes-generate_key_warning-title">
         <source>Warning</source>
         <extracomment>Title for the new key warning</extracomment>
-        <translation>Varning</translation>
+        <translation>Varning!</translation>
     </message>
     <message id="foilnotes-generate_key_warning-text">
         <source>Once you have generated a new key, you are going to lose access to all the files encrypted by the old key. Note that the same key is used by all Foil apps, such as Foil Auth and Foil Pics. If you have forgotten your password, then keep in mind that most likely it&apos;s computationally easier to brute-force your password and recover the old key than to decrypt files for which the key is lost.</source>
         <extracomment>Warning shown prior to generating the new key</extracomment>
-        <translation>När du väl har skapat en ny nyckel, kommer du att förlora åtkomst till alla filer krypterade med den tidigare nyckeln. Notera att samma nyckel används av samtliga Foil-appar, såsom Foil Auth och Foil Pics. Om du har glömt ditt lösenord, bör du betänka att det sannolikt är beräkningsmässigt lättare att knäcka (brute force) ditt lösenord och återställa den gamla nyckeln, än det är att avkryptera filer där nyckeln har förlorats.</translation>
+        <translation>När du väl har skapat en ny nyckel, kommer du att förlora åtkomst till alla filer krypterade med den tidigare nyckeln. Notera att samma nyckel används av samtliga Foil-appar, såsom Foil Auth och Foil Pics. Om du har glömt ditt lösenord, bör du betänka att det sannolikt är beräkningsmässigt lättare att knäcka (brute force) ditt lösenord och återställa den gamla nyckeln, än det är att avkryptera de filer där nyckeln har förlorats.</translation>
     </message>
     <message id="foilnotes-generating_key_view-generating_new_key">
         <source>Generating new key...</source>
         <extracomment>Progress view label</extracomment>
-        <translation>Genererar ny nyckel...</translation>
+        <translation>Skapar ny nyckel...</translation>
     </message>
     <message id="foilnotes-change_password_page-label-enter_passwords">
         <source>Please enter the current and the new password</source>
@@ -267,7 +267,7 @@
     <message id="foilnotes-change_password_page-button-change_password">
         <source>Change password</source>
         <extracomment>Button label</extracomment>
-        <translation>Ändra lösenord</translation>
+        <translation>Byt lösenord</translation>
     </message>
     <message id="foilnotes-confirm_password_page-info_label">
         <source>Please type in your new password one more time</source>
@@ -297,7 +297,7 @@
     <message id="foilnotes-remorse-decrypting">
         <source>Decrypting</source>
         <extracomment>Decrypting note in 5 seconds</extracomment>
-        <translation>Dekryptering</translation>
+        <translation>Avkrypterar</translation>
     </message>
     <message id="foilnotes-remorse-decrypting_selected" numerus="yes">
         <source>Decrypting %0 selected notes</source>
@@ -310,7 +310,7 @@
     <message id="foilnotes-foil_apps_warning">
         <source>Note that all Foil apps share the encryption key and the password.</source>
         <extracomment>Warning text, small size label below the password prompt</extracomment>
-        <translation>Notera att alla Foil-appar delar krypteringsnyckel och lösenord.</translation>
+        <translation>Notera att alla Foil-appar delar samma krypteringsnyckel och lösenord.</translation>
     </message>
     <message id="foilnotes-hint-delete_selected">
         <source>Delete selected notes</source>
@@ -320,12 +320,12 @@
     <message id="foilnotes-hint-encrypt_selected">
         <source>Encrypt selected notes</source>
         <extracomment>Hint text</extracomment>
-        <translation>Kryptera valda anteckningar</translation>
+        <translation>Krypterar valda anteckningar</translation>
     </message>
     <message id="foilnotes-hint-decrypt_selected">
         <source>Decrypt selected notes</source>
         <extracomment>Hint text</extracomment>
-        <translation>Avkryptera valda anteckningar</translation>
+        <translation>Avkrypterar valda anteckningar</translation>
     </message>
     <message id="foilnotes-hint-swipe_left_to_plaintext">
         <source>Swipe left to access plaintext notes</source>
@@ -355,12 +355,12 @@
     <message id="jail-explanation">
         <source>This application is not designed to function in a sandbox. Try installing the latest version from &lt;b&gt;&lt;a href=&apos;%1&apos;&gt;OpenRepos&lt;/a&gt;&lt;/b&gt; or &lt;b&gt;&lt;a href=&apos;%2&apos;&gt;GitHub&lt;/a&gt;&lt;/b&gt;, it may implement some sort of a workaround. No guarantee, though.</source>
         <extracomment>Label text explaining the sandbox situation</extracomment>
-        <translation type="unfinished">Denna applikation är inte utformad för att fungera i en sandlåda. Prova att installera den senaste versionen från &lt;b&gt;&lt;a href=&apos;%1&apos;&gt;OpenRepos&lt;/a&gt;&lt;/b&gt; eller &lt;b&gt;&lt;a href=&apos;%2&apos;&gt;GitHub&lt;/a&gt;&lt;/b&gt;, den kan implementera någon form av lösning. Ingen garanti, dock.</translation>
+        <translation>Detta program är inte utformat för att fungera i sandlåda. Prova att installera den senaste versionen från &lt;b&gt;&lt;a href=&apos;%1&apos;&gt;OpenRepos&lt;/a&gt;&lt;/b&gt; eller &lt;b&gt;&lt;a href=&apos;%2&apos;&gt;GitHub&lt;/a&gt;&lt;/b&gt;, den kan implementera någon form av lösning. Ingen garanti, dock.</translation>
     </message>
     <message id="jail-terminal_hint">
         <source>If you have developer mode enabled, you may also try running &lt;b&gt;%1&lt;/b&gt; from the terminal. Sorry for the inconvenience!</source>
         <extracomment>Hint suggesting to run the app from the terminal</extracomment>
-        <translation type="unfinished">Om du har aktiverat utvecklarläge kan du också försöka köra &lt;b&gt;%1&lt;/b&gt; från terminalen. Beklagar olägenheten!</translation>
+        <translation>Om du har aktiverat utvecklarläget kan du också försöka köra &lt;b&gt;%1&lt;/b&gt; från terminal. Beklagar olägenheten!</translation>
     </message>
     <message id="color_picker-action-select_color">
         <source>Select color</source>
@@ -370,37 +370,37 @@
     <message id="color_picker-action-add_color">
         <source>Add color</source>
         <extracomment>Dialog title label</extracomment>
-        <translation type="unfinished">Lägg till färg</translation>
+        <translation>Lägg till färg</translation>
     </message>
     <message id="color_picker-menu-reset_colors">
         <source>Reset colors</source>
         <extracomment>Pulley menu item</extracomment>
-        <translation type="unfinished">Återställ färger</translation>
+        <translation>Återställ färger</translation>
     </message>
     <message id="color_picker-slider-hue">
         <source>Color</source>
         <extracomment>Hue slider label</extracomment>
-        <translation type="unfinished">Färg</translation>
+        <translation>Färg</translation>
     </message>
     <message id="color_picker-slider-brightness">
         <source>Brightness</source>
         <extracomment>Brightness slider label</extracomment>
-        <translation type="unfinished">Ljusstyrka</translation>
+        <translation>Ljusstyrka</translation>
     </message>
     <message id="color_picker-text-hex_notation">
         <source>Hex notation</source>
         <extracomment>Text field description</extracomment>
-        <translation type="unfinished">Hex-format</translation>
+        <translation>Hex-format</translation>
     </message>
     <message id="foilnotes-nfc_share-info-nfc_off">
         <source>NFC is off</source>
         <extracomment>Full screen info label</extracomment>
-        <translation type="unfinished">NFC är avstängt.</translation>
+        <translation>NFC är avstängt</translation>
     </message>
     <message id="foilnotes-nfc_share-info-ready">
         <source>Touch another NFC capable device with Foil Notes running full screen.</source>
         <extracomment>Full screen info label</extracomment>
-        <translation type="unfinished">Tryck på en annan NFC-kompatibel enhet med Foil Notes på helskärm.</translation>
+        <translation>Tryck på en annan NFC-kompatibel enhet med Foil Notes i helskärmsläge.</translation>
     </message>
     <message id="foilnotes-settings_page-header-version">
         <source>Version %1</source>
@@ -410,22 +410,22 @@
     <message id="foilnotes-settings_page-section-appearance">
         <source>Appearance</source>
         <extracomment>Section label</extracomment>
-        <translation type="unfinished">Utseende</translation>
+        <translation>Utseende</translation>
     </message>
     <message id="foilnotes-settings_page-grid_font_size-label">
         <source>Grid text size</source>
         <extracomment>Slider label</extracomment>
-        <translation type="unfinished">Rutnätstextstorlek</translation>
+        <translation>Miniatyrens textstorlek</translation>
     </message>
     <message id="foilnotes-settings_page-editor_font_size-label">
         <source>Editor text size</source>
         <extracomment>Slider label</extracomment>
-        <translation type="unfinished">Editor textstorlek</translation>
+        <translation>Redigerarens textstorlek</translation>
     </message>
     <message id="foilnotes-settings_page-section-security">
         <source>Security</source>
         <extracomment>Section label</extracomment>
-        <translation type="unfinished">Säkerhet</translation>
+        <translation>Säkerhet</translation>
     </message>
     <message id="foilnotes-settings_page-autolock-text">
         <source>Automatic locking</source>
@@ -435,22 +435,22 @@
     <message id="foilnotes-settings_page-autolock-description">
         <source>Automatically lock the notes when the screen is locked and require to enter Foil password after unlocking the screen.</source>
         <extracomment>Text switch description</extracomment>
-        <translation type="unfinished">Lås automatiskt anteckningar när skärmen är låst och uppmanas att ange Foil-lösenord efter att skärmen har låsts upp.</translation>
+        <translation>Låser automatiskt anteckningarna när skärmen är låst och kräver att Foil-lösenordet anges, efter att skärmen har låsts upp.</translation>
     </message>
     <message id="foilnotes-settings_page-autolock_delay-label">
         <source>Locking delay</source>
         <extracomment>Slider label</extracomment>
-        <translation type="unfinished">Låsningsfördröjning</translation>
+        <translation>Låsfördröjning</translation>
     </message>
     <message id="foilnotes-settings_page-autolock_delay-value-no_delay">
         <source>No delay</source>
         <extracomment>Slider value (no delay)</extracomment>
-        <translation type="unfinished">Ingen försening</translation>
+        <translation>Ingen fördröjning</translation>
     </message>
     <message id="foilnotes-settings_page-autolock_delay-value-min" numerus="yes">
         <source>%1 min</source>
         <extracomment>Slider value</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 min</numerusform>
             <numerusform>%1 min</numerusform>
         </translation>
@@ -458,7 +458,7 @@
     <message id="foilnotes-settings_page-autolock_delay-value-sec" numerus="yes">
         <source>%1 sec</source>
         <extracomment>Slider value</extracomment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 sek</numerusform>
             <numerusform>%1 sek</numerusform>
         </translation>
